@@ -1,0 +1,8 @@
+NSP_GCC_enabled_languages:
+  - "c"
+  - "c++"
+  - "fortran"
+
+NSP_GCC_create_module: true
+
+NSP_GCC_clean_build: true

@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+{{ ansible_managed | comment(beginning='##', end='##', decoration='#', prefix_count=0, postfix_count=0) }}
+
+# Only run if the script is being sourced
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  echo "ERROR: This script must be sourced!"
+  echo "usage: '. ./spacktivate'"
+  exit 1
+fi
+
+initialize_spack () {
+    source {{ [NSP_SPACK_root, 'configs/spack/share/spack/setup-env.sh'] | path_join }}
+    exit_code=${?}
+    if [ ${exit_code} -ne 0 ]; then
+        echo "ERROR: Spack initialization failed with exit code ${exit_code}"
+    else
+        echo "Spack initialized."
+    fi
+}
+
+reset_git () {
+    git -C {{ [NSP_SPACK_root, 'configs/spack'] | path_join }} restore .
+    for f in $(git -C {{ [NSP_SPACK_root, 'configs/spack'] | path_join }} status -s | awk '$1 == "??" {print $2}'); do
+        rm {{ [NSP_SPACK_root, 'configs/spack'] | path_join }}/${f}
+    done
+}
+
+{% for _SPACK_environment_name in NSP_SPACK_environments %}
+{% set _SPACK_environment_configuration = NSP_SPACK_environment_default | ansible.builtin.combine(NSP_SPACK_environments[_SPACK_environment_name], recursive=true) %}
+{{ _SPACK_environment_name }} () {
+    # configure git
+    {
+        reset_git
+        git -C {{ [NSP_SPACK_root, 'configs/spack'] | path_join }} checkout {{ _SPACK_environment_configuration.git_reference }};
+{% if _SPACK_environment_configuration.patch_file %}
+        git -C {{ [NSP_SPACK_root, 'configs/spack'] | path_join }} apply {{ [NSP_SPACK_root, 'configs', _SPACK_environment_name, 'patches', _SPACK_environment_configuration.patch_file] | path_join }};
+{% endif %}
+{% for patch_file in _SPACK_environment_configuration.package_patch_files %}
+        cp {{ [NSP_SPACK_root, 'configs', _SPACK_environment_name, 'patches', patch_file.file] | path_join }} {{ [NSP_SPACK_root, 'configs/spack/var/spack/repos/builtin/packages', patch_file.package] | path_join }};
+{% endfor %}
+
+    } > /dev/null 2>&1 || {
+        echo "ERROR: Git setup for spack failed!"
+    }
+
+    # configure spack
+    initialize_spack
+    spack env activate -d {{ [NSP_SPACK_root, 'configs', _SPACK_environment_name] | path_join }}
+    exit_code=${?}
+    if [ ${exit_code} -ne 0 ]; then
+        echo "ERROR: Environment activation failed with exit code ${exit_code}"
+    else
+        echo "{{ _SPACK_environment_name }} activated."
+    fi
+
+
+
+}
+
+{% endfor %}
+
+# despacktivate
+despacktivate > /dev/null 2>&1
+
+# Select environment and activate
+select TARGET_ENV in{% for env in NSP_SPACK_environments %} {{ env }}{% endfor %}; do
+    ${TARGET_ENV}
+    break
+done

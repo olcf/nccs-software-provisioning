@@ -1,0 +1,21 @@
+{{ ansible_managed | comment(beginning='--[[', end=']]--', decoration='', prefix_count=0, postfix_count=0) }}
+
+family("compiler")
+
+whatis("GCC compiler v{{ NSP_GCC_version }}")
+
+help("GCC compiler v{{ NSP_GCC_version }}")
+
+local base = "{{ NSP_install_root }}"
+local package = "gcc"
+local version = "{{ NSP_GCC_version }}"
+local prefix = pathJoin(base, package, version)
+
+prepend_path("PATH", pathJoin(prefix, 'bin'))
+prepend_path("LIBRARY_PATH", pathJoin(prefix, 'lib64'))
+prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, 'lib64'))
+prepend_path("C_INCLUDE_PATH", pathJoin(prefix, 'include'))
+prepend_path("CPLUS_INCLUDE_PATH", pathJoin(prefix, 'include'))
+prepend_path("MANPATH", pathJoin(prefix, 'share/man'))
+
+setenv("{{ NSP_site_name }}_" .. package:upper() .. "_ROOT",  prefix)

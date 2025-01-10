@@ -1,0 +1,13 @@
+NSP_install_root: "{{ ['/opt', NSP_system_name] | path_join }}"
+
+NSP_module_root: "{{ [NSP_install_root, 'modules'] | path_join }}"
+
+NSP_max_threads: "{{ [((ansible_processor_nproc * 0.75) | int | abs), 16] | min }}"
+
+NSP_scratch_directory: "{{ ['/tmp', ansible_user_id] | path_join }}"
+NSP_keep_scratch_clear: false
+
+NSP_user: "{{ ansible_user_uid }}"
+NSP_group: "{{ ansible_user_gid }}"
+NSP_file_permissions: "644"
+NSP_executable_permissions: "755"

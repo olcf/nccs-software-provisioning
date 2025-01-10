@@ -1,0 +1,100 @@
+- name: Load {{ _SPACK_environment.key }} Configuration
+  ansible.builtin.set_fact:
+    _SPACK_environment_name: "{{ _SPACK_environment.key }}"
+    _SPACK_environment_configuration:
+      "{{ NSP_SPACK_environment_default | ansible.builtin.combine(_SPACK_environment.value, recursive=true) }}"
+  tags:
+    - spack
+    - configuration
+    - "{{ _SPACK_environment.key }}"
+
+- name: Load {{ _SPACK_environment_name }} Variable(s)
+  ansible.builtin.include_vars:
+    file: "{{ [playbook_dir, 'spack/vars', '{}.yaml'.format(_SPACK_environment_name.split('-')[0])] | path_join }}"
+  when: "[playbook_dir, 'spack/vars', '{}.yaml'.format(_SPACK_environment_name.split('-')[0])] | path_join is file"
+  tags:
+    - spack
+    - configuration
+    - "{{ _SPACK_environment.key }}"
+
+- name: Create {{ _SPACK_environment_name }} Configuration Folder
+  ansible.builtin.file:
+    path: "{{ [NSP_SPACK_root, 'configs', _SPACK_environment_name] | path_join }}"
+    state: directory
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  tags:
+    - spack
+    - configuration
+    - "{{ _SPACK_environment.key }}"
+
+- name: Generate {{ _SPACK_environment_name }} Configuration File(s)
+  ansible.builtin.template:
+    src: "{{ '{}.yaml.j2'.format(item)
+            if item in _SPACK_environment_configuration.osp_templates
+            else
+            ([playbook_dir, 'spack/templates', '{}.yaml.j2'.format(item)] | path_join
+              if item in _SPACK_environment_configuration.shared_templates
+              else
+              [playbook_dir, 'spack/templates', _SPACK_environment_name, '{}.yaml.j2'.format(item)] | path_join) }}"
+    dest: "{{ [NSP_SPACK_root, 'configs', _SPACK_environment_name, '{}.yaml'.format(item)] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  loop: "{{ (_SPACK_environment_configuration.osp_templates +
+             _SPACK_environment_configuration.shared_templates +
+             _SPACK_environment_configuration.specific_templates) | unique }}"
+  tags:
+    - spack
+    - configuration
+    - "{{ _SPACK_environment.key }}"
+
+- name: Copy {{ _SPACK_environment_name }} Spack Lock File
+  ansible.builtin.copy:
+    src: "{{ [playbook_dir, 'spack/templates', _SPACK_environment_name, 'spack.lock'] | path_join }}"
+    dest: "{{ [NSP_SPACK_root, 'configs', _SPACK_environment_name, 'spack.lock'] | path_join }}"
+  when: "[playbook_dir, 'spack/templates', _SPACK_environment_name, 'spack.lock'] | path_join is file"
+  tags:
+    - spack
+    - installation
+    - "{{ _SPACK_environment.key }}"
+
+- name: Create {{ _SPACK_environment_name }} Patches Folder
+  ansible.builtin.file:
+    path: "{{ [NSP_SPACK_root, 'configs', _SPACK_environment_name, 'patches'] | path_join }}"
+    state: directory
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  tags:
+    - spack
+    - configuration
+    - "{{ _SPACK_environment.key }}"
+
+- name: Copy {{ _SPACK_environment_name }} Spack Patch File
+  ansible.builtin.copy:
+    src: "{{ [playbook_dir, 'spack/files', _SPACK_environment_configuration.patch_file] | path_join }}"
+    dest: "{{ [NSP_SPACK_root, 'configs', _SPACK_environment_name, 'patches',
+              _SPACK_environment_configuration.patch_file] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  when: _SPACK_environment_configuration.patch_file
+  tags:
+    - spack
+    - configuration
+    - "{{ _SPACK_environment.key }}"
+
+- name: Copy {{ _SPACK_environment_name }} Package Patch File(s)
+  ansible.builtin.copy:
+    src: "{{ [playbook_dir, 'spack/files', item.file] | path_join }}"
+    dest: "{{ [NSP_SPACK_root, 'configs', _SPACK_environment_name, 'patches', item.file] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  loop: "{{ _SPACK_environment_configuration.package_patch_files }}"
+  tags:
+    - spack
+    - configuration
+    - "{{ _SPACK_environment.key }}"

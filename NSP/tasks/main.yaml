@@ -1,0 +1,12 @@
+- name: Ensure Scratch Directory Exist
+  ansible.builtin.file:
+    path: "{{ NSP_scratch_directory }}"
+    state: directory
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+    recurse: false
+  tags:
+    - "NSP"
+    - "meta"
+    - "always"

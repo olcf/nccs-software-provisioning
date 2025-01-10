@@ -1,0 +1,59 @@
+- name: Fill Out User's Default Spack Configuration
+  ansible.builtin.set_fact:
+    NSP_SPACK_environment_default:
+      "{{ { 'git_reference': 'develop', 
+            'patch_file': false, 
+            'package_patch_files': [ ], 
+            'osp_templates': [ 'concretizer', 'config', 'modules' ], 
+            'shared_templates': [ 'compilers', 'packages' ], 
+            'specific_templates': [ 'spack' ]
+          } | ansible.builtin.combine(NSP_SPACK_environment_default, recursive=true) }}"
+  tags:
+    - spack
+    - configuration
+
+- name: Clone Spack Repository
+  ansible.builtin.git:
+    repo: "{{ NSP_SPACK_repo }}"
+    dest: "{{ [NSP_SPACK_root, 'configs/spack'] | path_join }}"
+    clone: "{{ NSP_SPACK_clone }}"  # noqa: latest
+    force: true
+    update: true
+  tags:
+    - spack
+    - configuration
+
+- name: Deploy Spack Extensions
+  ansible.builtin.copy:
+    src: "{{ item.location }}"
+    dest: "{{ [NSP_SPACK_root, 'configs/extensions'] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+    directory_mode: "{{ NSP_executable_permissions }}"
+  loop: "{{ NSP_SPACK_extensions }}"
+  tags:
+    - spack
+    - configuration
+
+- name: Configure Spack Environments
+  ansible.builtin.include_tasks:
+    file: configure_environment.yaml
+  loop: "{{ NSP_SPACK_environments | dict2items }}"
+  loop_control:
+    label: "{{ _SPACK_environment.key }}"
+    loop_var: _SPACK_environment
+  tags:
+    - spack
+    - configuration
+
+- name: Create Spacktivate Script
+  ansible.builtin.template:
+    src: spacktivate.sh.j2
+    dest: "{{ [NSP_SPACK_root, 'configs/spacktivate'] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  tags:
+    - spack
+    - configuration

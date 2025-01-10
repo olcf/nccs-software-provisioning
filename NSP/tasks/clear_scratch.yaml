@@ -1,0 +1,19 @@
+- name: "Remove Scratch Directory If It Exist"
+  ansible.builtin.file:
+    path: "{{ NSP_scratch_directory }}"
+    state: absent
+  tags:
+    - "NSP"
+    - "meta"
+
+- name: "Create Scratch Directory"
+  ansible.builtin.file:
+    path: "{{ NSP_scratch_directory }}"
+    state: directory
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+    recurse: false
+  tags:
+    - "NSP"
+    - "meta"

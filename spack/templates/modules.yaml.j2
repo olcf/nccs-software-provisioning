@@ -1,0 +1,60 @@
+{{ ansible_managed | comment(beginning='##', end='##', decoration='#', prefix_count=0, postfix_count=0) }}
+
+modules:
+  prefix_inspections:
+    bin:
+      - PATH
+    man:
+      - MANPATH
+    share/man:
+      - MANPATH
+    share/aclocal:
+      - ACLOCAL_PATH
+    lib:
+      - LD_LIBRARY_PATH
+    lib64:
+      - LD_LIBRARY_PATH
+    lib/pkgconfig:
+      - PKG_CONFIG_PATH
+    lib64/pkgconfig:
+      - PKG_CONFIG_PATH
+    share/pkgconfig:
+      - PKG_CONFIG_PATH
+    .:
+      - CMAKE_PREFIX_PATH
+  default:
+    roots:
+      lmod: {{ [NSP_SPACK_root, 'modules'] | path_join }}
+    enable:
+      - lmod
+    arch_folder: false
+    lmod:
+      core_compilers:: []
+      all:
+        environment:
+          set:
+            OLCF_{NAME}_ROOT: '{prefix}'
+        autoload: none
+        suffixes:
+          ^llvm-amdgpu: gpu
+          ^cuda: gpu
+          ^mpi: mpi
+          +openmp: omp
+          threads=omp: omp
+      exclude_implicits: true
+      verbose: true
+      exclude: [ ]
+      hash_length: 0
+      hierarchy:: [ ]
+      projections:
+        # CMG
+        ^llvm-amdgpu ^mpi: '{^mpi.name}-{^mpi.version}/rocm-{^llvm-amdgpu.version}/{compiler.name}-{compiler.version}/{name}/{version}'
+        ^cuda ^mpi: '{^mpi.name}-{^mpi.version}/cuda-{^cuda.version}/{compiler.name}-{compiler.version}/{name}/{version}'
+        # CG
+        ^llvm-amdgpu: 'rocm-{^llvm-amdgpu.version}/{compiler.name}-{compiler.version}/{name}/{version}'
+        ^cuda: 'cuda-{^cuda.version}/{compiler.name}-{compiler.version}/{name}/{version}'
+        # CM
+        ^mpi: '{^mpi.name}-{^mpi.version}/{compiler.name}-{compiler.version}/{name}/{version}'
+        # C
+        all: '{compiler.name}-{compiler.version}/{name}/{version}'
+      core_specs: []

@@ -1,0 +1,66 @@
+argument_specs:
+  main:
+    description:
+      - >-
+        Sets up needed infrastructure for the other NSP roles.
+        Including defining variables and creating the scratch directory.
+    options:
+      NSP_system_name:
+        type: "str"
+        required: true
+        description: "The system's name."
+      NSP_install_root:
+        type: "path"
+        required: false
+        default: "{{ ['/opt', NSP_system_name] | path_join }}"
+        description: "The path to NSP installed software."
+      NSP_module_root:
+        type: "path"
+        required: false
+        default: "{{ [NSP_install_root, 'modules'] | path_join }}"
+        description: "The path to NSP software modules."
+      NSP_max_threads:
+        type: "int"
+        required: false
+        default: "{{ [((ansible_processor_nproc * 0.75) | int | abs), 16] | min }}"
+        description: "Reasonable number of threads to use for building software."
+      NSP_scratch_directory:
+        type: "path"
+        required: false
+        default: "{{ ['/tmp', ansible_user_id] | path_join }}"
+        description: "Scratch directory to perform builds in."
+      NSP_keep_scratch_clear:
+        type: "bool"
+        required: false
+        default: false
+        description: "Toggle retention of scratch directory contents."
+      NSP_user:
+        type: "str"
+        required: false
+        default: "{{ ansible_user_uid }}"
+        description: "The user for the installation."
+      NSP_group:
+        type: "str"
+        required: false
+        default: "{{ ansible_user_gid }}"
+        description: "The group for the installation."
+      NSP_file_permissions:
+        type: "str"
+        required: false
+        default: "644"
+        description: "The permissions for files (non-executables)."
+      NSP_executable_permissions:
+        type: "str"
+        required: false
+        default: "755"
+        description: "The permissions for executables (including folders)."
+      NSP_help_email:
+        type: "str"
+        required: true
+        description: "Help email."
+      NSP_site_name:
+        type: str
+        description: "Name of HPC site."
+  clear_scratch:
+    description:
+      - "Clears the scratch directory."
