@@ -1,0 +1,10 @@
+- name: Deploy Files and Directories
+  ansible.builtin.include_tasks:
+    file: "{{ 'file.yaml' if [playbook_dir, 'files', _FILES_entry.src] | path_join is file else 'directory.yaml' }}"
+  loop: "{{ NSP_FILES_inventory }}"
+  loop_control:
+    label: "{{ _FILES_entry.dest }}"
+    loop_var: _FILES_entry
+  tags:
+    - files
+    - configuration

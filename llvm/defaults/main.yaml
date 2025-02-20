@@ -1,0 +1,15 @@
+# NSP_LLVM_version:
+NSP_LLVM_targets:
+  - X86
+NSP_LLVM_projects:
+  - clang
+  - lld
+  - openmp
+  - compiler-rt
+NSP_LLVM_runtimes:
+  - libcxx
+  - libcxxabi
+  - libunwind
+NSP_LLVM_create_module: true
+
+NSP_LLVM_clean_build: true

@@ -1,16 +1,12 @@
-- name: "Check for Previous GCC v{{ NSP_GCC_version }} Installation"
-  ansible.builtin.stat:
-    path: "{{ [NSP_install_root, 'gcc', NSP_GCC_version, 'bin', 'gcc'] | path_join }}"
-  register: install_status
-  tags: [ "gcc", "installation" ]
-
-- name: "Launch GCC v{{ NSP_GCC_version }} Installation"
+- name: Launch GCC v{{ NSP_GCC_version }} Install
   ansible.builtin.include_tasks:
     file: "install.yaml"
-  when: not install_status.stat.exists
-  tags: [ "gcc", "installation" ]
+  when: "not [NSP_install_root, 'gcc', NSP_GCC_version, 'bin'] | path_join is directory"
+  tags:
+    - gcc
+    - installation
 
-- name: "Ensure GCC v{{ NSP_GCC_version }} Module Folder Exists"
+- name: Create GCC Module Directory
   ansible.builtin.file:
     path: "{{ [NSP_module_root, 'gcc'] | path_join }}"
     state: directory
@@ -18,14 +14,18 @@
     group: "{{ NSP_group }}"
     mode: "{{ NSP_executable_permissions }}"
   when: NSP_GCC_create_module
-  tags: [ "gcc", "configuration" ]
+  tags:
+    - gcc
+    - configuration
 
-- name: "Ensure GCC v{{ NSP_GCC_version }} Module File Exists"
+- name: Generate GCC v{{ NSP_GCC_version }} Module File
   ansible.builtin.template:
-    src: "module.lua.j2"
+    src: module.lua.j2
     dest: "{{ [NSP_module_root, 'gcc', '{}.lua'.format(NSP_GCC_version)] | path_join }}"
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
   when: NSP_GCC_create_module
-  tags: [ "gcc", "configuration" ]
+  tags:
+    - gcc
+    - configuration

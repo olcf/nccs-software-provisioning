@@ -2,14 +2,14 @@ NSP_SPACK_root: "{{ [NSP_install_root, 'spack'] | path_join }}"
 NSP_SPACK_repo: "https://github.com/spack/spack.git"
 NSP_SPACK_clone: true
 
+# NSP_SPACK_versions
+# NSP_SPACK_environments
+
 NSP_SPACK_environment_default:
-  git_reference: develop
-  patch_file: false
-  package_patch_files: [ ]
+  spack_version: develop
+  extensions: []
   osp_templates: [ "concretizer", "config", "modules" ]
   shared_templates: [ "compilers", "packages" ]
   specific_templates: [ "spack" ]
 
-NSP_SPACK_extensions:
-  - name: "spack-olcf"
-    location: "spack-olcf"
+NSP_SPACK_extensions: [ ]

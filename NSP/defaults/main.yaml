@@ -1,4 +1,4 @@
-NSP_install_root: "{{ ['/opt', NSP_system_name] | path_join }}"
+NSP_install_root: "{{ ['/sw', NSP_system_name] | path_join }}"
 
 NSP_module_root: "{{ [NSP_install_root, 'modules'] | path_join }}"
 

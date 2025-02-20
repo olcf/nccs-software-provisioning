@@ -1,0 +1,37 @@
+{{ ansible_managed | comment(beginning="--[[", end="]]--", decoration="", prefix_count=0, postfix_count=0) }}
+
+family("compiler")
+
+whatis("LLVM v{{ NSP_LLVM_version }} Projects: {{ NSP_LLVM_projects }} Runtimes: {{ NSP_LLVM_runtimes }}")
+
+help("LLVM v{{ NSP_LLVM_version }} Projects: {{ NSP_LLVM_projects }} Runtimes: {{ NSP_LLVM_runtimes }}")
+
+local base = "{{ NSP_install_root }}"
+local package = "llvm"
+local version = "{{ NSP_LLVM_version }}"
+local prefix = pathJoin(base, package, version)
+
+-- Environment Globals
+prepend_path("PATH", pathJoin(prefix, "bin"))
+
+prepend_path("MANPATH", pathJoin(prefix, "share/man"))
+
+prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "lib"))
+prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "lib/clang/18/lib/x86_64-unknown-linux-gnu"))
+prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "lib/x86_64-unknown-linux-gnu"))
+
+prepend_path("LIBRARY_PATH", pathJoin(prefix, "lib"))
+prepend_path("LIBRARY_PATH", pathJoin(prefix, "lib/clang/18/lib/x86_64-unknown-linux-gnu"))
+prepend_path("LIBRARY_PATH", pathJoin(prefix, "lib/x86_64-unknown-linux-gnu"))
+
+prepend_path("CMAKE_PREFIX_PATH", prefix)
+
+prepend_path("C_INCLUDE_PATH", pathJoin(prefix, 'include'))
+prepend_path("C_INCLUDE_PATH", pathJoin(prefix, 'lib/clang/18/include'))
+
+prepend_path("CPLUS_INCLUDE_PATH", pathJoin(prefix, 'include'))
+prepend_path("CPLUS_INCLUDE_PATH", pathJoin(prefix, 'lib/clang/18/include'))
+
+-- OLCF specific Environment
+setenv("OLCF_" .. package:upper() .. "_ROOT",  prefix)
+

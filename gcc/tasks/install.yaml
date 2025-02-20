@@ -1,25 +1,23 @@
-- name: "Check for GCC v{{ NSP_GCC_version }} Source"
-  ansible.builtin.stat:
-    path: "{{ [NSP_scratch_directory, 'gcc-{}'.format(NSP_GCC_version)] | path_join }}"
-  register: source_status
-  tags: [ "gcc", "installation" ]
-
-- name: "Clear Previous GCC v{{ NSP_GCC_version }} Build Source"
+- name: Clear Previous GCC v{{ NSP_GCC_version }} Build Files
   ansible.builtin.file:
     path: "{{ [NSP_scratch_directory, 'gcc-{}'.format(NSP_GCC_version)] | path_join }}"
     state: absent
-  when: NSP_GCC_clean_build and source_status.stat.exists
-  tags: [ "gcc", "installation" ]
+  when: "NSP_GCC_clean_build and [NSP_scratch_directory, 'gcc-{}'.format(NSP_GCC_version)] | path_join is directory"
+  tags:
+    - gcc
+    - installation
 
-- name: "Download and Unpack GCC v{{ NSP_GCC_version }} Tarball"
+- name: Download and Unpack GCC v{{ NSP_GCC_version }} Tarball
   ansible.builtin.unarchive:
     remote_src: true
     src: "https://gcc.gnu.org/pub/gcc/releases/gcc-{{ NSP_GCC_version }}/gcc-{{ NSP_GCC_version }}.tar.gz"
     dest: "{{ NSP_scratch_directory }}"
-  when: not source_status.stat.exists or NSP_GCC_clean_build
-  tags: [ "gcc", "installation" ]
+  when: "not [NSP_scratch_directory, 'gcc-{}'.format(NSP_GCC_version)] | path_join is directory"
+  tags:
+    - gcc
+    - installation
 
-- name: "Build and Install GCC v{{ NSP_GCC_version }}"
+- name: Build and Install GCC v{{ NSP_GCC_version }}
   ansible.builtin.shell:
     cmd: |
       ./contrib/download_prerequisites
@@ -30,11 +28,15 @@
       make install
     chdir: "{{ [NSP_scratch_directory, 'gcc-{}'.format(NSP_GCC_version)] | path_join }}"
   changed_when: true
-  tags: [ "gcc", "installation" ]
+  tags:
+    - gcc
+    - installation
 
-- name: "Clean up Scratch after GCC v{{ NSP_GCC_version }} Build"
+- name: Clean up Scratch after GCC v{{ NSP_GCC_version }} Build
   ansible.builtin.include_role:
-    name: osp
+    name: NSP
     tasks_from: clear_scratch
   when: NSP_keep_scratch_clear
-  tags: [ "gcc", "installation" ]
+  tags:
+    - gcc
+    - installation

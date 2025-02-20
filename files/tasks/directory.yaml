@@ -1,0 +1,40 @@
+- name: Create {{ _FILES_entry.dest }}
+  ansible.builtin.file:
+    path: "{{ _FILES_entry.dest }}"
+    state: directory
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  tags:
+    - files
+    - configuration
+
+- name: Create Directories in {{ _FILES_entry.dest }}
+  ansible.builtin.file:
+    path: "{{ [_FILES_entry.dest, item.path] | path_join }}"
+    state: directory
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  with_community.general.filetree: "{{ [playbook_dir, 'files', _FILES_entry.src] | path_join }}"
+  loop_control:
+    label: "{{ item.path }}"
+  when: item.state == 'directory'
+  tags:
+    - files
+    - configuration
+
+- name: Generate Files in {{ _FILES_entry.dest }}
+  ansible.builtin.template:
+    src: "{{ [playbook_dir, 'files', _FILES_entry.src, item.path] | path_join }}"
+    dest: "{{ [_FILES_entry.dest, item.path] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  with_community.general.filetree: "{{ [playbook_dir, 'files', _FILES_entry.src] | path_join }}"
+  loop_control:
+    label: "{{ item.path }}"
+  when: item.state == 'file'
+  tags:
+    - files
+    - configuration

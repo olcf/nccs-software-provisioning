@@ -1,0 +1,38 @@
+- name: Clear Previous Lua Bootstrap Files
+  ansible.builtin.file:
+    path: "{{ [NSP_scratch_directory, 'lua-5.1.4.9'] | path_join }}"
+    state: absent
+  tags:
+    - lmod
+    - installation
+
+- name: Download and Unpack Lua Bootstrap Tarball
+  ansible.builtin.unarchive:
+    remote_src: true
+    src: "https://sourceforge.net/projects/lmod/files/lua-5.1.4.9.tar.bz2"
+    dest: "{{ NSP_scratch_directory }}"
+  tags:
+    - lmod
+    - installation
+
+- name: Build & Install Lua Bootstrap
+  ansible.builtin.shell:
+    cmd: |
+      ./configure --prefix={{ [NSP_install_root, 'lmod/bootstrap/lua/5.1.4.9'] | path_join }}
+      make
+      make install
+      ln -s {{ [NSP_install_root, 'lmod/bootstrap/lua/5.1.4.9'] | path_join }} \
+        {{ [NSP_install_root, 'lmod/bootstrap/lua/lua'] | path_join }}
+    chdir: "{{ [NSP_scratch_directory, 'lua-5.1.4.9'] | path_join }}"
+  tags:
+    - lmod
+    - installation
+
+- name: Clean up Scratch after Lua Bootstrap Build
+  ansible.builtin.include_role:
+    name: NSP
+    tasks_from: clear_scratch
+  when: NSP_keep_scratch_clear
+  tags:
+    - lmod
+    - installation

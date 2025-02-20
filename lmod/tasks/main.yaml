@@ -1,0 +1,84 @@
+- name: Create NSP_module_root Directory
+  ansible.builtin.file:
+    path: "{{ NSP_module_root }}"
+    state: directory
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  tags:
+    - lmod
+    - configuration
+
+- name: Create LMOD Directories
+  ansible.builtin.file:
+    path: "{{ [NSP_install_root, 'lmod', item] | path_join }}"
+    state: directory
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  loop:
+    - etc
+  tags:
+    - lmod
+    - configuration
+
+- name: Generate LMOD SitePackage File
+  ansible.builtin.template:
+    src: SitePackage.lua.j2
+    dest: "{{ [NSP_install_root, 'lmod/etc/SitePackage.lua'] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  tags:
+    - lmod
+    - configuration
+
+- name: Generate LMOD DefApps File
+  ansible.builtin.template:
+    src: DefApps.lua.j2
+    dest: "{{ [NSP_module_root, 'DefApps.lua'] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  tags:
+    - lmod
+    - configuration
+
+- name: Generate LMOD rc File
+  ansible.builtin.template:
+    src: "{{ [playbook_dir, 'lmod/rc.lua.j2'] | path_join }}"
+    dest: "{{ [NSP_install_root, 'lmod/etc/rc.lua'] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  tags:
+    - lmod
+    - configuration
+
+- name: Generate LMOD admin File
+  ansible.builtin.template:
+    src: "{{ [playbook_dir, 'lmod/admin.list.j2'] | path_join }}"
+    dest: "{{ [NSP_install_root, 'lmod/etc/admin.list'] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  tags:
+    - lmod
+    - configuration
+
+- name: Include Internal LMOD Tasks
+  ansible.builtin.include_tasks:
+    file: internal.yaml
+  when: NSP_LMOD_install_type == 'internal'
+  tags:
+    - lmod
+    - installation
+    - configuration
+
+- name: Included External LMOD Tasks
+  ansible.builtin.include_tasks:
+    file: external.yaml
+  when: NSP_LMOD_install_type == 'external'
+  tags:
+    - lmod
+    - configuration

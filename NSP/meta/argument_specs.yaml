@@ -12,7 +12,7 @@ argument_specs:
       NSP_install_root:
         type: "path"
         required: false
-        default: "{{ ['/opt', NSP_system_name] | path_join }}"
+        default: "{{ ['/sw', NSP_system_name] | path_join }}"
         description: "The path to NSP installed software."
       NSP_module_root:
         type: "path"

@@ -1,0 +1,22 @@
+- name: Create Supporting Directories for {{ _FILES_entry.dest }}
+  ansible.builtin.file:
+    path: "{{ _FILES_entry.dest | dirname }}"
+    state: directory
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  tags:
+    - files
+    - configuration
+
+- name: Generate {{ _FILES_entry.dest }}
+  ansible.builtin.template:
+    src: "{{ [playbook_dir, 'files', _FILES_entry.src] | path_join }}"
+    dest: "{{ _FILES_entry.dest }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  when: "[playbook_dir, 'files', _FILES_entry.src] | path_join is file"
+  tags:
+    - files
+    - configuration

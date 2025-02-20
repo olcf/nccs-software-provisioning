@@ -90,7 +90,5 @@ argument_specs:
       NSP_SPACK_extensions:
         type: list
         required: false
-        default:
-          - name: spack-olcf
-            location: spack-olcf
+        default: [ ]
         description: "Name and location of spack extensions."

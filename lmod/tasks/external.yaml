@@ -1,0 +1,37 @@
+- name: Insert LMOD Init profile Configuration
+  ansible.builtin.blockinfile:
+    block: |
+      export LMOD_SYSTEM_NAME={{ NSP_system_name }}
+      export LMOD_PACKAGE_PATH={{ [NSP_install_root, 'lmod/etc'] | path_join }}
+      export LMOD_AVAIL_STYLE=nsp-pretty:system
+      export LMOD_MODULERCFILE={{ [NSP_install_root, 'lmod/etc/rc.lua'] | path_join }}
+      module --initial_load --no_redirect restore
+    path: "{{ [NSP_install_root, 'init', 'profile'] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+    marker: "# {mark} LMOD MANAGED"
+    append_newline: true
+    prepend_newline: true
+  tags:
+    - lmod
+    - configuration
+
+- name: Insert LMOD Init cshrc Configuration
+  ansible.builtin.blockinfile:
+    block: |
+      setenv LMOD_SYSTEM_NAME {{ NSP_system_name }}
+      setenv LMOD_PACKAGE_PATH {{ [NSP_install_root, 'lmod/etc'] | path_join }}
+      setenv LMOD_AVAIL_STYLE nsp-pretty:system
+      setenv LMOD_MODULERCFILE {{ [NSP_install_root, 'lmod/etc/rc.lua'] | path_join }}
+      module --initial_load --no_redirect restore
+    path: "{{ [NSP_install_root, 'init', 'cshrc'] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+    marker: "# {mark} LMOD MANAGED"
+    append_newline: true
+    prepend_newline: true
+  tags:
+    - lmod
+    - configuration

@@ -1,0 +1,46 @@
+- name: Clear Previous LLVM v{{ NSP_LLVM_version }} Build Files
+  ansible.builtin.file:
+    path: "{{ [NSP_scratch_directory, 'llvm-project-llvmorg-{}'.format(NSP_LLVM_version)] | path_join }}"
+    state: absent
+  when: "NSP_LLVM_clean_build and [NSP_scratch_directory, 'llvm-project-llvmorg-{}'.format(NSP_LLVM_version)] | path_join is directory"
+  tags:
+    - llvm
+    - installation
+
+- name: Download and Unpack LLVM v{{ NSP_LLVM_version }} Tarball
+  ansible.builtin.unarchive:
+    remote_src: true
+    src: "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-{{ NSP_LLVM_version }}.tar.gz"
+    dest: "{{ NSP_scratch_directory }}"
+  when: "not [NSP_scratch_directory, 'llvm-project-llvmorg-{}'.format(NSP_LLVM_version)] | path_join is directory"
+  tags:
+    - llvm
+    - installation
+
+- name: Build and Install LLVM v{{ NSP_LLVM_version }}
+  ansible.builtin.shell:
+    cmd: |
+      cmake \
+      -S llvm \
+      -B build \
+      -DCMAKE_INSTALL_PREFIX={{ [NSP_install_root, 'llvm', NSP_LLVM_version] | path_join }} \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DLLVM_TARGETS_TO_BUILD='{{ ';'.join(NSP_LLVM_targets) }}' \
+      -DLLVM_ENABLE_PROJECTS='{{ ';'.join(NSP_LLVM_projects) }}' \
+      -DLLVM_ENABLE_RUNTIMES='{{ ';'.join(NSP_LLVM_runtimes) }}'
+      cmake --build build -j{{ NSP_max_threads }}
+      cmake --build build --target install
+    chdir: "{{ [NSP_scratch_directory, 'llvm-project-llvmorg-{}'.format(NSP_LLVM_version)] | path_join }}"
+  changed_when: true
+  tags:
+    - llvm
+    - installation
+
+- name: Clean up Scratch after LLVM v{{ NSP_LLVM_version }} Build
+  ansible.builtin.include_role:
+    name: NSP
+    tasks_from: clear_scratch
+  when: NSP_keep_scratch_clear
+  tags:
+    - llvm
+    - installation

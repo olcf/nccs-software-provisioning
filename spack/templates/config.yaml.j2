@@ -17,17 +17,18 @@ config:
   test_stage: {{ [NSP_scratch_directory, 'spack/test', _SPACK_environment_name] | path_join }}
   source_cache: {{ [NSP_SPACK_root, 'envs/scache'] | path_join }}
   misc_cache: {{ [NSP_SPACK_root, 'envs', _SPACK_environment_name, 'mcache'] | path_join }}
+{% if _SPACK_environment_configuration.extensions | length > 0 %}
 
   extensions:
-{% for ext in NSP_SPACK_extensions %}
-    - {{ [NSP_SPACK_root, 'configs/extensions', ext.name] | path_join }}
+{% endif %}
+{% for extension in _SPACK_environment_configuration.extensions %}
+    - {{ [NSP_SPACK_root, 'configs/extensions', extension] | path_join }}
 {% endfor %}
 
   connect_timeout: 10
   verify_ssl: true
   ssl_certs: $SSL_CERT_FILE
   suppress_gpg_warnings: false
-  install_missing_compilers: false
   checksum: true
   deprecated: false
   dirty: false
@@ -36,7 +37,6 @@ config:
   url_fetch_method: urllib
   build_jobs: {{ NSP_max_threads }}
   ccache: false
-  concretizer: clingo
   db_lock_timeout: 60
   package_lock_timeout: null
 

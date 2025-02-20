@@ -1,0 +1,53 @@
+- name: Configure Lua Bootstrap
+  ansible.builtin.include_tasks:
+    file: lua_bootstrap.yaml
+  when: "not [NSP_install_root, 'lmod/bootstrap/lua/lua/bin/lua'] | path_join is file"
+  tags:
+    - lmod
+    - installation
+
+- name: Clear Previous LMOD v{{ NSP_LMOD_version }} Build Files
+  ansible.builtin.file:
+    path: "{{ [NSP_scratch_directory, 'Lmod-{}'.format(NSP_LMOD_version)] | path_join }}"
+    state: absent
+  tags:
+    - lmod
+    - installation
+
+- name: Download and Unpack LMOD v{{ NSP_LMOD_version }} Tarball
+  ansible.builtin.unarchive:
+    remote_src: true
+    src: "https://github.com/TACC/Lmod/archive/refs/tags/{{ NSP_LMOD_version }}.tar.gz"
+    dest: "{{ NSP_scratch_directory }}"
+  tags:
+    - lmod
+    - installation
+
+- name: Build & Install LMOD v{{ NSP_LMOD_version }}
+  ansible.builtin.shell:
+    cmd: |
+      export PATH={{ [NSP_install_root, 'lmod/bootstrap/lua/lua/bin'] | path_join }}:$PATH
+      ./configure \
+      --prefix='{{ NSP_install_root }}' \
+      --with-siteName='{{ NSP_site_name }}' \
+      --with-syshost='{{ NSP_system_name }}' \
+      --with-tcl='{{ 'yes' if NSP_LMOD_enable_tcl else 'no' }}' \
+      --with-fastTCLInterp='no' \
+      --with-spiderCacheDir={{ [NSP_install_root, 'lmod/cache/cacheDir'] | path_join }} \
+      --with-updateSystemFn={{ [NSP_install_root, 'lmod/cache/system.txt'] | path_join }} \
+      --with-ModulePathInit={{ [NSP_install_root, 'lmod/etc/modulepath.default'] | path_join }} \
+      --with-lmodConfigDir={{ [NSP_install_root, 'lmod/etc'] | path_join }}
+      make install
+    chdir: "{{ [NSP_scratch_directory, 'Lmod-{}'.format(NSP_LMOD_version)] | path_join }}"
+  tags:
+    - lmod
+    - installation
+
+- name: Clean up Scratch after LMOD v{{ NSP_LMOD_version }} Build
+  ansible.builtin.include_role:
+    name: NSP
+    tasks_from: clear_scratch
+  when: NSP_keep_scratch_clear
+  tags:
+    - lmod
+    - installation
