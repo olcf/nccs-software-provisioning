@@ -262,7 +262,7 @@ should be placed in a directory named ``lmod`` that resides with your system pla
 
 :Type: **str**
 
-:Required: **true**
+:Required: **false**
 
 :Description: The version to install (only applies if :ref:`NSP_LMOD_install_type_variable` = ``internal``).
 
@@ -346,7 +346,7 @@ For example:
 
 .. code:: yaml
 
-    lmod_hierarchy:
+    NSP_LMOD_hierarchy:
       compiler:
         members: ['gcc', 'llvm']
         paths:
@@ -388,7 +388,7 @@ For example:
 
 .. code:: yaml
 
-    lmod_nv_mappings:
+    NSP_LMOD_nv_mappings:
         gcc-native/12.3.0: {name: 'gcc', version: '%s'} # maps to gcc/12.3.0
         # %s substitutes in the value from the system module
 
@@ -414,7 +414,7 @@ For example:
 
 .. code:: yaml
 
-    lmod_path_names:
+    NSP_LMOD_path_names:
       /opt/cray: "[ Cray Programming Environment ]"
 
 All modules that reside somewhere under ``/opt/cray`` will appear in the ``[ Cray Programming Environment ]``

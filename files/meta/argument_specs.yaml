@@ -1,0 +1,20 @@
+argument_specs:
+  main:
+    description:
+      - Deploys files and directories to specified locations. All of the source files should be stored in your home
+      - directory under a folder called ``files``.
+    options:
+      NSP_FILES_inventory:
+        type: list
+        elements: path
+        required: false
+        default: [ ]
+        description: >-
+          Mapping of file/directories and their target locations. Each entry is a dictionary that takes two keys
+          ``src`` and ``dest``.
+        raw: |-
+          .. code:: yaml
+
+              NSP_FILES_inventory:
+                - src: <some file or dir in `playbook_dir`/files>
+                  dest: <destination on machine>

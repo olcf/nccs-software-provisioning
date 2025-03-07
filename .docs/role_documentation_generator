@@ -65,7 +65,8 @@ if __name__ == "__main__":
                                     json_dumps(specs["argument_specs"]["main"]["options"][option]["choices"])
                                 )
                             ])
-                        if not specs["argument_specs"]["main"]["options"][option]["required"]:
+                        if (not specs["argument_specs"]["main"]["options"][option]["required"] and
+                                "default" in  specs["argument_specs"]["main"]["options"][option]):
                             roles_rst.extend([
                                 ":Default: ``{}``".format(
                                     json_dumps(

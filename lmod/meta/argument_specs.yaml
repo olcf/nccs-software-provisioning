@@ -25,7 +25,7 @@ argument_specs:
         description: This toggles the lmod role installing its own lmod or using an external installation.
       NSP_LMOD_version:
         type: str
-        required: true
+        required: false
         description: The version to install (only applies if :ref:`NSP_LMOD_install_type_variable` = ``internal``).
       NSP_LMOD_enable_tcl:
         type: bool
@@ -72,7 +72,7 @@ argument_specs:
 
           .. code:: yaml
 
-              lmod_hierarchy:
+              NSP_LMOD_hierarchy:
                 compiler:
                   members: ['gcc', 'llvm']
                   paths:
@@ -106,7 +106,7 @@ argument_specs:
 
           .. code:: yaml
 
-              lmod_nv_mappings:
+              NSP_LMOD_nv_mappings:
                   gcc-native/12.3.0: {name: 'gcc', version: '%s'} # maps to gcc/12.3.0
                   # %s substitutes in the value from the system module
 
@@ -124,7 +124,7 @@ argument_specs:
 
           .. code:: yaml
 
-              lmod_path_names:
+              NSP_LMOD_path_names:
                 /opt/cray: "[ Cray Programming Environment ]"
 
           All modules that reside somewhere under ``/opt/cray`` will appear in the ``[ Cray Programming Environment ]``
