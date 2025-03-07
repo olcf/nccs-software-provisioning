@@ -2,7 +2,8 @@
   ansible.builtin.file:
     path: "{{ [NSP_scratch_directory, 'llvm-project-llvmorg-{}'.format(NSP_LLVM_version)] | path_join }}"
     state: absent
-  when: "NSP_LLVM_clean_build and [NSP_scratch_directory, 'llvm-project-llvmorg-{}'.format(NSP_LLVM_version)] | path_join is directory"
+  when: "NSP_LLVM_clear_source and [NSP_scratch_directory, 'llvm-project-llvmorg-{}'.format(NSP_LLVM_version)]
+    | path_join is directory"
   tags:
     - llvm
     - installation
@@ -12,7 +13,7 @@
     remote_src: true
     src: "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-{{ NSP_LLVM_version }}.tar.gz"
     dest: "{{ NSP_scratch_directory }}"
-  when: "not [NSP_scratch_directory, 'llvm-project-llvmorg-{}'.format(NSP_LLVM_version)] | path_join is directory"
+  when: not [NSP_scratch_directory, 'llvm-project-llvmorg-{}'.format(NSP_LLVM_version)] | path_join is directory
   tags:
     - llvm
     - installation
@@ -38,7 +39,7 @@
 
 - name: Clean up Scratch after LLVM v{{ NSP_LLVM_version }} Build
   ansible.builtin.include_role:
-    name: NSP
+    name: nsp
     tasks_from: clear_scratch
   when: NSP_keep_scratch_clear
   tags:

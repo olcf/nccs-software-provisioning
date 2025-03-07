@@ -1,28 +1,28 @@
 argument_specs:
   main:
     description:
-      - "Installs gcc and optionally generates a module file."
+      - Installs GCC and optionally generates a module file.
     options:
       NSP_GCC_version:
-        type: "str"
+        type: str
         required: true
-        description: "The version to install."
+        description: The version to install.
       NSP_GCC_enabled_languages:
-        type: "list"
-        elements: "str"
+        type: list
+        elements: str
         required: false
         default:
-          - "c"
-          - "c++"
-          - "fortran"
-        description: "The languages that the build will support."
+          - c
+          - c++
+          - fortran
+        description: The languages that the build will support.
       NSP_GCC_create_module:
-        type: "bool"
+        type: bool
         required: false
         default: true
-        description: "Toggles module generation."
+        description: Toggles module generation.
       NSP_GCC_clear_source:
-        type: "bool"
+        type: bool
         required: false
         default: true
-        description: "Clear build source."
+        description: Clear previous build source files.

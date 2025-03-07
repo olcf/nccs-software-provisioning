@@ -51,6 +51,7 @@
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
+  when: "[playbook_dir, 'lmod/rc.lua.j2'] | path_join is file"
   tags:
     - lmod
     - configuration
@@ -62,6 +63,19 @@
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
+  when: "[playbook_dir, 'lmod/admin.list.j2'] | path_join is file"
+  tags:
+    - lmod
+    - configuration
+
+- name: Generate LMOD lmodrc File
+  ansible.builtin.template:
+    src: "{{ [playbook_dir, 'lmod/lmodrc.lua.j2'] | path_join }}"
+    dest: "{{ [NSP_install_root, 'lmod/etc/lmodrc.lua'] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  when: "[playbook_dir, 'lmod/lmodrc.lua.j2'] | path_join is file"
   tags:
     - lmod
     - configuration
@@ -69,7 +83,7 @@
 - name: Include Internal LMOD Tasks
   ansible.builtin.include_tasks:
     file: internal.yaml
-  when: NSP_LMOD_install_type == 'internal'
+  when: NSP_LMOD_install_type == "internal"
   tags:
     - lmod
     - installation
@@ -78,7 +92,7 @@
 - name: Included External LMOD Tasks
   ansible.builtin.include_tasks:
     file: external.yaml
-  when: NSP_LMOD_install_type == 'external'
+  when: NSP_LMOD_install_type == "external"
   tags:
     - lmod
     - configuration

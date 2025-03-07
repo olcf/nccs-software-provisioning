@@ -11,19 +11,19 @@
 
 - name: Generate profile
   ansible.builtin.template:
-    src: "profile.j2"
+    src: profile.j2
     dest: "{{ [NSP_install_root, 'init', 'profile'] | path_join }}"
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
-  when: "NSP_INIT_wipe or not [NSP_install_root, 'init', 'profile'] | path_join is file"
+  when: NSP_INIT_wipe or not [NSP_install_root, 'init', 'profile'] | path_join is file
   tags:
     - init
     - configuration
 
 - name: Add Contents to profile
   ansible.builtin.blockinfile:
-    block: "{{ lookup('template', [playbook_dir, 'init/profile'] | path_join) }}"
+    block: "{{ lookup('template', [playbook_dir, 'init/profile.j2'] | path_join) }}"
     path: "{{ [NSP_install_root, 'init', 'profile'] | path_join }}"
     marker: "# {mark} INIT MANAGED"
     append_newline: true
@@ -31,26 +31,25 @@
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
-  when: "[playbook_dir, 'init/profile'] | path_join is file"
   tags:
     - init
     - configuration
 
 - name: Generate cshrc
   ansible.builtin.template:
-    src: "cshrc.j2"
+    src: cshrc.j2
     dest: "{{ [NSP_install_root, 'init', 'cshrc'] | path_join }}"
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
-  when: "NSP_INIT_wipe or not [NSP_install_root, 'init', 'cshrc'] | path_join is file"
+  when: NSP_INIT_wipe or not [NSP_install_root, 'init', 'cshrc'] | path_join is file
   tags:
     - init
     - configuration
 
 - name: Add Contents to cshrc
   ansible.builtin.blockinfile:
-    block: "{{ lookup('file', [playbook_dir, 'init/cshrc'] | path_join) }}"
+    block: "{{ lookup('template', [playbook_dir, 'init/cshrc.j2'] | path_join) }}"
     path: "{{ [NSP_install_root, 'init', 'cshrc'] | path_join }}"
     marker: "# {mark} INIT MANAGED"
     append_newline: true
@@ -58,7 +57,6 @@
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
-  when: "[playbook_dir, 'init/cshrc'] | path_join is file"
   tags:
     - init
     - configuration

@@ -1,7 +1,7 @@
 - name: Configure Lua Bootstrap
   ansible.builtin.include_tasks:
     file: lua_bootstrap.yaml
-  when: "not [NSP_install_root, 'lmod/bootstrap/lua/lua/bin/lua'] | path_join is file"
+  when: not [NSP_install_root, 'lmod/bootstrap/lua/lua/bin/lua'] | path_join is file
   tags:
     - lmod
     - installation
@@ -32,20 +32,21 @@
       --with-siteName='{{ NSP_site_name }}' \
       --with-syshost='{{ NSP_system_name }}' \
       --with-tcl='{{ 'yes' if NSP_LMOD_enable_tcl else 'no' }}' \
-      --with-fastTCLInterp='no' \
+      --with-fastTCLInterp='{{ 'yes' if NSP_LMOD_enable_tcl else 'no' }}' \
       --with-spiderCacheDir={{ [NSP_install_root, 'lmod/cache/cacheDir'] | path_join }} \
       --with-updateSystemFn={{ [NSP_install_root, 'lmod/cache/system.txt'] | path_join }} \
       --with-ModulePathInit={{ [NSP_install_root, 'lmod/etc/modulepath.default'] | path_join }} \
       --with-lmodConfigDir={{ [NSP_install_root, 'lmod/etc'] | path_join }}
       make install
     chdir: "{{ [NSP_scratch_directory, 'Lmod-{}'.format(NSP_LMOD_version)] | path_join }}"
+  changed_when: true
   tags:
     - lmod
     - installation
 
 - name: Clean up Scratch after LMOD v{{ NSP_LMOD_version }} Build
   ansible.builtin.include_role:
-    name: NSP
+    name: nsp
     tasks_from: clear_scratch
   when: NSP_keep_scratch_clear
   tags:

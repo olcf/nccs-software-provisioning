@@ -1,7 +1,7 @@
-- name: Install LMOD v{{ NSP_LMOD_version }}
+- name: Launch LMOD v{{ NSP_LMOD_version }} Install
   ansible.builtin.include_tasks:
     file: install.yaml
-  when: "not [NSP_install_root, 'lmod', NSP_LMOD_version] | path_join is directory"
+  when: not [NSP_install_root, 'lmod', NSP_LMOD_version] | path_join is directory
   tags:
     - lmod
     - installation
@@ -21,6 +21,9 @@
   ansible.builtin.template:
     src: modulepath.default.j2
     dest: "{{ [NSP_install_root, 'lmod/etc/modulepath.default'] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
   tags:
     - lmod
     - configuration
@@ -33,13 +36,15 @@
           clearLmod -q > /dev/null 2>&1
           unset LMOD_MODULEPATH_INIT
       fi
-      
+
       export LMOD_SYSTEM_NAME={{ NSP_system_name }}
       export LMOD_SYSTEM_DEFAULT_MODULES=DefApps
       export LMOD_PACKAGE_PATH={{ [NSP_install_root, 'lmod/etc'] | path_join }}
       export LMOD_AVAIL_STYLE=nsp-pretty:system
       export LMOD_MODULERCFILE={{ [NSP_install_root, 'lmod/etc/rc.lua'] | path_join }}
-      
+      export LMOD_ADMIN_FILE={{ [NSP_install_root, 'lmod/etc/admin.list'] | path_join }}
+      export LMOD_RC={{ [NSP_install_root, 'lmod/etc/lmodrc.lua'] | path_join }}
+
       source {{ [NSP_install_root, 'lmod/lmod/init/profile'] | path_join }}
       module --initial_load --no_redirect restore
     path: "{{ [NSP_install_root, 'init', 'profile'] | path_join }}"
@@ -61,13 +66,15 @@
           clearLmod -q >&/dev/null
           unset LMOD_MODULEPATH_INIT
       endif
-      
+
       setenv LMOD_SYSTEM_NAME {{ NSP_system_name }}
       setenv LMOD_SYSTEM_DEFAULT_MODULES DefApps
       setenv LMOD_PACKAGE_PATH {{ [NSP_install_root, 'lmod/etc'] | path_join }}
       setenv LMOD_AVAIL_STYLE nsp-pretty:system
       setenv LMOD_MODULERCFILE {{ [NSP_install_root, 'lmod/etc/rc.lua'] | path_join }}
-      
+      setenv LMOD_ADMIN_FILE {{ [NSP_install_root, 'lmod/etc/admin.list'] | path_join }}
+      setenv LMOD_RC {{ [NSP_install_root, 'lmod/etc/lmodrc.lua'] | path_join }}
+
       source {{ [NSP_install_root, 'lmod/lmod/init/cshrc'] | path_join }}
       module --initial_load --no_redirect restore
     path: "{{ [NSP_install_root, 'init', 'cshrc'] | path_join }}"

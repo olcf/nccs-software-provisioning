@@ -1,0 +1,18 @@
+argument_specs:
+  main:
+    description:
+      - The init role initializes the system init scripts and adds your content to them.
+      - To add contents, create a directory called ``init`` in the directory that contains your playbook.
+      - In the ``init`` directory create the files ``profile.j2`` and ``cshrc.j2`` with your desired content.
+      - ""
+      - |-
+          .. note::
+
+             The ``init`` directory and accompanying files are completely optional. Without them, blank init script
+             will be created.
+    options:
+      NSP_INIT_wipe:
+        type: bool
+        required: false
+        default: false
+        description: Wipe and recreate the init scripts on every run.

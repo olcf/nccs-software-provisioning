@@ -5,6 +5,9 @@
       export LMOD_PACKAGE_PATH={{ [NSP_install_root, 'lmod/etc'] | path_join }}
       export LMOD_AVAIL_STYLE=nsp-pretty:system
       export LMOD_MODULERCFILE={{ [NSP_install_root, 'lmod/etc/rc.lua'] | path_join }}
+      export LMOD_ADMIN_FILE={{ [NSP_install_root, 'lmod/etc/admin.list'] | path_join }}
+      export LMOD_RC={{ [NSP_install_root, 'lmod/etc/lmodrc.lua'] | path_join }}
+
       module --initial_load --no_redirect restore
     path: "{{ [NSP_install_root, 'init', 'profile'] | path_join }}"
     owner: "{{ NSP_user }}"
@@ -24,6 +27,9 @@
       setenv LMOD_PACKAGE_PATH {{ [NSP_install_root, 'lmod/etc'] | path_join }}
       setenv LMOD_AVAIL_STYLE nsp-pretty:system
       setenv LMOD_MODULERCFILE {{ [NSP_install_root, 'lmod/etc/rc.lua'] | path_join }}
+      setenv LMOD_ADMIN_FILE {{ [NSP_install_root, 'lmod/etc/admin.list'] | path_join }}
+      setenv LMOD_RC {{ [NSP_install_root, 'lmod/etc/lmodrc.lua'] | path_join }}
+
       module --initial_load --no_redirect restore
     path: "{{ [NSP_install_root, 'init', 'cshrc'] | path_join }}"
     owner: "{{ NSP_user }}"

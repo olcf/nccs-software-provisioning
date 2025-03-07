@@ -1,3 +1,5 @@
+# NSP_GCC_version
+
 NSP_GCC_enabled_languages:
   - "c"
   - "c++"

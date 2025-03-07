@@ -4,3 +4,4 @@ var_naming_pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$"
 # skip_list
 skip_list:
   - "name[template]"
+  - "schema[role-arg-spec]"

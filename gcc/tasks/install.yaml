@@ -2,7 +2,7 @@
   ansible.builtin.file:
     path: "{{ [NSP_scratch_directory, 'gcc-{}'.format(NSP_GCC_version)] | path_join }}"
     state: absent
-  when: "NSP_GCC_clean_build and [NSP_scratch_directory, 'gcc-{}'.format(NSP_GCC_version)] | path_join is directory"
+  when: NSP_GCC_clean_build and [NSP_scratch_directory, 'gcc-{}'.format(NSP_GCC_version)] | path_join is directory
   tags:
     - gcc
     - installation
@@ -12,7 +12,7 @@
     remote_src: true
     src: "https://gcc.gnu.org/pub/gcc/releases/gcc-{{ NSP_GCC_version }}/gcc-{{ NSP_GCC_version }}.tar.gz"
     dest: "{{ NSP_scratch_directory }}"
-  when: "not [NSP_scratch_directory, 'gcc-{}'.format(NSP_GCC_version)] | path_join is directory"
+  when: not [NSP_scratch_directory, 'gcc-{}'.format(NSP_GCC_version)] | path_join is directory
   tags:
     - gcc
     - installation
@@ -34,7 +34,7 @@
 
 - name: Clean up Scratch after GCC v{{ NSP_GCC_version }} Build
   ansible.builtin.include_role:
-    name: NSP
+    name: nsp
     tasks_from: clear_scratch
   when: NSP_keep_scratch_clear
   tags:

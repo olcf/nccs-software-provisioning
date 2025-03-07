@@ -1,0 +1,46 @@
+- name: Delete Previous MINIFORGE3 v{{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }} Install Script
+  ansible.builtin.file:
+    path: "{{ [NSP_scratch_directory, 'Miniforge3-{}-{}-Linux-{}.sh'.format(NSP_MINIFORGE3_version,
+      NSP_MINIFORGE3_revision, ansible_architecture)] | path_join }}"
+    state: absent
+  when: "NSP_MINIFORGE3_clean_install and [NSP_scratch_directory,
+    'Miniforge3-{}-{}-Linux-{}.sh'.format(NSP_MINIFORGE3_version, NSP_MINIFORGE3_revision, ansible_architecture)]
+    | path_join is directory"
+  tags:
+    - miniforge3
+    - installation
+
+- name: Download MINIFORGE3 v{{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }} Install Script
+  ansible.builtin.get_url:
+    url: "https://github.com/conda-forge/miniforge/releases/download/\
+      {{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }}/\
+      Miniforge3-{{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }}-Linux-{{ ansible_architecture }}.sh"
+    dest: "{{ NSP_scratch_directory }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  when: "not [NSP_scratch_directory, 'Miniforge3-{}-{}-Linux-{}.sh'.format(NSP_MINIFORGE3_version,
+    NSP_MINIFORGE3_revision, ansible_architecture)] | path_join is directory"
+  tags:
+    - miniforge3
+    - installation
+
+- name: Install MINIFORGE3 v{{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }}
+  ansible.builtin.command:
+    cmd: "bash {{ [NSP_scratch_directory, 'Miniforge3-{}-{}-Linux-{}.sh'.format(NSP_MINIFORGE3_version,
+      NSP_MINIFORGE3_revision, ansible_architecture)] | path_join }} -b
+      -p {{ [NSP_install_root, 'miniforge3', '{}-{}'.format(NSP_MINIFORGE3_version, NSP_MINIFORGE3_revision)]
+      | path_join }}"
+  changed_when: true
+  tags:
+    - miniforge3
+    - installation
+
+- name: Clean up Scratch after MINIFORGE3 v{{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }} Install
+  ansible.builtin.include_role:
+    name: nsp
+    tasks_from: clear_scratch
+  when: NSP_keep_scratch_clear
+  tags:
+    - miniforge3
+    - installation

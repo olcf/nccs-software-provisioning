@@ -1,0 +1,8 @@
+# NSP_MINIFORGE3_version
+NSP_MINIFORGE3_revision: "0"
+
+NSP_MINIFORGE3_base_packages: [ ]
+
+NSP_MINIFORGE3_clean_install: true
+
+NSP_MINIFORGE3_create_module: true

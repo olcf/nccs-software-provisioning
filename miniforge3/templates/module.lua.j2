@@ -1,0 +1,28 @@
+{{ ansible_managed | comment(beginning="--[[", end="]]--", decoration="", prefix_count=0, postfix_count=0) }}
+
+family("python")
+
+whatis("Name : Miniforge")
+whatis("Miniforge Version : {{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }}")
+whatis("Short description : The Miniforge Python distribution")
+
+help("The Miniforge Python distribution")
+
+local base = "{{ NSP_install_root}}"
+local package = "miniforge3"
+local version = "{{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }}"
+local prefix = pathJoin(base, package, version)
+
+prepend_path("PATH", pathJoin(prefix, "bin"), ":")
+prepend_path("MANPATH", pathJoin(prefix, "share/man"), ":")
+
+unsetenv("PYTHONSTARTUP")
+
+local user_home = os.getenv("HOME") or ""
+if user_home ~= "" then
+    setenv("PYTHONUSERBASE",
+        pathJoin(user_home, ".local", package, version)
+    )
+end
+
+setenv(string.upper("{{ NSP_site_name }}_") .. package:upper() .. "_ROOT",  prefix)

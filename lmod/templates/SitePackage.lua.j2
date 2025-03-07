@@ -1,6 +1,7 @@
 {{ ansible_managed | comment(beginning="--[[", end="]]--", decoration="", prefix_count=0, postfix_count=0) }}
 
 --------------------------------------------------------------------------
+-- this really needs to be refactored
 -- @module SitePackage
 
 require("strict")
@@ -941,7 +942,7 @@ function log_module_loads(UsrCmd)
 
     -- log the loads
     local curl_cmd = string.format(
-        "curl --max-time 3 -X 'POST' '{{ lmod_logging_url }}' -H 'accept: application/json' -H 'Content-Type: application/json' -d '%s' > /dev/null 2>&1",
+        "curl --max-time 3 -X 'POST' '{{ NSP_LMOD_logging_url }}' -H 'accept: application/json' -H 'Content-Type: application/json' -d '%s' > /dev/null 2>&1",
         json.encode(gl_load_logs)
     )
     os.execute(curl_cmd)

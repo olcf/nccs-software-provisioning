@@ -1,0 +1,94 @@
+#!/usr/bin/env python3
+
+from pathlib import Path
+from yaml import safe_load as yaml_safe_load
+from json import dumps as json_dumps
+
+if __name__ == "__main__":
+    print("--- generating documentation for NSP roles ---")
+
+    roles_rst = [
+        "",
+        "Ansible Roles",
+        "=============",
+        "",
+        "Documentation for NSP ansible roles.",
+        ""
+    ]
+
+    roles = list(Path(__file__).parent.parent.iterdir())
+    roles.sort()
+    for path in roles:
+        if path.is_dir() and path.name[0] != ".":
+            roles_rst.extend([
+                "-" * 80,
+                "",
+                ".. _{}_role:".format(path.name),
+                "",
+                path.name,
+                "-" * len(path.name),
+                "",
+            ])
+
+            if path.joinpath("meta/argument_specs.yaml").is_file():
+                with open(path.joinpath("meta/argument_specs.yaml"), "r") as fi:
+                    specs = yaml_safe_load(fi)
+
+                    # description
+                    roles_rst.extend(["`Description`", "^^^^^^^^^^^^^", ""])
+                    roles_rst.extend(specs["argument_specs"]["main"]["description"])
+                    roles_rst.append("")
+
+                    # options
+                    roles_rst.extend(["`Variables`", "^^^^^^^^^^^", ""])
+                    for option in specs["argument_specs"]["main"]["options"]:
+                        roles_rst.extend([
+                            ".. _{}_variable:".format(option),
+                            "",
+                            "``{}``".format(option),
+                            '"' * (len(option) + 4),
+                            "",
+                            ":Type: **{}**".format(
+                                specs["argument_specs"]["main"]["options"][option]["type"]
+                            ),
+                            "",
+                            ":Required: **{}**".format(
+                                json_dumps(
+                                    specs["argument_specs"]["main"]["options"][option]["required"]
+                                )
+                            ),
+                            "",
+                        ])
+                        if "choices" in specs["argument_specs"]["main"]["options"][option]:
+                            roles_rst.extend([
+                                ":Allowed Values: ``{}``".format(
+                                    json_dumps(specs["argument_specs"]["main"]["options"][option]["choices"])
+                                )
+                            ])
+                        if not specs["argument_specs"]["main"]["options"][option]["required"]:
+                            roles_rst.extend([
+                                ":Default: ``{}``".format(
+                                    json_dumps(
+                                        specs["argument_specs"]["main"]["options"][option]["default"]
+                                    )
+                                ),
+                                "",
+                            ])
+                        roles_rst.extend([
+                            ":Description: {}".format(
+                                specs["argument_specs"]["main"]["options"][option]["description"]
+                            ),
+                            "",
+                        ])
+                        if "raw" in specs["argument_specs"]["main"]["options"][option]:
+                            roles_rst.extend([
+                                specs["argument_specs"]["main"]["options"][option]["raw"],
+                                "",
+                            ])
+
+    print("--- writing out documentation for NSP roles ---")
+    out_dir = Path(__file__).parent.joinpath("source/reference")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    with open(out_dir.joinpath("roles.rst"), "w") as fo:
+        for i in range(len(roles_rst)):
+            fo.write(roles_rst[i] + "\n" if i < len(roles_rst) - 1 else roles_rst[i])

@@ -1,0 +1,70 @@
+- name: Launch MINIFORGE3 v{{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }} Install
+  ansible.builtin.include_tasks:
+    file: "install.yaml"
+  when: "not [NSP_install_root, 'miniforge3', '{}-{}'.format(NSP_MINIFORGE3_version, NSP_MINIFORGE3_revision), 'bin']
+    | path_join is directory"
+  tags:
+    - miniforge3
+    - installation
+
+- name: Create MINIFORGE3 Module Directory
+  ansible.builtin.file:
+    path: "{{ [NSP_module_root, 'miniforge3'] | path_join }}"
+    state: directory
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  when: NSP_MINIFORGE3_create_module
+  tags:
+    - miniforge3
+    - configuration
+
+- name: Generate MINIFORGE3 v{{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }} Module File
+  ansible.builtin.template:
+    src: module.lua.j2
+    dest: "{{ [NSP_module_root, 'miniforge3', '{}-{}.lua'.format(NSP_MINIFORGE3_version, NSP_MINIFORGE3_revision)]
+      | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  when: NSP_MINIFORGE3_create_module
+  tags:
+    - miniforge3
+    - configuration
+
+- name: Generate MINIFORGE3 v{{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }} .condarc File
+  ansible.builtin.template:
+    src: condarc.j2
+    dest: "{{ [NSP_install_root, 'miniforge3', '{}-{}'.format(NSP_MINIFORGE3_version, NSP_MINIFORGE3_revision),
+      '.condarc'] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  tags:
+    - miniforge3
+    - configuration
+
+- name: Inventory MINIFORGE3 v{{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }} Base Packages
+  ansible.builtin.shell:  # noqa risky-shell-pipe
+    cmd: "export PATH={{ [NSP_install_root, 'miniforge3',
+      '{}-{}'.format(NSP_MINIFORGE3_version, NSP_MINIFORGE3_revision), 'bin'] | path_join }}:$PATH\n
+      source deactivate\n
+      conda list | awk 'NR > 3 {print $1}' | grep -E
+      '^({% for package in NSP_MINIFORGE3_base_packages %}{{ package }}|{% endfor %})$' | wc -l"
+  register: base_package_num
+  changed_when: (NSP_MINIFORGE3_base_packages | list | length) != (base_package_num.stdout | int)
+  tags:
+    - miniforge3
+    - configuration
+
+- name: Install MINIFORGE3 v{{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }} Base Packages
+  ansible.builtin.shell:
+    cmd: "export PATH={{ [NSP_install_root, 'miniforge3', '{}-{}'.format(NSP_MINIFORGE3_version,
+      NSP_MINIFORGE3_revision), 'bin'] | path_join }}:$PATH\n
+      source deactivate\n
+      conda install -y{% for package in NSP_MINIFORGE3_base_packages %} {{ package }}{% endfor %}"
+  when: (NSP_MINIFORGE3_base_packages | list | length) != (base_package_num.stdout | int)
+  changed_when: (NSP_MINIFORGE3_base_packages | list | length) != (base_package_num.stdout | int)
+  tags:
+    - miniforge3
+    - configuration

@@ -47,7 +47,7 @@ rules:
     forbid-scientific-notation: false
     require-numeral-before-decimal: true
   line-length:
-    max: 130
+    max: 120
     level: warning
   new-line-at-end-of-file: enable
   new-lines:

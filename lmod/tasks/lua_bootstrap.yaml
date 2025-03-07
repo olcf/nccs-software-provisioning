@@ -24,13 +24,14 @@
       ln -s {{ [NSP_install_root, 'lmod/bootstrap/lua/5.1.4.9'] | path_join }} \
         {{ [NSP_install_root, 'lmod/bootstrap/lua/lua'] | path_join }}
     chdir: "{{ [NSP_scratch_directory, 'lua-5.1.4.9'] | path_join }}"
+  changed_when: true
   tags:
     - lmod
     - installation
 
 - name: Clean up Scratch after Lua Bootstrap Build
   ansible.builtin.include_role:
-    name: NSP
+    name: nsp
     tasks_from: clear_scratch
   when: NSP_keep_scratch_clear
   tags:

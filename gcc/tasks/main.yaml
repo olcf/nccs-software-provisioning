@@ -1,7 +1,7 @@
 - name: Launch GCC v{{ NSP_GCC_version }} Install
   ansible.builtin.include_tasks:
     file: "install.yaml"
-  when: "not [NSP_install_root, 'gcc', NSP_GCC_version, 'bin'] | path_join is directory"
+  when: not [NSP_install_root, 'gcc', NSP_GCC_version, 'bin'] | path_join is directory
   tags:
     - gcc
     - installation

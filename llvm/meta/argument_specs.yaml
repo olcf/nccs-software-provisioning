@@ -1,0 +1,38 @@
+argument_specs:
+  main:
+    description:
+      - Installs LLVM and optionally generates a module file.
+    options:
+      NSP_LLVM_version:
+        type: str
+        required: true
+        description: The version to install.
+      NSP_LLVM_projects:
+        type: list
+        elements: str
+        required: false
+        default:
+          - clang
+          - lld
+          - openmp
+          - compiler-rt
+        description: LLVM projects to build.
+      NSP_LLVM_runtimes:
+        type: list
+        elements: str
+        required: false
+        default:
+          - libcxx
+          - libcxxabi
+          - libunwind
+        description: Library runtimes to build.
+      NSP_LLVM_create_module:
+        type: bool
+        required: false
+        default: true
+        description: Toggles module generation.
+      NSP_LLVM_clear_source:
+        type: bool
+        required: false
+        default: true
+        description: Clear previous build source files.

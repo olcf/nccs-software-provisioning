@@ -1,7 +1,7 @@
 - name: Launch LLVM v{{ NSP_LLVM_version }} Install
   ansible.builtin.include_tasks:
     file: install.yaml
-  when: "not [NSP_install_root, 'llvm', NSP_LLVM_version, 'bin'] | path_join is directory"
+  when: not [NSP_install_root, 'llvm', NSP_LLVM_version, 'bin'] | path_join is directory
   tags:
     - llvm
     - installation

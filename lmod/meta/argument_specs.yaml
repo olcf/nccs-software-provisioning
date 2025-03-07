@@ -1,0 +1,151 @@
+argument_specs:
+  main:
+    description:
+      - The lmod role configures and under certain circumstances installs lmod.
+      - The main part of the configuration is a custom lmod hook that can be configured to look for modules in spack
+      - projections and add paths to ``MODULEPATH`` when appropriate. It also supports having custom lmod
+      - "`rc.lua <https://lmod.readthedocs.io/en/latest/093_modulerc.html>`_,"
+      - "`admin.list <https://lmod.readthedocs.io/en/latest/140_deprecating_modules.html>`_, and"
+      - "`lmodrc.lua <https://lmod.readthedocs.io/en/latest/145_properties.html>`_ files. These files"
+      - should be placed in a directory named ``lmod`` that resides with your system playbook.
+      - ""
+      - |-
+          .. note::
+
+              The ``lmod`` directory and accompanying files are completely optional. If no template files are provided
+              the lmod role will skip generating them.
+      # TODO
+    options:
+      NSP_LMOD_install_type:
+        type: str
+        choices:
+          - "internal"
+          - "external"
+        required: true
+        description: This toggles the lmod role installing its own lmod or using an external installation.
+      NSP_LMOD_version:
+        type: str
+        required: true
+        description: The version to install (only applies if :ref:`NSP_LMOD_install_type_variable` = ``internal``).
+      NSP_LMOD_enable_tcl:
+        type: bool
+        required: false
+        default: false
+        description: >-
+          Build support for tcl module files (only applies if :ref:`NSP_LMOD_install_type_variable` = ``internal``).
+      NSP_LMOD_default_modules:
+        type: list
+        elements: str
+        required: false
+        default: [ ]
+        description: A list of modules to load in the ``DefApps`` module.
+        raw: |-
+          .. note::
+
+              If you are installing lmod with NSP then the ``DefApps`` module will be set to load automatically.
+              If you are using an external lmod installation you will have to configure loading ``DefApps`` outside
+              of NSP.
+      NSP_LMOD_default_module_paths:
+        type: list
+        elements: str
+        required: false
+        default: [ ]
+        description: >-
+          List of paths to add to ``MODULEPATH`` (only applies if :ref:`NSP_LMOD_install_type_variable` = ``internal``).
+        raw: |- # noqa schema[role-arg-spec]
+          .. note::
+
+              The path in ``NSP_module_root`` will automatically be added. So, there is no need to add it
+              to ``NSP_LMOD_default_module_paths``.
+      NSP_LMOD_spack_modules:
+        type: path
+        required: false
+        default: "{{ [NSP_SPACK_root | default([NSP_install_root, 'spack'] | path_join), 'modules'] | path_join }}"
+        description: Path to the spack generated module files.
+      NSP_LMOD_hierarchy:
+        type: dict
+        required: false
+        default: { }
+        description: This variable holds a list of components for module projections.
+        raw: |-
+          For example:
+
+          .. code:: yaml
+
+              lmod_hierarchy:
+                compiler:
+                  members: ['gcc', 'llvm']
+                  paths:
+                    - {path: '|compiler.name|-|compiler.version|', weight: 20}
+                    - {path: '|mpi.name|-|mpi.version|/|compiler.name|-|compiler.version|', weight: 30}
+                  level: 0
+                mpi:
+                  members: ['openmpi', 'mpich']
+                  paths:
+                    - {path: '|mpi.name|-|mpi.version|/|compiler.name|-|compiler.version|', weight: 30}
+                  level: 1
+
+          Notice the two components named ``compiler`` and ``mpi``. Each component has a list of ``members``. These
+          members are the names of modules that belong to that component. In the module files for these members,
+          they should share the same ``family("...")`` so that they are mutually exclusive. For each component we
+          also define a list of ``paths``. These paths template the paths that the hook should add/remove from
+          ``MODULEPATH``. Take for example the first path defined for compiler. If ``gcc/12.3.0`` were loaded then
+          ``|compiler.name|-|compiler.version|`` would become ``gcc-12.3.0``. These paths are combined with
+          :ref:`NSP_LMOD_spack_modules_variable` to create the final path to add to ``MODULEPATH``. If
+          :ref:`NSP_LMOD_enable_spack_compiler_projections_variable` is set then additional parts are added to the path
+          to accommodate spack's automatic additions for compiler and version. Each path also has an associated
+          ``weight``. The last item in each component is ``level`` which sets the order that the different component
+          members are printed in the lmdo header for ``module avail``.
+      NSP_LMOD_nv_mappings:
+        type: dict
+        required: false
+        default: { }
+        description: Converts module names to their package names in spack.
+        raw: |-
+          For example:
+
+          .. code:: yaml
+
+              lmod_nv_mappings:
+                  gcc-native/12.3.0: {name: 'gcc', version: '%s'} # maps to gcc/12.3.0
+                  # %s substitutes in the value from the system module
+
+          Sometimes, spack uses a different name for a package than the system does. For example, on Cray systems we
+          now have ``gcc-native`` but spack just uses ``gcc``. By default the hook will not pick up on the difference.
+          In order to fix this problem you can define an entry here that will remap a module name to the spack
+          equivalent.
+      NSP_LMOD_path_names:
+        type: dict
+        required: false
+        default: [ ]
+        description: Defines lmod section header names for paths that meet the specified regexes.
+        raw: |-
+          For example:
+
+          .. code:: yaml
+
+              lmod_path_names:
+                /opt/cray: "[ Cray Programming Environment ]"
+
+          All modules that reside somewhere under ``/opt/cray`` will appear in the ``[ Cray Programming Environment ]``
+          section when using ``module avail``.
+      NSP_LMOD_enable_spack_compiler_projections:
+        type: bool
+        required: false
+        default: true
+        description: >-
+          Toggles that addition of paths in the hook that spack's automatic additions for compiler and version.
+        raw: |-
+          .. caution::
+
+              When in doubt, leave this variable with its default value.
+      NSP_LMOD_enable_logging:
+        type: bool
+        required: false
+        default: false
+        description: Enable logging of module loads.
+      NSP_LMOD_logging_url:
+        type: str
+        required: false
+        default: "http://localhost:8080/"
+        description: API URL to send module loads to.

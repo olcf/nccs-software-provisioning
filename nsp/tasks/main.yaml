@@ -7,6 +7,6 @@
     mode: "{{ NSP_executable_permissions }}"
     recurse: false
   tags:
-    - "NSP"
-    - "meta"
-    - "always"
+    - nps
+    - meta
+    - always
