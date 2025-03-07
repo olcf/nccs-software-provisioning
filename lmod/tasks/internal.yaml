@@ -62,7 +62,7 @@
   ansible.builtin.blockinfile:
     block: |
       type module >&/dev/null
-      if ($status != 0) then
+      if ($status == 0) then
           clearLmod -q >&/dev/null
           unset LMOD_MODULEPATH_INIT
       endif
