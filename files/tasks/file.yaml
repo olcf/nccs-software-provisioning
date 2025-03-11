@@ -15,7 +15,8 @@
     dest: "{{ _FILES_entry.dest }}"
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
-    mode: "{{ NSP_file_permissions }}"
+    mode: "{{ NSP_file_permissions if not _FILES_entry.file_permissions is defined
+      else _FILES_entry.file_permissions }}"
   when: "[playbook_dir, 'files', _FILES_entry.src] | path_join is file"
   tags:
     - files

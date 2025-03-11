@@ -19,7 +19,7 @@
   with_community.general.filetree: "{{ [playbook_dir, 'files', _FILES_entry.src] | path_join }}"
   loop_control:
     label: "{{ item.path }}"
-  when: item.state == 'directory'
+  when: item.state == "directory"
   tags:
     - files
     - configuration
@@ -30,11 +30,12 @@
     dest: "{{ [_FILES_entry.dest, item.path] | path_join }}"
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
-    mode: "{{ NSP_file_permissions }}"
+    mode: "{{ NSP_file_permissions if not _FILES_entry.file_permissions is defined
+      else _FILES_entry.file_permissions }}"
   with_community.general.filetree: "{{ [playbook_dir, 'files', _FILES_entry.src] | path_join }}"
   loop_control:
     label: "{{ item.path }}"
-  when: item.state == 'file'
+  when: item.state == "file"
   tags:
     - files
     - configuration

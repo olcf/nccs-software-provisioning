@@ -10,11 +10,13 @@ argument_specs:
         required: false
         default: [ ]
         description: >-
-          Mapping of file/directories and their target locations. Each entry is a dictionary that takes two keys
-          ``src`` and ``dest``.
+          Mapping of file/directories and their target locations. Each entry is a dictionary that takes two mandatory
+          keys ``src`` and ``dest`` and one optional key ``file_permissions``. ``file_permissions`` overrides the value
+          of :ref:`NSP_file_permissions_variable`.
         raw: |-
           .. code:: yaml
 
               NSP_FILES_inventory:
                 - src: <some file or dir in `playbook_dir`/files>
                   dest: <destination on machine>
+                  file_permissions: <unix permission string>
