@@ -796,14 +796,14 @@ For example:
 For each environment you should create a directory with the same name in the playbook directory under
 ``spack/environments``.
 
-``spack_version`` should reference a spack version defined in 
+``spack_version`` should reference a spack version defined in
 :ref:`NSP_SPACK_versions_variable` and ``extensions`` should be a list of extensions that can be found
 in the playbook directory under ``spack/extensions``.
 
 We like to split our spack configuration for each environment into multiple files. ``specific_templates``
-are templates that are specific to each environment. They should be places under 
-``spack/environments/<environment_name>``. Shared templates are used by all of the environments and should
+are templates that are specific to each environment. They should be places under
+``spack/environments/<environment_name>``. ``shared_templates`` are used by all of the environments and should
 be placed under ``spack/environments``. There is a third catagory of templates that should not go into your
 configuration but is important to know about. We call them ``nsp_templates`` these are templates that are
-shared by all environment but instead of being in you playbook directory they are provided by the spack role 
+shared by all environment but instead of being in you playbook directory they are provided by the spack role
 itself.

@@ -1,8 +1,9 @@
 argument_specs:
   main:
     description:
-      - >-
-        The spack role templates spack environments for deployment.
+      - The spack role templates spack environments for deployment. If you have any spack extentions they should be
+      - placed in the playbook directory under ``spack/extentions``. All patch files should go in the playbook
+      - directory under ``spack/patches``.
     options:
       NSP_SPACK_root:
         type: path
@@ -13,82 +14,49 @@ argument_specs:
         type: str
         required: false
         default: "https://github.com/spack/spack.git"
-        description:  "The Spack git repo to clone."
-      NSP_SPACK_environment_default:
+        description: "The Spack repo to clone."
+      NSP_SPACK_versions:
         type: dict
-        required: false
-        default:
-          git_reference: develop
-          patch_file: false
-          package_patch_files: [ ]
-          osp_templates: [ "concretizer", "config", "modules" ]
-          shared_templates: [ "compilers", "packages" ]
-          specific_templates: [ "spack" ]
-        description: "The default environment configuration. This configuration will be merged with the configuration from NSP_SPACK_environments for each environment."
-        options:
-          git_reference:
-            type: str
-            required: false
-            default: develop
-            description: "Sets the Spack git reference for the environment."
-          patch_file:
-            type: str
-            required: false
-            default: false
-            description: "The patch file for the spack git repo."
-          package_patch_files:
-            type: list
-            elements: dict
-            required: false
-            default: [ ]
-            description: "List of patch files for spack packages"
-          osp_templates:
-            type: list
-            elements: str
-            choices:
-              - "concretizer"
-              - "config"
-              - "modules"
-            required: false
-            default:
-              - "concretizer"
-              - "config"
-              - "modules"
-            description: "Templates the use from NSP provided."
-          shared_templates:
-            type: list
-            elements: str
-            choices:
-              - "compilers"
-              - "concretizer"
-              - "config"
-              - "modules"
-              - "packages"
-            required: false
-            default:
-              - "compilers"
-              - "packages"
-            description: "Templates that are shared between the environments."
-          specific_templates:
-            type: list
-            elements: str
-            choices:
-              - "compilers"
-              - "concretizer"
-              - "config"
-              - "modules"
-              - "packages"
-              - "spack"
-            required: false
-            default:
-              - "spack"
-            description: "Templates that are specific to the environment."
+        required: true
+        description: >-
+          Defines available spack versions for the environments.
+        raw: |-
+          .. code:: yaml
+
+              NSP_SPACK_versions:
+                v0.23.1:
+                  git_reference: 2bfcc69
+                  patch: v0.23.1.patch
       NSP_SPACK_environments:
         type: dict
         required: true
-        description: "Defines the spack environments to deploy. Will override the default configuration from NSP_SPACK_environment_default."
-      NSP_SPACK_extensions:
-        type: list
-        required: false
-        default: [ ]
-        description: "Name and location of spack extensions."
+        description: "Defines spack environments."
+        raw: |-
+          For example:
+
+          .. code:: yaml
+
+              NSP_SPACK_environments:
+                example_env:
+                  spack_version: v0.23.1
+                  extensions:
+                    - spack-olcf
+                  specific_templates:
+                    - packages
+                  shared_templates:
+                    - mirrors
+
+          For each environment you should create a directory with the same name in the playbook directory under
+          ``spack/environments``.
+
+          ``spack_version`` should reference a spack version defined in
+          :ref:`NSP_SPACK_versions_variable` and ``extensions`` should be a list of extensions that can be found
+          in the playbook directory under ``spack/extensions``.
+
+          We like to split our spack configuration for each environment into multiple files. ``specific_templates``
+          are templates that are specific to each environment. They should be places under
+          ``spack/environments/<environment_name>``. ``shared_templates`` are used by all of the environments and should
+          be placed under ``spack/environments``. There is a third catagory of templates that should not go into your
+          configuration but is important to know about. We call them ``nsp_templates`` these are templates that are
+          shared by all environments but instead of being in your playbook directory they are provided by the spack role
+          itself.

@@ -1,4 +1,4 @@
-{{ ansible_managed | comment(beginning='##', end='##', decoration='#', prefix_count=0, postfix_count=0) }}
+{{ ansible_managed | comment(beginning="##", end="##", decoration="#", prefix_count=0, postfix_count=0) }}
 
 modules:
   prefix_inspections:
@@ -24,7 +24,7 @@ modules:
       - CMAKE_PREFIX_PATH
   default:
     roots:
-      lmod: {{ [NSP_SPACK_root, 'modules'] | path_join }}
+      lmod: {{ [NSP_SPACK_root, "modules"] | path_join }}
     enable:
       - lmod
     arch_folder: false
@@ -33,7 +33,7 @@ modules:
       all:
         environment:
           set:
-            OLCF_{NAME}_ROOT: '{prefix}'
+            OLCF_{NAME}_ROOT: "{prefix}"
         autoload: none
         suffixes:
           ^llvm-amdgpu: gpu
@@ -48,13 +48,13 @@ modules:
       hierarchy:: [ ]
       projections:
         # CMG
-        ^llvm-amdgpu ^mpi: '{^mpi.name}-{^mpi.version}/rocm-{^llvm-amdgpu.version}/{compiler.name}-{compiler.version}/{name}/{version}'
-        ^cuda ^mpi: '{^mpi.name}-{^mpi.version}/cuda-{^cuda.version}/{compiler.name}-{compiler.version}/{name}/{version}'
+        ^llvm-amdgpu ^mpi: "{^mpi.name}-{^mpi.version}/rocm-{^llvm-amdgpu.version}/{compiler.name}-{compiler.version}/{name}/{version}"
+        ^cuda ^mpi: "{^mpi.name}-{^mpi.version}/cuda-{^cuda.version}/{compiler.name}-{compiler.version}/{name}/{version}"
         # CG
-        ^llvm-amdgpu: 'rocm-{^llvm-amdgpu.version}/{compiler.name}-{compiler.version}/{name}/{version}'
-        ^cuda: 'cuda-{^cuda.version}/{compiler.name}-{compiler.version}/{name}/{version}'
+        ^llvm-amdgpu: "rocm-{^llvm-amdgpu.version}/{compiler.name}-{compiler.version}/{name}/{version}"
+        ^cuda: "cuda-{^cuda.version}/{compiler.name}-{compiler.version}/{name}/{version}"
         # CM
-        ^mpi: '{^mpi.name}-{^mpi.version}/{compiler.name}-{compiler.version}/{name}/{version}'
+        ^mpi: "{^mpi.name}-{^mpi.version}/{compiler.name}-{compiler.version}/{name}/{version}"
         # C
-        all: '{compiler.name}-{compiler.version}/{name}/{version}'
+        all: "{compiler.name}-{compiler.version}/{name}/{version}"
       core_specs: []

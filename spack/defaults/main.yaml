@@ -4,12 +4,3 @@ NSP_SPACK_clone: true
 
 # NSP_SPACK_versions
 # NSP_SPACK_environments
-
-NSP_SPACK_environment_default:
-  spack_version: develop
-  extensions: []
-  osp_templates: [ "concretizer", "config", "modules" ]
-  shared_templates: [ "compilers", "packages" ]
-  specific_templates: [ "spack" ]
-
-NSP_SPACK_extensions: [ ]

@@ -4,7 +4,7 @@
     _SPACK_environment_configuration:
       "{{ {
             'extensions': [],
-            'osp_templates': [ 'concretizer', 'config', 'modules' ],
+            'nsp_templates': [ 'concretizer', 'config', 'modules' ],
             'shared_templates': [ 'compilers', 'packages' ],
             'specific_templates': [ 'spack' ]
           } | ansible.builtin.combine(_SPACK_environment.value, list_merge='append_rp', recursive=true) }}"
@@ -36,20 +36,24 @@
 
 - name: Generate {{ _SPACK_environment_name }} Configuration File(s)
   ansible.builtin.template:
-    src: "{{ '{}.yaml.j2'.format(item)
-            if item in _SPACK_environment_configuration.osp_templates
+    src: "{{
+          [playbook_dir, 'spack/environments', _SPACK_environment_name, '{}.yaml.j2'.format(item)] | path_join
+          if item in _SPACK_environment_configuration.specific_templates
+          else
+          (
+            [playbook_dir, 'spack/environments', '{}.yaml.j2'.format(item)] | path_join
+            if item in _SPACK_environment_configuration.shared_templates
             else
-            ([playbook_dir, 'spack/environments', '{}.yaml.j2'.format(item)] | path_join
-              if item in _SPACK_environment_configuration.shared_templates
-              else
-              [playbook_dir, 'spack/environments', _SPACK_environment_name, '{}.yaml.j2'.format(item)] | path_join) }}"
+            '{}.yaml.j2'.format(item)
+          )
+         }}"
     dest: "{{ [NSP_SPACK_root, 'configs', _SPACK_environment_name, '{}.yaml'.format(item)] | path_join }}"
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
-  loop: "{{ (_SPACK_environment_configuration.osp_templates +
+  loop: "{{ (_SPACK_environment_configuration.specific_templates +
              _SPACK_environment_configuration.shared_templates +
-             _SPACK_environment_configuration.specific_templates) | unique }}"
+             _SPACK_environment_configuration.nsp_templates) | unique }}"
   tags:
     - spack
     - configuration
@@ -59,6 +63,9 @@
   ansible.builtin.copy:
     src: "{{ [playbook_dir, 'spack/environments', _SPACK_environment_name, 'spack.lock'] | path_join }}"
     dest: "{{ [NSP_SPACK_root, 'configs', _SPACK_environment_name, 'spack.lock'] | path_join }}"
+  owner: "{{ NSP_user }}"
+  group: "{{ NSP_group }}"
+  mode: "{{ NSP_file_permissions }}"
   when: "[playbook_dir, 'spack/environments', _SPACK_environment_name, 'spack.lock'] | path_join is file"
   tags:
     - spack
