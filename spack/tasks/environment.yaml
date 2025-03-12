@@ -63,9 +63,9 @@
   ansible.builtin.copy:
     src: "{{ [playbook_dir, 'spack/environments', _SPACK_environment_name, 'spack.lock'] | path_join }}"
     dest: "{{ [NSP_SPACK_root, 'configs', _SPACK_environment_name, 'spack.lock'] | path_join }}"
-  owner: "{{ NSP_user }}"
-  group: "{{ NSP_group }}"
-  mode: "{{ NSP_file_permissions }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
   when: "[playbook_dir, 'spack/environments', _SPACK_environment_name, 'spack.lock'] | path_join is file"
   tags:
     - spack
