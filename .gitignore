@@ -3,3 +3,6 @@
 
 # build files
 .docs/build
+
+# ignore generate roles.rst
+.docs/source/reference/roles.rst
