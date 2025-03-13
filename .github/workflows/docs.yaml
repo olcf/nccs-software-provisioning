@@ -39,7 +39,7 @@ jobs:
           pip install PyYaml sphinx sphinx_copybutton sphinx_rtd_theme
       - name: Build Docs
         run: |
-          cd docs && make html
+          cd .docs && make html
       - name: Upload HTML Files
         uses: actions/upload-pages-artifact@v3
         with:
