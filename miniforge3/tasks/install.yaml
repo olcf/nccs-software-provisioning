@@ -1,10 +1,10 @@
 - name: Delete Previous MINIFORGE3 v{{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }} Install Script
   ansible.builtin.file:
     path: "{{ [NSP_scratch_directory, 'Miniforge3-{}-{}-Linux-{}.sh'.format(NSP_MINIFORGE3_version,
-      NSP_MINIFORGE3_revision, ansible_architecture)] | path_join }}"
+      NSP_MINIFORGE3_revision, NSP_architecture)] | path_join }}"
     state: absent
   when: "NSP_MINIFORGE3_clean_install and [NSP_scratch_directory,
-    'Miniforge3-{}-{}-Linux-{}.sh'.format(NSP_MINIFORGE3_version, NSP_MINIFORGE3_revision, ansible_architecture)]
+    'Miniforge3-{}-{}-Linux-{}.sh'.format(NSP_MINIFORGE3_version, NSP_MINIFORGE3_revision, NSP_architecture)]
     | path_join is directory"
   tags:
     - miniforge3
@@ -14,13 +14,13 @@
   ansible.builtin.get_url:
     url: "https://github.com/conda-forge/miniforge/releases/download/\
       {{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }}/\
-      Miniforge3-{{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }}-Linux-{{ ansible_architecture }}.sh"
+      Miniforge3-{{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }}-Linux-{{ NSP_architecture }}.sh"
     dest: "{{ NSP_scratch_directory }}"
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_executable_permissions }}"
   when: "not [NSP_scratch_directory, 'Miniforge3-{}-{}-Linux-{}.sh'.format(NSP_MINIFORGE3_version,
-    NSP_MINIFORGE3_revision, ansible_architecture)] | path_join is directory"
+    NSP_MINIFORGE3_revision, NSP_architecture)] | path_join is directory"
   tags:
     - miniforge3
     - installation
@@ -28,7 +28,7 @@
 - name: Install MINIFORGE3 v{{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }}
   ansible.builtin.command:
     cmd: "bash {{ [NSP_scratch_directory, 'Miniforge3-{}-{}-Linux-{}.sh'.format(NSP_MINIFORGE3_version,
-      NSP_MINIFORGE3_revision, ansible_architecture)] | path_join }} -b
+      NSP_MINIFORGE3_revision, NSP_architecture)] | path_join }} -b
       -p {{ [NSP_install_root, 'miniforge3', '{}-{}'.format(NSP_MINIFORGE3_version, NSP_MINIFORGE3_revision)]
       | path_join }}"
   changed_when: true

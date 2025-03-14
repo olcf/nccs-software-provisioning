@@ -60,6 +60,11 @@ argument_specs:
         required: false
         default: "755"
         description: The unix permissions for executables (including folders).
+      NSP_architecture:
+        type: str
+        required: false
+        default: "{{ ansible_architecture }}"
+        description: Hardware architecture to target.
   clear_scratch:
     description:
       - "Clears the scratch directory."

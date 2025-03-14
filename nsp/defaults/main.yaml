@@ -15,3 +15,5 @@ NSP_user: "{{ ansible_user_uid }}"
 NSP_group: "{{ ansible_user_gid }}"
 NSP_file_permissions: "644"
 NSP_executable_permissions: "755"
+
+NSP_architecture: "{{ ansible_architecture }}"
