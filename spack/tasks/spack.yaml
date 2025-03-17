@@ -3,9 +3,9 @@
     cmd: |
       set -o pipefail
       exit_code=0;
-      for f in $(git -C {{ [NSP_SPACK_root, 'configs/spack-{}'.format(_SPACK_version.key)] | path_join }} status -s \
-          | awk '$1 == "??" {print $2}'); do
-          rm -rf {{ [NSP_SPACK_root, 'configs/spack-{}'.format(_SPACK_version.key)] | path_join }}/${f};
+      for f in $(git -C {{ [NSP_SPACK_config_directory, 'spack-{}'.format(_SPACK_version.key)] | path_join }} \
+        status -s | awk '$1 == "??" {print $2}'); do
+          rm -rf {{ [NSP_SPACK_config_directory, 'spack-{}'.format(_SPACK_version.key)] | path_join }}/${f};
           exit_code=3;
       done;
       exit ${exit_code};
@@ -13,7 +13,7 @@
   register: result
   changed_when: result.rc == 3
   failed_when: result.rc != 0 and result.rc != 3
-  when: "[NSP_SPACK_root, 'configs/spack-{}'.format(_SPACK_version.key)] | path_join is directory
+  when: "[NSP_SPACK_config_directory, 'spack-{}'.format(_SPACK_version.key)] | path_join is directory
     and not ansible_check_mode"
   tags:
     - spack
@@ -23,7 +23,7 @@
 - name: Clone Spack Repository {{ _SPACK_version.key }}({{ _SPACK_version.value.git_reference }})
   ansible.builtin.git:
     repo: "{{ NSP_SPACK_repo }}"
-    dest: "{{ [NSP_SPACK_root, 'configs/spack-{}'.format(_SPACK_version.key)] | path_join }}"
+    dest: "{{ [NSP_SPACK_config_directory, 'spack-{}'.format(_SPACK_version.key)] | path_join }}"
     clone: "{{ NSP_SPACK_clone }}"
     force: true
     update: true
@@ -37,7 +37,7 @@
 - name: Patch Spack Repository {{ _SPACK_version.key }}({{ _SPACK_version.value.git_reference }})
   ansible.posix.patch:
     src: "{{ [playbook_dir, 'spack/patches', _SPACK_version.value.patch] | path_join }}"
-    basedir: "{{ [NSP_SPACK_root, 'configs/spack-{}'.format(_SPACK_version.key)] | path_join }}"
+    basedir: "{{ [NSP_SPACK_config_directory, 'spack-{}'.format(_SPACK_version.key)] | path_join }}"
     strip: 1
   when: _SPACK_version.value.patch is defined and _SPACK_version.value.patch and not ansible_check_mode
   tags:

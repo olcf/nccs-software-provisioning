@@ -18,7 +18,7 @@ declare -A data=(
 select TARGET_ENV in "${!data[@]}" ; do
     TARGET_VERSION="${data[$TARGET_ENV]}"
     # Initialize Spack
-    source {{ [NSP_SPACK_root, "configs"] | path_join }}/spack-${TARGET_VERSION}/share/spack/setup-env.sh
+    source {{ NSP_SPACK_config_directory }}/spack-${TARGET_VERSION}/share/spack/setup-env.sh
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
         echo "ERROR: Spack initialization failed with exit code $exit_code"
@@ -27,7 +27,7 @@ select TARGET_ENV in "${!data[@]}" ; do
     fi
 
     # Activate environment
-    spack env activate -d {{ [NSP_SPACK_root, "configs"] | path_join }}/$TARGET_ENV
+    spack env activate -d {{ NSP_SPACK_config_directory }}/$TARGET_ENV
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
         echo "ERROR: Environment activation failed with exit code $exit_code"

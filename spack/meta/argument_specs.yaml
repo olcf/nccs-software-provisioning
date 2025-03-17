@@ -5,11 +5,11 @@ argument_specs:
       - placed in the playbook directory under ``spack/extentions``. All patch files should go in the playbook
       - directory under ``spack/patches``.
     options:
-      NSP_SPACK_root:
+      NSP_SPACK_config_directory:
         type: path
         required: false
         default: "{{ [NSP_install_root, 'spack'] | path_join }}"
-        description: "This sets the root directory to deploy spack in."
+        description: "The target directory for spack configuration files."
       NSP_SPACK_repo:
         type: str
         required: false

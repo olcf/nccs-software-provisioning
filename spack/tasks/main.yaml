@@ -12,7 +12,7 @@
 - name: Deploy Spack Extensions
   ansible.builtin.copy:
     src: "{{ [playbook_dir, 'spack/extensions'] | path_join }}/"
-    dest: "{{ [NSP_SPACK_root, 'configs/extensions'] | path_join }}/"
+    dest: "{{ [NSP_SPACK_config_directory, 'extensions'] | path_join }}/"
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
@@ -36,7 +36,7 @@
 - name: Create Spacktivate Script
   ansible.builtin.template:
     src: spacktivate.sh.j2
-    dest: "{{ [NSP_SPACK_root, 'configs/spacktivate'] | path_join }}"
+    dest: "{{ [NSP_SPACK_config_directory, 'spacktivate'] | path_join }}"
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_executable_permissions }}"
