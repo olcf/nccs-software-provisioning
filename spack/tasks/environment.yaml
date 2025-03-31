@@ -1,7 +1,7 @@
 - name: Load {{ _SPACK_environment.key }} Configuration
   ansible.builtin.set_fact:
     _SPACK_environment_name: "{{ _SPACK_environment.key }}"
-    _SPACK_environment_configuration:
+    _SPACK_environment_configuration: # noqa: jinja[spacing]
       "{{ {
             'extensions': [ ],
             'shared_templates': [ ],

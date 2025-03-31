@@ -1,9 +1,11 @@
 argument_specs:
   main:
     description:
-      - The spack role templates spack environments for deployment. If you have any spack extentions they should be
-      - placed in the playbook directory under ``spack/extentions``. All patch files should go in the playbook
-      - directory under ``spack/patches``.
+      - The spack role templates spack environments for deployment.
+      - ""
+      - If you have any spack extentions they should be placed in the playbook directory under ``spack/extentions``.
+      - Extensions will be deployed in ``"{{ [NSP_SPACK_config_directory, 'extensions'] | path_join }}"`` .
+      - All Spack patch files should go in the playbook directory under ``spack/patches``.
     options:
       NSP_SPACK_config_directory:
         type: path

@@ -60,7 +60,7 @@ argument_specs:
       NSP_LMOD_spack_modules:
         type: path
         required: false
-        default: "{{ [NSP_SPACK_root | default([NSP_install_root, 'spack'] | path_join), 'modules'] | path_join }}"
+        default: "{{ [NSP_install_root, 'spack/modules'] | path_join }}"
         description: Path to the spack generated module files.
       NSP_LMOD_hierarchy:
         type: dict
@@ -95,7 +95,7 @@ argument_specs:
           :ref:`NSP_LMOD_enable_spack_compiler_projections_variable` is set then additional parts are added to the path
           to accommodate spack's automatic additions for compiler and version. Each path also has an associated
           ``weight``. The last item in each component is ``level`` which sets the order that the different component
-          members are printed in the lmdo header for ``module avail``.
+          members are printed in the lmod header for ``module avail``.
       NSP_LMOD_nv_mappings:
         type: dict
         required: false

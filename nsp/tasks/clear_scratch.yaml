@@ -2,6 +2,7 @@
   ansible.builtin.file:
     path: "{{ NSP_scratch_directory }}"
     state: absent
+  changed_when: false
   tags:
     - nsp
     - meta
@@ -15,6 +16,7 @@
     group: "{{ NSP_group }}"
     mode: "{{ NSP_executable_permissions }}"
     recurse: false
+  changed_when: false
   tags:
     - nsp
     - meta

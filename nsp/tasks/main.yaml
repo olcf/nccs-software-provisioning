@@ -6,6 +6,7 @@
     group: "{{ NSP_group }}"
     mode: "{{ NSP_executable_permissions }}"
     recurse: false
+  changed_when: false
   tags:
     - nps
     - meta
