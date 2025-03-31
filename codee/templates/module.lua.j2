@@ -1,0 +1,10 @@
+{{ ansible_managed | comment(beginning="--[[", end="]]--", decoration="", prefix_count=0, postfix_count=0) }}
+
+whatis([[Name : A code modernization and optimization platform]])
+whatis([[Version : {{ NSP_CODEE_version }}]])
+
+prepend_path("PATH", "{{ [NSP_install_root, 'codee', NSP_CODEE_version, 'bin'] | path_join }}")
+
+setenv("CODEE_LICENSE_PATH", "{{ [NSP_install_root, 'codee/licenses', NSP_CODEE_license_file] | path_join }}")
+
+setenv(string.upper("{{ NSP_site_name }}_") .. "CODEE_ROOT",  "{{ [NSP_install_root, 'codee', NSP_CODEE_version] | path_join }}")

@@ -1,0 +1,39 @@
+- name: Clear Previous CODEE v{{ NSP_CODEE_version }} Download
+  ansible.builtin.file:
+    path: "{{ [NSP_scratch_directory, 'codee-{}-linux-{}'.format(NSP_CODEE_version, NSP_architecture)] | path_join }}"
+    state: absent
+  when: "[NSP_scratch_directory, 'codee-{}-linux-{}'.format(NSP_CODEE_version, NSP_architecture)] | path_join is file"
+  tags:
+    - codee
+    - installation
+
+- name: Download and Unpack CODEE v{{ NSP_CODEE_version }} Tarball
+  ansible.builtin.unarchive:
+    remote_src: true
+    src: "https://codee.com/release/codee-{{ NSP_CODEE_version }}-linux-{{ NSP_architecture }}.tar.gz"
+    dest: "{{ NSP_scratch_directory }}"
+  tags:
+    - codee
+    - installation
+
+- name: Install CODEE v{{ NSP_CODEE_version }}
+  ansible.builtin.copy:
+    src: "{{ [NSP_scratch_directory, 'codee-{}-linux-{}'.format(NSP_CODEE_version, NSP_architecture)] | path_join }}/"
+    dest: "{{ [NSP_install_root, 'codee', NSP_CODEE_version] | path_join }}/"
+    remote_src: true
+    directory_mode: "{{ NSP_executable_permissions }}"
+    mode: "preserve"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+  tags:
+    - codee
+    - installation
+
+- name: Clean up Scratch after CODEE v{{ NSP_CODEE_version }} Install
+  ansible.builtin.include_role:
+    name: nsp
+    tasks_from: clear_scratch
+  when: NSP_keep_scratch_clear
+  tags:
+    - codee
+    - installation

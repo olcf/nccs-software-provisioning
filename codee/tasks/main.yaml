@@ -1,0 +1,31 @@
+- name: Launch CODEE v{{ NSP_CODEE_version }} Install
+  ansible.builtin.include_tasks:
+    file: install.yaml
+  when: not [NSP_install_root, 'codee', NSP_CODEE_version, 'bin/codee'] | path_join is file
+  tags:
+    - codee
+    - installation
+
+- name: Create CODEE Module Directory
+  ansible.builtin.file:
+    path: "{{ [NSP_module_root, 'codee'] | path_join }}"
+    state: directory
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  when: NSP_CODEE_create_module
+  tags:
+    - codee
+    - configuration
+
+- name: Generate CODEE v{{ NSP_CODEE_version }} Module Files
+  ansible.builtin.template:
+    src: module.lua.j2
+    dest: "{{ [NSP_module_root, 'codee/{}.lua'.format(NSP_CODEE_version)] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  when: NSP_CODEE_create_module
+  tags:
+    - codee
+    - configuration

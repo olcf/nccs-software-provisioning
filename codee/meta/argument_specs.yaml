@@ -1,0 +1,20 @@
+argument_specs:
+  main:
+    description:
+      - Installs Codee and optionally generates a module file.
+    options:
+      NSP_CODEE_version:
+        type: str
+        required: true
+        description: The version to install.
+      NSP_CODEE_license_file:
+        type: str
+        required: true
+        description: >-
+          This variable specifies which license file codee should use. License files should be placed in
+          ``"{{ [NSP_install_root, 'codee/licenses'] | path_join }}"``.
+      NSP_CODEE_create_module:
+        type: bool
+        required: false
+        default: true
+        description: Toggles module generation.
