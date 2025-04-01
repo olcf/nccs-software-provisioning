@@ -1,0 +1,23 @@
+argument_specs:
+  main:
+    description:
+      - Installs CUDA and optionally generates a module file.
+    options:
+      NSP_CUDA_version:
+        type: str
+        required: true
+        description: The version to install.
+      NSP_CUDA_driver:
+        type: str
+        required: true
+        description: The Nvidia driver version specified in the download URL.
+      NSP_CUDA_architecture:
+        type: str
+        required: false
+        default: "linux"
+        description: The CUDA architecture specified in the download URL.
+      NSP_CUDA_create_module:
+        type: bool
+        required: false
+        default: true
+        description: Toggles module generation.

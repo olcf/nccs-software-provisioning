@@ -1,0 +1,31 @@
+- name: Launch CUDA v{{ NSP_CUDA_version }} Install
+  ansible.builtin.include_tasks:
+    file: install.yaml
+  when: not [NSP_install_root, 'cuda', NSP_CUDA_version] | path_join is directory
+  tags:
+    - cuda
+    - installation
+
+- name: Create CUDA Module Directory
+  ansible.builtin.file:
+    path: "{{ [NSP_module_root, 'cuda'] | path_join }}"
+    state: directory
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  when: NSP_CUDA_create_module
+  tags:
+    - cuda
+    - configuration
+
+- name: Generate CUDA v{{ NSP_CUDA_version }} Module File
+  ansible.builtin.template:
+    src: module.lua.j2
+    dest: "{{ [NSP_module_root, 'cuda/{}.lua'.format(NSP_CUDA_version)] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  when: NSP_CUDA_create_module
+  tags:
+    - cuda
+    - configuration

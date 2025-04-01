@@ -1,0 +1,5 @@
+# NSP_CUDA_version
+# NSP_CUDA_driver
+NSP_CUDA_architecture: "linux"
+
+NSP_CUDA_create_module: true
