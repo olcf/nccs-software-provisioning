@@ -1,0 +1,46 @@
+argument_specs:
+  main:
+    description:
+      - Installs Intel's OneAPI and optionally generates a module file.
+    options:
+      NSP_ONEAPI_version:
+        type: str
+        required: true
+        description: The version to install.
+      NSP_ONEAPI_base_toolkit_url:
+        type: str
+        required: true
+        description: The download URL for the base toolkit installer.
+      NSP_ONEAPI_base_toolkit_components:
+        type: list
+        elements: str
+        required: false
+        default:
+          - "intel.oneapi.lin.dpcpp-ct"
+          - "intel.oneapi.lin.dpcpp_dbg"
+          - "intel.oneapi.lin.dpl"
+          - "intel.oneapi.lin.tbb.devel"
+          - "intel.oneapi.lin.dpl"
+          - "intel.oneapi.lin.dal.devel"
+          - "intel.oneapi.lin.ipp.devel"
+          - "intel.oneapi.lin.ippcp.devel"
+          - "intel.oneapi.lin.mkl.devel"
+          - "intel.oneapi.lin.advisor"
+          - "intel.oneapi.lin.vtune"
+        description: The base toolkit components to install.
+      NSP_ONEAPI_hpc_toolkit_url:
+        type: str
+        required: true
+        description: The download URL for the HPC toolkit installer.
+      NSP_ONEAPI_hpc_toolkit_components:
+        type: list
+        elements: str
+        required: false
+        default:
+          - "intel.oneapi.lin.ifort-compiler"
+        description: The HPC toolkit components to install.
+      NSP_ONEAPI_create_module:
+        type: bool
+        required: false
+        default: true
+        description: Toggles module generation.

@@ -1,0 +1,24 @@
+{{ ansible_managed | comment(beginning="--[[", end="]]--", decoration="", prefix_count=0, postfix_count=0) }}
+
+family("compiler")
+
+whatis("Intel OneAPI v{{ NSP_ONEAPI_version }}")
+
+help("Intel OneAPI v{{ NSP_ONEAPI_version }}")
+
+local base = "{{ NSP_install_root }}"
+local package = "oneapi"
+local version = "{{ NSP_ONEAPI_version }}"
+local prefix = pathJoin(base, package, version, "{{ '.'.join(NSP_ONEAPI_version.split('.')[:2]) }}")
+
+setenv("INTEL_PATH", prefix)
+setenv("INTEL_VERSION", version)
+setenv("INTEL_COMPILER_TYPE", "ONEAPI")
+prepend_path("PATH",  pathJoin(prefix, "bin" ))
+prepend_path("MANPATH", pathJoin(prefix, "share/man" ))
+prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "lib"))
+prepend_path("PKG_CONFIG_PATH", pathJoin(prefix, "lib", "pkgconfig"))
+prepend_path("MKLROOT", pathJoin(base, package, version, "mkl", "{{ '.'.join(NSP_ONEAPI_version.split('.')[:2]) }}"))
+prepend_path("CPATH", pathJoin(base, package, version, "mkl", "{{ '.'.join(NSP_ONEAPI_version.split('.')[:2]) }}", "include"))
+
+setenv(string.upper("{{ NSP_site_name }}_") .. package:upper() .. "_ROOT",  prefix)

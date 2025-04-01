@@ -1,0 +1,21 @@
+# NSP_ONEAPI_version
+
+# NSP_ONEAPI_base_toolkit_url
+NSP_ONEAPI_base_toolkit_components:
+  - "intel.oneapi.lin.dpcpp-ct"
+  - "intel.oneapi.lin.dpcpp_dbg"
+  - "intel.oneapi.lin.dpl"
+  - "intel.oneapi.lin.tbb.devel"
+  - "intel.oneapi.lin.dpl"
+  - "intel.oneapi.lin.dal.devel"
+  - "intel.oneapi.lin.ipp.devel"
+  - "intel.oneapi.lin.ippcp.devel"
+  - "intel.oneapi.lin.mkl.devel"
+  - "intel.oneapi.lin.advisor"
+  - "intel.oneapi.lin.vtune"
+
+# NSP_ONEAPI_hpc_toolkit_url
+NSP_ONEAPI_hpc_toolkit_components:
+  - "intel.oneapi.lin.ifort-compiler"
+
+NSP_ONEAPI_create_module: true
