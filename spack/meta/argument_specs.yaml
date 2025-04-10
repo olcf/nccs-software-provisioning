@@ -10,7 +10,7 @@ argument_specs:
       NSP_SPACK_config_directory:
         type: path
         required: false
-        default: "{{ [NSP_install_root, 'spack'] | path_join }}"
+        default: "{{ [NSP_install_root, 'spack/configs'] | path_join }}"
         description: "The target directory for spack configuration files."
       NSP_SPACK_repo:
         type: str

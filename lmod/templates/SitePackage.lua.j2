@@ -230,7 +230,7 @@ function observe_and_trigger(t)
 end
 
 function label_paths(t)
-    -- Label OLCF paths when human readable descriptions
+    -- Label NSP paths when human readable descriptions
     local availStyle = masterTbl().availStyle
     if availStyle ~= 'nsp-pretty' then
         return
@@ -600,15 +600,14 @@ function olcf_spider(usrCmd)
         -- print header
         spider_output = spider_output .. string.rep("-", twidth) .. "\n"
         if cosmic:value("LMOD_COLORIZE") == "no" then
-            spider_output = spider_output .. "(OLCF SPIDER): WARNING >>> Not all modules shown here are" ..
-                                " supported by OLCF. Support is indicated below.\n"
+            spider_output = spider_output .. "(NSP SPIDER): WARNING >>> Not all modules shown here are" ..
+                                " supported. Support is indicated below.\n"
         else
-            spider_output = spider_output .. "(" .. colorize("magenta", "OLCF SPIDER") .. "): " ..
-                                colorize("red", "Modules in RED are not supported by ORNL!") ..
+            spider_output = spider_output .. "(" .. colorize("magenta", "NSP SPIDER") .. "): " ..
+                                colorize("red", "Modules in RED are not supported!") ..
                                 "    (for non-colorized output, set LMOD_COLORIZE=0)\n"
         end
-        spider_output = spider_output .. "  To learn more about unsupported modules see: " ..
-                            "https://docs.olcf.ornl.gov/software/UMS/index.html\n" .. string.rep("-", twidth) .. "\n"
+        spider_output = spider_output .. string.rep("-", twidth) .. "\n"
 
         -- handel each search
         if #optionTbl.pargs == 0 then

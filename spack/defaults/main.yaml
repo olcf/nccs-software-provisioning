@@ -1,4 +1,4 @@
-NSP_SPACK_config_directory: "{{ [NSP_install_root, 'spack/config'] | path_join }}"
+NSP_SPACK_config_directory: "{{ [NSP_install_root, 'spack/configs'] | path_join }}"
 
 NSP_SPACK_repo: "https://github.com/spack/spack.git"
 NSP_SPACK_clone: true
