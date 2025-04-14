@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
+from json import dumps as json_dumps
 from pathlib import Path
 from yaml import safe_load as yaml_safe_load
-from json import dumps as json_dumps
 
 if __name__ == "__main__":
     print("--- generating documentation for NSP roles ---")

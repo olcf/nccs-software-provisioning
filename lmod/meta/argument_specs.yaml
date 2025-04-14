@@ -22,7 +22,7 @@ argument_specs:
           - "internal"
           - "external"
         required: true
-        description: This toggles the lmod role installing its own lmod or using an external installation.
+        description: This toggles the lmod role installing its own Lmod or using an external installation.
       NSP_LMOD_version:
         type: str
         required: false
@@ -44,7 +44,7 @@ argument_specs:
 
               If you are installing lmod with NSP then the ``DefApps`` module will be set to load automatically.
               If you are using an external lmod installation you will have to configure loading ``DefApps`` outside
-              of NSP.
+              of NSP by setting the ``LMOD_SYSTEM_DEFAULT_MODULES`` environment variable.
       NSP_LMOD_default_module_paths:
         type: list
         elements: str
@@ -87,15 +87,18 @@ argument_specs:
 
           Notice the two components named ``compiler`` and ``mpi``. Each component has a list of ``members``. These
           members are the names of modules that belong to that component. In the module files for these members,
-          they should share the same ``family("...")`` so that they are mutually exclusive. For each component we
-          also define a list of ``paths``. These paths template the paths that the hook should add/remove from
-          ``MODULEPATH``. Take for example the first path defined for compiler. If ``gcc/12.3.0`` were loaded then
-          ``|compiler.name|-|compiler.version|`` would become ``gcc-12.3.0``. These paths are combined with
+          they should share the same ``family("...")`` so that they are mutually exclusive.
+
+          For each component we also define a list of ``paths``. These paths template the paths that the hook should
+          add/remove from ``MODULEPATH``. Take for example the first path defined for compiler. If ``gcc/12.3.0`` were
+          loaded then ``|compiler.name|-|compiler.version|`` would become ``gcc-12.3.0``. These paths are combined with
           :ref:`NSP_LMOD_spack_modules_variable` to create the final path to add to ``MODULEPATH``. If
           :ref:`NSP_LMOD_enable_spack_compiler_projections_variable` is set then additional parts are added to the path
           to accommodate spack's automatic additions for compiler and version. Each path also has an associated
-          ``weight``. The last item in each component is ``level`` which sets the order that the different component
-          members are printed in the lmod header for ``module avail``.
+          ``weight``.
+
+          The last item in each component is ``level`` which sets the order that the different component members are
+          printed in the lmod header for ``module avail``.
       NSP_LMOD_nv_mappings:
         type: dict
         required: false
@@ -134,11 +137,11 @@ argument_specs:
         required: false
         default: true
         description: >-
-          Toggles that addition of paths in the hook that spack's automatic additions for compiler and version.
+          Toggles the addition of paths in the hook that Spack adds in module projections for compiler and version.
         raw: |-
           .. caution::
 
-              When in doubt, leave this variable with its default value.
+              When in doubt (and using with Spack), leave this variable with its default value.
       NSP_LMOD_enable_logging:
         type: bool
         required: false

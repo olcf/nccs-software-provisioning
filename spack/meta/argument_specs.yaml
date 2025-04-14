@@ -1,10 +1,11 @@
 argument_specs:
   main:
     description:
-      - The spack role templates spack environments for deployment.
+      - The spack role clones and patches Spack and templates environments for deployment.
       - ""
       - If you have any spack extentions they should be placed in the playbook directory under ``spack/extentions``.
       - Extensions will be deployed in ``"{{ [NSP_SPACK_config_directory, 'extensions'] | path_join }}"`` .
+      - ""
       - All Spack patch files should go in the playbook directory under ``spack/patches``.
     options:
       NSP_SPACK_config_directory:
@@ -21,7 +22,8 @@ argument_specs:
         type: dict
         required: true
         description: >-
-          Defines available spack versions for the environments.
+          Defines available spack versions for the environments. Specifying a ``git_reference`` is mandatory but the
+          patch file is optional.
         raw: |-
           .. code:: yaml
 
@@ -41,24 +43,24 @@ argument_specs:
               NSP_SPACK_environments:
                 example_env:
                   spack_version: v0.23.1
-                  extensions:
-                    - spack-olcf
                   specific_templates:
-                    - packages
+                    - spack
                   shared_templates:
+                    - bootstrap
+                    - compilers
+                    - concretizer
+                    - config
                     - mirrors
+                    - modules
+                    - packages
 
           For each environment you should create a directory with the same name in the playbook directory under
           ``spack/environments``.
 
           ``spack_version`` should reference a spack version defined in
-          :ref:`NSP_SPACK_versions_variable` and ``extensions`` should be a list of extensions that can be found
-          in the playbook directory under ``spack/extensions``.
+          :ref:`NSP_SPACK_versions_variable`.
 
           We like to split our spack configuration for each environment into multiple files. ``specific_templates``
-          are templates that are specific to each environment. They should be places under
-          ``spack/environments/<environment_name>``. ``shared_templates`` are used by all of the environments and should
-          be placed under ``spack/environments``. There is a third catagory of templates that should not go into your
-          configuration but is important to know about. We call them ``nsp_templates`` these are templates that are
-          shared by all environments but instead of being in your playbook directory they are provided by the spack role
-          itself.
+          are templates that are specific to each environment. They should be placed under
+          ``spack/environments/<environment_name>`` in your playbook directory. ``shared_templates`` are used by all
+          of the environments and should be placed under ``spack/environments``.

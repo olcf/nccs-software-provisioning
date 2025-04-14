@@ -3,7 +3,7 @@ import datetime as dt
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "NCCS Software Provisioning"
+project = "NSP"
 copyright = f"{dt.datetime.now().year}, NCCS"
 author = "NCCS"
 release = "0.dev"
@@ -27,3 +27,8 @@ copybutton_prompt_is_regexp = True
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
+html_logo = "_static/NSP.svg"
+html_favicon = "_static/NSP.svg"
+html_theme_options = {
+    "style_nav_header_background": "#5e3b34"
+}

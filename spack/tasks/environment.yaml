@@ -3,7 +3,6 @@
     _SPACK_environment_name: "{{ _SPACK_environment.key }}"
     _SPACK_environment_configuration: # noqa: jinja[spacing]
       "{{ {
-            'extensions': [ ],
             'shared_templates': [ ],
             'specific_templates': [ ]
           } | ansible.builtin.combine(_SPACK_environment.value, list_merge='replace', recursive=true) }}"

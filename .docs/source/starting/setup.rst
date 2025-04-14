@@ -68,15 +68,15 @@ Next create a new playbook in the directory you just created for your system.
     :caption: ``moria/playbook.yaml``
 
     - name: Deploy Moria
-     hosts: localhost
+      hosts: localhost
 
-     vars:
-       NSP_system_name: moria
-       NSP_install_root: "{{ ['/tmp', NSP_system_name] | path_join }}"
-       NSP_help_email: example@example.com
-       NSP_site_name: MySiteName
+      vars:
+        NSP_system_name: moria
+        NSP_install_root: "{{ ['/tmp', NSP_system_name] | path_join }}"
+        NSP_help_email: example@example.com
+        NSP_site_name: MySiteName
 
-     roles: [ ]
+      roles: [ ]
 
 
 
@@ -119,16 +119,16 @@ to fine tune Lmod, set up convenience variables and more. As a first step for ou
        - role: init
 
 Various roles in NSP will add to the init scripts but if you have extra content, that you want added to the init
-scripts, you can do so by creating a ``profile`` and/or ``cshrc`` file in ``<system>/init``. For this tutorial we
+scripts, you can do so by creating a ``profile.j2`` and/or ``cshrc.j2`` file in ``<system>/init``. For this tutorial we
 will add some content to our init scripts that prints a welcome message.
 
 .. code-block:: jinja
-    :caption: ``moria/init/profile``
+    :caption: ``moria/init/profile.j2``
 
     echo "Welcome to {{ NSP_system_name }}!!!"
 
 .. code-block:: jinja
-    :caption: ``moria/init/cshrc``
+    :caption: ``moria/init/cshrc.j2``
 
     echo "Welcome to {{ NSP_system_name }}!!!"
 
@@ -191,8 +191,7 @@ Bootstrap Lmod
 
 The next step in setting up a system is installing Lmod. We will have to add a little more configuration to lmod
 when we get to setting up the :ref:`spack_role` role but for now let's add the :ref:`lmod_role` role to
-``moria/playbook.yaml``, create our ``rc.lua`` template (this is where we set default modules etc.), create our
-``admin.list`` template (this is where we set messages for modules) and run our playbook.
+our playbook.
 
 .. code-block:: yaml
    :caption: ``moria/playbook.yaml``
@@ -211,12 +210,12 @@ when we get to setting up the :ref:`spack_role` role but for now let's add the :
        - role: init
        - role: lmod
          vars:
-           NSP_LMOD_version: 8.7.31
+           NSP_LMOD_version: 8.7.37
            NSP_LMOD_install_type: internal
 
 After we run our playbook again we can source the init script and see our new software stack!
 
-.. code-block:: text
+.. code-block::
 
     $ ansible-playbook moria/playbook.yaml
     ...
@@ -224,19 +223,18 @@ After we run our playbook again we can source the init script and see our new so
     $ module avail
 
     ------------------------------------------------- [ Base Modules ] -------------------------------------------------
-      DefApps (L)
+       DefApps (L)
 
-     Where:
-      L:  Module is loaded
+      Where:
+       L:  Module is loaded
 
-   If the avail list is too long consider trying:
+    If the avail list is too long consider trying:
 
-   "module --default avail" or "ml -d av" to just list the default modules.
-   "module overview" or "ml ov" to display the number of modules for each name.
+    "module --default avail" or "ml -d av" to just list the default modules.
+    "module overview" or "ml ov" to display the number of modules for each name.
 
-   Use "module spider" to find all possible modules and extensions.
-   Use "module keyword key1 key2 ..." to search for all possible modules matching any of the "keys".
-
+    Use "module spider" to find all possible modules and extensions.
+    Use "module keyword key1 key2 ..." to search for all possible modules matching any of the "keys".
 
 If you were to look at the init scripts you would see that they now have an additional section that was added by lmod.
 
@@ -299,7 +297,7 @@ where their module files are placed.
 
       vars:
         NSP_system_name: moria
-        NSP_install_root: "{{ ['/sw', NSP_system_name] | path_join }}"
+        NSP_install_root: "{{ ['/tmp', NSP_system_name] | path_join }}"
         NSP_help_email: example@example.com
         NSP_site_name: MySiteName
 
@@ -370,19 +368,10 @@ Spack
 
 We are going to set up spack for the system gcc (mine is 13.3.0 but yours may be different) and the gcc and llvm versions
 that we built above. We will have a ``Core`` set of modules built by the system gcc and then a software stack
-built on gcc 13.3.0 and llvm 18.1.6.
+built on gcc 14.2.0 and llvm 19.1.0.
 
-We name our spack environments according to the following schema ``core<year>.<month>`` and ``sw<year>.<month>``
-(in this tutorial we will use ``core25.02`` and ``sw25.02``). Create the following files:
-
-.. code-block:: jinja
-    :caption: ``moria/spack/environments/mirrors.yaml.j2``
-
-    {{ ansible_managed | comment(beginning="##", end="##", decoration="#", prefix_count=0, postfix_count=0) }}
-
-    mirrors:
-      facility_builds: {{ [NSP_SPACK_root, "envs/bmirrors"] | path_join }}
-      source_mirror: {{ [NSP_SPACK_root, "envs/smirrors"] | path_join }}
+We will name our spack environments according to the following schema ``core<year>.<month>`` and
+``sw<year>.<month>`` (in this tutorial we will use ``core25.02`` and ``sw25.02``). Create the following files:
 
 .. code-block:: jinja
     :caption: ``moria/spack/environments/compilers.yaml.j2``
@@ -390,40 +379,172 @@ We name our spack environments according to the following schema ``core<year>.<m
     {{ ansible_managed | comment(beginning="##", end="##", decoration="#", prefix_count=0, postfix_count=0) }}
 
     compilers:
-    - compiler:
-        spec: gcc@13.3.0
-        paths:
-          cc: /usr/bin/gcc
-          cxx: /usr/bin/g++
-          f77: /usr/bin/gfortran
-          fc: /usr/bin/gfortran
-        operating_system: ubuntu24.04
-        modules: [ ]
+      # system GCC
+      - compiler:
+          spec: gcc@{{ system_gcc.version }}
+          paths:
+            cc: /usr/bin/gcc
+            cxx: /usr/bin/g++
+            f77: /usr/bin/gfortran
+            fc: /usr/bin/gfortran
+          operating_system: {{ os.identifier }}
+          modules: [ ]
 
-    # GCC compiler
-    - compiler:
-        spec: gcc@{{ gcc.version }}
-        paths:
-          cc: {{ gcc.path }}/bin/gcc
-          cxx: {{ gcc.path }}/bin/g++
-          f77: {{ gcc.path }}/bin/gfortran
-          fc: {{ gcc.path }}/bin/gfortran
-        operating_system: ubuntu24.04
-        modules:
-        - gcc/{{ gcc.version }}
+      # GCC compiler
+      - compiler:
+          spec: gcc@{{ gcc.version }}
+          paths:
+            cc: {{ [NSP_install_root, 'gcc', gcc.version, 'bin/gcc'] | path_join }}
+            cxx: {{ [NSP_install_root, 'gcc', gcc.version, 'bin/g++'] | path_join }}
+            f77: {{ [NSP_install_root, 'gcc', gcc.version, 'bin/gfortran'] | path_join }}
+            fc: {{ [NSP_install_root, 'gcc', gcc.version, 'bin/gfortran'] | path_join }}
+          operating_system: {{ os.identifier }}
+          modules:
+            - gcc/{{ gcc.version }}
 
-    # LLVM compiler
+      # LLVM compiler
     {% set gcc_v_list = gcc.version.split(".") %}
-    - compiler:
-        spec: clang@{{ llvm.version }}-gfortran{{ gcc_v_list[0] }}
-        paths:
-          cc: {{ llvm.path }}/bin/clang
-          cxx: {{ llvm.path }}/bin/clang++
-          f77: {{ gcc.path }}/bin/gfortran
-          fc: {{ gcc.path }}/bin/gfortran
-        operating_system: ubuntu24.04
-        modules:
-        - llvm/{{ llvm.version }}
+      - compiler:
+          spec: clang@{{ llvm.version }}-gfortran{{ gcc_v_list[0] }}
+          paths:
+            cc: {{ [NSP_install_root, 'llvm', llvm.version, 'bin/clang'] | path_join }}
+            cxx: {{ [NSP_install_root, 'llvm', llvm.version, 'bin/clang++'] | path_join }}
+            f77: {{ [NSP_install_root, 'gcc', gcc.version, 'bin/gfortran'] | path_join }}
+            fc: {{ [NSP_install_root, 'gcc', gcc.version, 'bin/gfortran'] | path_join }}
+          operating_system: {{ os.identifier }}
+          modules:
+            - llvm/{{ llvm.version }}
+
+.. code-block:: jinja
+    :caption: ``moria/spack/environments/concretizer.yaml.j2``
+
+    {{ ansible_managed | comment(beginning="##", end="##", decoration="#", prefix_count=0, postfix_count=0) }}
+
+    concretizer:
+      reuse: false
+      targets:
+        granularity: microarchitectures
+        host_compatible: true
+      unify: false
+      duplicates:
+        strategy: none
+
+.. code-block:: jinja
+    :caption: ``moria/spack/environments/config.yaml.j2``
+
+    {{ ansible_managed | comment(beginning="##", end="##", decoration="#", prefix_count=0, postfix_count=0) }}
+
+    config:
+      install_tree:
+        root: {{ [NSP_install_root, 'spack/envs', _SPACK_environment_name, 'opt'] | path_join }}
+        projections:
+          all: '{compiler.name}-{compiler.version}/{name}-{version}-{hash}'
+
+      template_dirs:
+        - $spack/share/spack/templates
+
+      license_dir: $spack/etc/spack/licenses
+
+      build_stage:
+        - {{ [NSP_scratch_directory, "spack/stage", _SPACK_environment_name] | path_join }}
+
+      test_stage: {{ [NSP_scratch_directory, "spack/test", _SPACK_environment_name] | path_join }}
+      source_cache: {{ [NSP_install_root, "spack/envs/scache"] | path_join }}
+      misc_cache: {{ [NSP_install_root, "spack/envs", _SPACK_environment_name, "mcache"] | path_join }}
+
+      extensions: [ ]
+
+      connect_timeout: 10
+      verify_ssl: true
+      ssl_certs: $SSL_CERT_FILE
+      suppress_gpg_warnings: false
+      checksum: true
+      deprecated: false
+      dirty: false
+      build_language: C
+      locks: true
+      url_fetch_method: urllib
+      build_jobs: {{ NSP_max_threads }}
+      ccache: false
+      concretizer: clingo
+      db_lock_timeout: 60
+      package_lock_timeout: null
+
+      shared_linking:
+        type: rpath
+        bind: false
+
+      allow_sgid: true
+      install_status: true
+      binary_index_ttl: 600
+
+      flags:
+        keep_werror: 'none'
+
+      aliases:
+        rm: remove
+        search: list
+
+.. code-block:: jinja
+    :caption: ``moria/spack/environments/modules.yaml.j2``
+
+    {{ ansible_managed | comment(beginning="##", end="##", decoration="#", prefix_count=0, postfix_count=0) }}
+
+    modules:
+      prefix_inspections:
+        bin:
+          - PATH
+        man:
+          - MANPATH
+        share/man:
+          - MANPATH
+        share/aclocal:
+          - ACLOCAL_PATH
+        lib:
+          - LD_LIBRARY_PATH
+        lib64:
+          - LD_LIBRARY_PATH
+        lib/pkgconfig:
+          - PKG_CONFIG_PATH
+        lib64/pkgconfig:
+          - PKG_CONFIG_PATH
+        share/pkgconfig:
+          - PKG_CONFIG_PATH
+        .:
+          - CMAKE_PREFIX_PATH
+      default:
+        roots:
+          lmod: {{ [NSP_install_root, "spack/modules"] | path_join }}
+        enable:
+          - lmod
+        arch_folder: false
+        lmod:
+          core_compilers:
+            - gcc@{{ system_gcc.version }}
+          all:
+            environment:
+              set:
+                {{ NSP_site_name.upper() }}_{NAME}_ROOT: "{prefix}"
+            autoload: none
+            suffixes:
+              ^llvm-amdgpu: gpu
+              ^cuda: gpu
+              ^mpi: mpi
+              +openmp: omp
+              threads=omp: omp
+          exclude_implicits: true
+          verbose: true
+          exclude: [ ]
+          hash_length: 0
+          hierarchy:: [ ]
+          projections:
+            ^llvm-amdgpu ^mpi: "{^mpi.name}-{^mpi.version}/rocm-{^llvm-amdgpu.version}/{compiler.name}-{compiler.version}/{name}/{version}"
+            ^cuda ^mpi: "{^mpi.name}-{^mpi.version}/cuda-{^cuda.version}/{compiler.name}-{compiler.version}/{name}/{version}"
+            ^llvm-amdgpu: "rocm-{^llvm-amdgpu.version}/{compiler.name}-{compiler.version}/{name}/{version}"
+            ^cuda: "cuda-{^cuda.version}/{compiler.name}-{compiler.version}/{name}/{version}"
+            ^mpi: "{^mpi.name}-{^mpi.version}/{compiler.name}-{compiler.version}/{name}/{version}"
+            all: "{compiler.name}-{compiler.version}/{name}/{version}"
+          core_specs: []
 
 .. code-block:: jinja
     :caption: ``moria/spack/environments/packages.yaml.j2``
@@ -449,7 +570,6 @@ We name our spack environments according to the following schema ``core<year>.<m
       view: false
       include:
         - concretizer.yaml
-        - mirrors.yaml
         - modules.yaml
         - compilers.yaml
         - config.yaml
@@ -458,10 +578,10 @@ We name our spack environments according to the following schema ``core<year>.<m
       modules:
         default:
           lmod:
-            core_compilers: [ gcc@13.3.0 ]
+            core_compilers: [ gcc@{{ system_gcc.version }} ]
             projections:
               # core
-              '%gcc@13.3.0': '25.02/{name}/{version}'
+              '%gcc@{{ system_gcc.version }}': '25.02/{name}/{version}'
 
       # -------------------------------------------------------------------
       # Specs Definitions
@@ -469,7 +589,7 @@ We name our spack environments according to the following schema ``core<year>.<m
 
       definitions:
         - core_compiler:
-          - '%gcc@13.3.0'
+          - '%gcc@{{ system_gcc.version }}'
 
         - core_25.02:
           - matrix:
@@ -492,7 +612,6 @@ We name our spack environments according to the following schema ``core<year>.<m
       view: false
       include:
       - concretizer.yaml
-      - mirrors.yaml
       - modules.yaml
       - compilers.yaml
       - config.yaml
@@ -531,14 +650,18 @@ We name our spack environments according to the following schema ``core<year>.<m
 .. code-block:: jinja
     :caption: ``moria/spack/environments/sw25.02/variables.yaml``
 
+    # system gcc
+    system_gcc:
+      version: 13.3.0
     # GCC
     gcc:
       version: 14.2.0
-      path: '{{ NSP_install_root }}/gcc/14.2.0'
     # LLVM
     llvm:
       version: 19.1.0
-      path: '{{ NSP_install_root }}/llvm/19.1.0'
+    # OS
+    os:
+      identifier: ubuntu24.04
 
 .. code-block:: text
     :caption: ``moria/spack/environments/core25.02/variables.yaml``
@@ -549,7 +672,7 @@ Finally we will need to add the spack role to our playbook.
 
 .. code-block:: yaml
     :caption: ``moria/playbook.yaml``
-    :emphasize-lines: 26-39
+    :emphasize-lines: 26-41
 
     - name: Deploy Moria
       hosts: localhost
@@ -578,18 +701,20 @@ Finally we will need to add the spack role to our playbook.
             # if your system architecture is not x86_64 you will need to set `NSP_LLVM_targets`
         - role: spack
           vars:
+            _shared_templates: &shared_L
+              - compilers
+              - concretizer
+              - config
+              - modules
+              - packages
+            _specific_templates: &specific_L
+              - spack
             NSP_SPACK_versions:
               v0.23.1:
                 git_reference: 2bfcc69
             NSP_SPACK_environments:
-              core25.02:
-                spack_version: v0.23.1
-                shared_templates:
-                  - mirrors
-              sw25.02:
-                spack_version: v0.23.1
-                shared_templates:
-                  - mirrors
+              core25.02: { spack_version: v0.23.1, specific_templates: *specific_L, shared_templates: *shared_L }
+              sw25.02: { spack_version: v0.23.1, specific_templates: *specific_L, shared_templates: *shared_L }
 
 After running the playbook explore ``/tmp/moria/spack/configs``. To install our software via spack run the following.
 
@@ -609,18 +734,18 @@ All of our software should now be installed to ``/tmp/moria/spack/envs``; howeve
 Lmod Hook & Core
 ################
 
-The final part of our Lmod configuration is setting up the custom hook. This will make the software that we built with
-our ``sw25.02`` spack environment visible. Also, because we have a versioned core environment, we will create a module
-file to add the ``Core`` (a.k.a ``core25.02``) environment that we installed.
+The final part of our Lmod configuration is setting up the NSP hook. This will make the software that we built with
+our ``sw25.02`` spack environment visible. We will also create a module file to add the ``Core`` (a.k.a ``core25.02``)
+environment that we installed.
 
 .. code-block:: jinja
-    :caption: ``moria/files/Core/25.02.lua.j2``
+    :caption: ``moria/files/Core/25.02.lua``
 
     {{ ansible_managed | comment(beginning="--[[", end="]]--", decoration="", prefix_count=0, postfix_count=0) }}
 
     help("Add path for Core 25.02 modules to MODULEPATH")
 
-    prepend_path{"MODULEPATH","{{ NSP_SPACK_root }}/modules/Core/25.02", priority=10}
+    prepend_path{"MODULEPATH", "{{ [NSP_install_root, 'spack/modules/Core/25.02'] | path_join }}", priority=10}
 
 Modify the playbook to include configuration for our hook and the :ref:`files_role` role which is where we are keeping
 the ``Core`` module files. Also add some modules to lmod's :ref:`NSP_LMOD_default_modules_variable`.
@@ -690,8 +815,8 @@ the ``Core`` module files. Also add some modules to lmod's :ref:`NSP_LMOD_defaul
                 dest: "{{ [NSP_module_root, 'Core'] | path_join }}"
 
 
-After running the playbook again our example software stack is complete! Run the playbook to generate new init scripts,
-source the init scripts and test out the new stack.
+After running the playbook again our example software stack is complete! Run the playbook, source the init scripts
+and test out the new stack.
 
 .. code-block:: bash
 

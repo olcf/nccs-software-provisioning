@@ -8,7 +8,7 @@ argument_specs:
       - |-
           .. note::
 
-             The ``init`` directory and accompanying files are completely optional. Without them, blank init script
+             The ``init`` directory and accompanying files are completely optional. Without them, blank init scripts
              will be created.
     options:
       NSP_INIT_wipe:
