@@ -7,14 +7,12 @@
 - name: "Download and Unpack AOCC v{{ NSP_AOCC_version_major }}.{{ NSP_AOCC_version_middle }}.{{ NSP_AOCC_version_minor }} Tarball"
   ansible.builtin.unarchive:
     remote_src: true
-    #src: "https://download.amd.com/developer/eula/aocc/aocc-{{ NSP_AOCC_version }}/aocc-compiler-{{ NSP_AOCC_version }}.tar"
-    #src: "https://www.amd.com/en/developer/aocc/eula/aocc-{{ NSP_AOCC_version_major }}-{{ NSP_AOCC_version_middle }}-eula.html?filename=aocc-compiler-{{ NSP_AOCC_version_major }}.{{ NSP_AOCC_version_middle }}.{{ NSP_AOCC_version_minor }}.tar"
     src: "https://download.amd.com/developer/eula/aocc/aocc-{{NSP_AOCC_version_major}}-{{ NSP_AOCC_version_middle }}/aocc-compiler-{{ NSP_AOCC_version_major }}.{{ NSP_AOCC_version_middle }}.{{ NSP_AOCC_version_minor }}.tar"
     dest: "/tmp"
 
 - name: "Ensure AOCC v{{ NSP_AOCC_version_major }}.{{ NSP_AOCC_version_middle }}.{{ NSP_AOCC_version_minor }} Installation Folder Exists"
   ansible.builtin.file:
-    path: "/{{ NSP_install_root }}/aocc/{{ NSP_AOCC_version_major }}.{{ NSP_AOCC_version_middle }}.{{ NSP_AOCC_version_minor }}"
+    path: "{{ NSP_install_root }}/aocc/{{ NSP_AOCC_version_major }}.{{ NSP_AOCC_version_middle }}.{{ NSP_AOCC_version_minor }}"
     state: directory
 
 - name: "Build and Install AOCC v{{ NSP_AOCC_version_major }}.{{ NSP_AOCC_version_middle }}.{{ NSP_AOCC_version_minor }}"
