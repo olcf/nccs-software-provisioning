@@ -12,7 +12,7 @@ AOCC Compiler
 
 local base = "{{ NSP_install_root }}"
 local package = "aocc"
-local version = "{{ NSP_AOCC_version_major }}.{{ NSP_AOCC_version_middle }}.{{ NSP_AOCC_version_minor }}"
+local version = "{{ NSP_AOCC_version }}"
 local prefix = pathJoin(base, package, version)
 
 whatis("Description: AOCC compiler " .. version)

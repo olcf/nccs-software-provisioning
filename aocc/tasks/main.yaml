@@ -1,19 +1,19 @@
 ---
-- name: "Check for Previous AOCC v{{ NSP_AOCC_version_major }}.{{ NSP_AOCC_version_middle }}.{{ NSP_AOCC_version_minor }} Installation"
+- name: "Check for Previous AOCC v{{ NSP_AOCC_version }} Installation"
   ansible.builtin.stat:
-    path: "{{ NSP_install_root }}/aocc/{{ NSP_AOCC_version_major }}.{{ NSP_AOCC_version_middle }}.{{ NSP_AOCC_version_minor }}"
+    path: "{{ NSP_install_root }}/aocc/{{ NSP_AOCC_version }}"
   register: install_status
 
-- name: "Launch AOCC v{{ NSP_AOCC_version_major }}.{{ NSP_AOCC_version_middle }}.{{ NSP_AOCC_version_minor }} Install"
+- name: "Launch AOCC v{{ NSP_AOCC_version }} Install"
   ansible.builtin.include_tasks: install.yaml
   when: install_status.stat.exists == False
 
-- name: "Ensure AOCC v{{ NSP_AOCC_version_major }}.{{ NSP_AOCC_version_middle }}.{{ NSP_AOCC_version_minor }} Module Folder Exists"
+- name: "Ensure AOCC v{{ NSP_AOCC_version }} Module Folder Exists"
   ansible.builtin.file:
     path: "{{ NSP_module_root }}/aocc"
     state: directory
 
-- name: "Ensure AOCC v{{ NSP_AOCC_version_major }}.{{ NSP_AOCC_version_middle }}.{{ NSP_AOCC_version_minor }} Module File Exists"
+- name: "Ensure AOCC v{{ NSP_AOCC_version }} Module File Exists"
   ansible.builtin.template:
     src: module.lua.j2
-    dest: "{{ NSP_module_root }}/aocc/{{ NSP_AOCC_version_major }}.{{ NSP_AOCC_version_middle }}.{{ NSP_AOCC_version_minor }}.lua"
+    dest: "{{ NSP_module_root }}/aocc/{{ NSP_AOCC_version }}.lua"
