@@ -1,14 +1,14 @@
 ---
 - name: "Clear Previous AOCC v{{ NSP_AOCC_version }} Build Files"
   ansible.builtin.file:
-    path: "/tmp/aocc-compiler-{{ NSP_AOCC_version }}"
+    path: "{{ [NSP_scratch_directory, 'aocc-compiler', NSP_AOCC_version] | path_join }}"
     state: absent
 
 - name: "Download and Unpack AOCC v{{ NSP_AOCC_version }} Tarball"
   ansible.builtin.unarchive:
     remote_src: true
     src: "https://download.amd.com/developer/eula/aocc/aocc-{{ NSP_AOCC_version.split('.')[0] }}-{{ NSP_AOCC_version.split('.')[1] }}/aocc-compiler-{{ NSP_AOCC_version }}.tar"
-    dest: "/tmp"
+    dest: "{{ NSP_scratch_directory }}"
 
 - name: "Ensure AOCC v{{ NSP_AOCC_version }} Installation Folder Exists"
   ansible.builtin.file:
@@ -19,4 +19,4 @@
   ansible.builtin.shell:
     cmd: |
       cp -r ./* {{ NSP_install_root }}/aocc/{{ NSP_AOCC_version }}/.
-    chdir: "/tmp/aocc-compiler-{{ NSP_AOCC_version }}"
+    chdir: "{{ [NSP_scratch_directory, 'aocc-compiler-' ~ NSP_AOCC_version] | path_join }}"
