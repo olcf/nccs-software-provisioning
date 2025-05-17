@@ -9,7 +9,7 @@ help("Intel OneAPI v{{ NSP_ONEAPI_version }}")
 local base = "{{ NSP_install_root }}"
 local package = "oneapi"
 local version = "{{ NSP_ONEAPI_version }}"
-local prefix = pathJoin(base, package, version, "{{ '.'.join(NSP_ONEAPI_version.split('.')[:2]) }}")
+local prefix = pathJoin(base, package, version, 'compiler', "{{ '.'.join(NSP_ONEAPI_version.split('.')[:2]) }}")
 
 setenv("INTEL_PATH", prefix)
 setenv("INTEL_VERSION", version)
