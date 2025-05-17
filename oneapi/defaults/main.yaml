@@ -7,7 +7,6 @@ NSP_ONEAPI_base_toolkit_components:
   - "intel.oneapi.lin.dpcpp_dbg"
   - "intel.oneapi.lin.dpl"
   - "intel.oneapi.lin.tbb.devel"
-  - "intel.oneapi.lin.dpl"
   - "intel.oneapi.lin.dal.devel"
   - "intel.oneapi.lin.ipp.devel"
   - "intel.oneapi.lin.ippcp.devel"
@@ -18,5 +17,7 @@ NSP_ONEAPI_base_toolkit_components:
 # NSP_ONEAPI_hpc_toolkit_url
 NSP_ONEAPI_hpc_toolkit_components:
   - "intel.oneapi.lin.ifort-compiler"
+  - "intel.oneapi.lin.dpl"
+  - "intel.oneapi.lin.dpcpp-cpp-compiler"
 
 NSP_ONEAPI_create_module: true
