@@ -1,0 +1,19 @@
+argument_specs:
+  main:
+    description:
+      - Installs CUDA and optionally generates a module file.
+    options:
+      NSP_nvhpc_version:
+        type: str
+        required: true
+        description: The version to install.
+      NSP_nvhpc_architecture:
+        type: str
+        required: false
+        default: "linux"
+        description: The CUDA architecture specified in the download URL.
+      NSP_nvhpc_create_module:
+        type: bool
+        required: false
+        default: true
+        description: Toggles module generation.
