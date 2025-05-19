@@ -12,7 +12,7 @@
 
 - name: "Ensure AOCC v{{ NSP_AOCC_version }} Installation Folder Exists"
   ansible.builtin.file:
-    path: "{{ NSP_install_root }}/aocc/{{ NSP_AOCC_version }}"
+    path: "{{ [NSP_install_root, aocc, NSP_AOCC_version] | path_join }}"
     state: directory
 
 - name: "Build and Install AOCC v{{ NSP_AOCC_version }}"
