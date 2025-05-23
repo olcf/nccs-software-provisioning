@@ -1,19 +1,31 @@
----
-- name: "Check for Previous AOCC v{{ NSP_AOCC_version }} Installation"
-  ansible.builtin.stat:
-    path: "{{ [NSP_install_root, 'aocc', NSP_AOCC_version] | path_join }}"
-  register: install_status
-
 - name: "Launch AOCC v{{ NSP_AOCC_version }} Install"
-  ansible.builtin.include_tasks: install.yaml
-  when: install_status.stat.exists == False
+  ansible.builtin.include_tasks: 
+    file: "install.yaml"
+  when: not [NSP_install_root, 'aocc', NSP_AOCC_version, 'bin'] | path_join is directory
+  tags:
+    - aocc
+    - installation
 
-- name: "Ensure AOCC v{{ NSP_AOCC_version }} Module Folder Exists"
+- name: Create AOCC Module Directory
   ansible.builtin.file:
     path: "{{ [NSP_module_root, 'aocc'] | path_join }}"
     state: directory
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  when: NSP_AOCC_create_module
+  tags:
+    - aocc
+    - configuration
 
-- name: "Ensure AOCC v{{ NSP_AOCC_version }} Module File Exists"
+- name: Generate AOCC v{{ NSP_AOCC_version }} Module File
   ansible.builtin.template:
     src: module.lua.j2
-    dest: "{{ [NSP_module_root, 'aocc', NSP_AOCC_version ~ '.lua'] | path_join }}"
+    dest: "{{ [NSP_module_root, 'aocc', '{}.lua'.format(NSP_AOCC_version)] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  when: NSP_AOCC_create_module
+  tags:
+    - aocc
+    - configuration

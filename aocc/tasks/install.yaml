@@ -1,22 +1,39 @@
----
-- name: "Clear Previous AOCC v{{ NSP_AOCC_version }} Build Files"
+- name: Clear Previous AOCC v{{ NSP_AOCC_version }} Build Files
   ansible.builtin.file:
-    path: "{{ [NSP_scratch_directory, 'aocc-compiler', NSP_AOCC_version] | path_join }}"
+    path: "{{ [NSP_scratch_directory, 'aocc-{}'.format(NSP_AOCC_version)] | path_join }}"
     state: absent
+  when: NSP_AOCC_clean_build and [NSP_scratch_directory, 'aocc-{}'.format(NSP_AOCC_version)] | path_join is directory
+  tags:
+    - aocc
+    - installation
 
 - name: "Download and Unpack AOCC v{{ NSP_AOCC_version }} Tarball"
   ansible.builtin.unarchive:
     remote_src: true
     src: "https://download.amd.com/developer/eula/aocc/aocc-{{ NSP_AOCC_version.split('.')[0] }}-{{ NSP_AOCC_version.split('.')[1] }}/aocc-compiler-{{ NSP_AOCC_version }}.tar"
     dest: "{{ NSP_scratch_directory }}"
-
-- name: "Ensure AOCC v{{ NSP_AOCC_version }} Installation Folder Exists"
-  ansible.builtin.file:
-    path: "{{ [NSP_install_root, aocc, NSP_AOCC_version] | path_join }}"
-    state: directory
+  when: not [NSP_scratch_directory, 'aocc-{}'.format(NSP_AOCC_version)] | path_join is directory
+  tags:
+    - aocc
+    - configuration
 
 - name: "Build and Install AOCC v{{ NSP_AOCC_version }}"
-  ansible.builtin.shell:
-    cmd: |
-      cp -r ./* {{ NSP_install_root }}/aocc/{{ NSP_AOCC_version }}/.
-    chdir: "{{ [NSP_scratch_directory, 'aocc-compiler-' ~ NSP_AOCC_version] | path_join }}"
+  ansible.builtin.copy:
+    src: "{{ [NSP_scratch_directory, 'aocc-compiler-{}'.format(NSP_AOCC_version)] | path_join }}"
+    dest: "{{ [NSP_install_root, 'aocc', NSP_AOCC_version] | path_join }}"
+    ownner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  when: NSP_AOCC_create_module
+  tags:
+    - aocc
+    - configuration
+
+- name: Clean up Scratch after AOCC v{{ NSP_AOCC_version }} Build
+  ansible.builtin.include_role:
+    name: nsp
+    tasks_from: clear_scratch
+  when: NSP_keep_scratch_clear
+  tags:
+    - aocc
+    - installation

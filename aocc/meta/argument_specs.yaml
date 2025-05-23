@@ -1,9 +1,19 @@
-    argument_specs:
-      main:
-        description:
-          - Installs the AOCC compiler and optionally generates a module file.
-        options:
-          NSP_AOCC_version:
-            type: str
-            required: true
-            description: The version to install.
+argument_specs:
+  main:
+    description:
+      - Installs the AOCC compiler and optionally generates a module file.
+    options:
+      NSP_AOCC_version:
+        type: str
+        required: true
+        description: The version to install.
+      NSP_AOCC_create_module:
+        type: bool
+        required: false
+        default: true
+        description: Toggles module generation.
+      NSP_AOCC_clear_source:
+        type: bool
+        required: false
+        default: true
+        description: Clear previous build source files.
