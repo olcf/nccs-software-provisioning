@@ -21,7 +21,7 @@
   ansible.builtin.copy:
     src: "{{ [NSP_scratch_directory, 'aocc-compiler-{}'.format(NSP_AOCC_version)] | path_join }}"
     dest: "{{ [NSP_install_root, 'aocc', NSP_AOCC_version] | path_join }}"
-    ownner: "{{ NSP_user }}"
+    owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
   when: NSP_AOCC_create_module
