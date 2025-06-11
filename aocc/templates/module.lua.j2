@@ -12,8 +12,6 @@ local package = "aocc"
 local version = "{{ NSP_AOCC_version }}"
 local prefix = pathJoin(base, package, version)
 
-whatis("Description: AOCC compiler " .. version)
-
 -- Environment Globals
 prepend_path( "PATH",  pathJoin(prefix, "bin" ) )
 prepend_path( "PATH",  pathJoin(prefix, "share/opt-viewer" ) )
