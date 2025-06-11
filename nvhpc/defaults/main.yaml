@@ -1,4 +1,0 @@
-NSP_NVHPC_SDK_architecture: "linux"
-
-NSP_NVHPC_SDK_create_module: true
-NSP_nvhpc_clean_build: true
