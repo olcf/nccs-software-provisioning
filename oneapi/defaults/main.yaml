@@ -4,9 +4,9 @@
 NSP_ONEAPI_base_toolkit_components:
   - "intel.oneapi.lin.dpcpp-ct"
   - "intel.oneapi.lin.dpcpp_dbg"
-  - "intel.oneapi.lin.dpl.devel"
+  - "intel.oneapi.lin.dpl"
   - "intel.oneapi.lin.tbb.devel"
-  - "intel.oneapi.lin.dpl.devel"
+  - "intel.oneapi.lin.dpl"
   - "intel.oneapi.lin.dal.devel"
   - "intel.oneapi.lin.ipp.devel"
   - "intel.oneapi.lin.ippcp.devel"
