@@ -7,14 +7,6 @@
     - aocc
     - installation
 
-- name: Clear Previous AOCC v{{ NSP_AOCC_version }} Build
-  ansible.builtin.file:
-    path: "{{ [NSP_install_root, 'aocc', NSP_AOCC_version] | path_join }}"
-    state: absent
-  tags:
-    - aocc
-    - installation
-
 - name: Create AOCC Install Directory
   ansible.builtin.file:
     path: "{{ [NSP_install_root, 'aocc'] | path_join }}"
