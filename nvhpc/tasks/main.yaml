@@ -1,0 +1,42 @@
+- name: Check NVHPC v{{ NSP_NVHPC_version }} Installation
+  ansible.builtin.stat:
+    path: # noqa: jinja[spacing]
+      "{{ [NSP_install_root, 'nvhpc/{}/{}_{}/{}'.format(
+        NSP_NVHPC_version, ansible_facts['system'], NSP_architecture, NSP_NVHPC_version
+      )] | path_join }}"
+  register: install_status
+  tags:
+    - nvhpc
+    - installation
+
+- name: Install NVHPC v{{ NSP_NVHPC_version }}
+  ansible.builtin.include_tasks:
+    file: install.yaml
+  when: not install_status.stat.exists
+  tags:
+    - nvhpc
+    - installation
+
+- name: Create NVHPC Module Directory
+  ansible.builtin.file:
+    path: "{{ [NSP_module_root, 'nvhpc'] | path_join }}"
+    state: directory
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  when: NSP_NVHPC_create_module
+  tags:
+    - nvhpc
+    - configuration
+
+- name: Generate NVHPC v{{ NSP_NVHPC_version }} Module File
+  ansible.builtin.template:
+    src: module.lua.j2
+    dest: "{{ [NSP_module_root, 'nvhpc/{}.lua'.format(NSP_NVHPC_version)] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  when: NSP_NVHPC_create_module
+  tags:
+    - nvhpc
+    - configuration

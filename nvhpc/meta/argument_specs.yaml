@@ -1,0 +1,19 @@
+argument_specs:
+  main:
+    description:
+      - Installs NVHPC SDK and optionally generates a module file.
+    options:
+      NSP_NVHPC_version:
+        type: str
+        required: true
+        description: The version to install.
+      NSP_NVHPC_cuda_version:
+        type: str
+        required: false
+        default: multi
+        description: SDK CUDA version(s).
+      NSP_NVHPC_create_module:
+        type: bool
+        required: false
+        default: true
+        description: Toggles module generation.

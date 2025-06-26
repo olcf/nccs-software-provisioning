@@ -1,0 +1,64 @@
+- name: Clear Previous NVHPC v{{ NSP_NVHPC_version }} Scratch Files
+  ansible.builtin.file:
+    path: # noqa: jinja[spacing]
+      "{{ [NSP_scratch_directory, 'nvhpc_20{}_{}{}_{}_{}_cuda_{}'.format(
+        NSP_NVHPC_version.__str__().split('.')[0],
+        NSP_NVHPC_version.__str__().split('.')[0],
+        NSP_NVHPC_version.__str__().split('.')[1],
+        ansible_facts['system'],
+        NSP_architecture,
+        NSP_NVHPC_cuda_version
+      ), '*'] | path_join }}"
+    state: absent
+  tags:
+    - nvhpc
+    - installation
+
+- name: Download and Unpack NVHPC v{{ NSP_NVHPC_version }} Tarball
+  ansible.builtin.unarchive:
+    remote_src: true
+    src: # noqa: jinja[spacing]
+      "{{ 'https://developer.download.nvidia.com/hpc-sdk/{}/nvhpc_20{}_{}{}_{}_{}_cuda_{}.tar.gz'.format(
+        NSP_NVHPC_version,
+        NSP_NVHPC_version.__str__().split('.')[0],
+        NSP_NVHPC_version.__str__().split('.')[0],
+        NSP_NVHPC_version.__str__().split('.')[1],
+        ansible_facts['system'],
+        NSP_architecture,
+        NSP_NVHPC_cuda_version
+      ) }}"
+    dest: "{{ [NSP_scratch_directory] | path_join }}"
+  changed_when: true
+  tags:
+    - nvhpc
+    - installation
+
+- name: Install NVHPC v{{ NSP_NVHPC_version }}
+  ansible.builtin.shell:
+    chdir: # noqa: jinja[spacing]
+      "{{ [NSP_scratch_directory, 'nvhpc_20{}_{}{}_{}_{}_cuda_{}'.format(
+        NSP_NVHPC_version.__str__().split('.')[0],
+        NSP_NVHPC_version.__str__().split('.')[0],
+        NSP_NVHPC_version.__str__().split('.')[1],
+        ansible_facts['system'],
+        NSP_architecture,
+        NSP_NVHPC_cuda_version
+      )] | path_join }}"
+    cmd: |
+      export NVHPC_SILENT=true
+      export NVHPC_INSTALL_DIR={{ [NSP_install_root, 'nvhpc', NSP_NVHPC_version.__str__()] | path_join }}
+      export NVHPC_INSTAL_TYPE=single
+      ./install
+  changed_when: true
+  tags:
+    - nvhpc
+    - installation
+
+- name: Clean up Scratch after NVHPC v{{ NSP_NVHPC_version }} Build
+  ansible.builtin.include_role:
+    name: nsp
+    tasks_from: clear_scratch
+  when: NSP_keep_scratch_clear
+  tags:
+    - nvhpc
+    - installation

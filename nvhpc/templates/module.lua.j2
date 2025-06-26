@@ -1,0 +1,45 @@
+{{ ansible_managed | comment(beginning="--[[", end="]]--", decoration="", prefix_count=0, postfix_count=0) }}
+
+family("compiler")
+
+whatis("NVHPC SDK v{{ NSP_NVHPC_version }}")
+
+help("NVHPC SDK v{{ NSP_NVHPC_version }}")
+
+local base = "{{ NSP_install_root }}"
+local package = "nvhpc"
+local version = "{{ NSP_NVHPC_version }}"
+local arch = "{{ '{}_{}'.format(ansible_facts['system'], NSP_architecture) }}"
+
+local prefix = pathJoin(base, package, version, arch, version)
+
+-- Environment Globals
+setenv("NVHPC", pathJoin(base, package, version))
+setenv("CC", pathJoin(prefix, "compilers/bin/nvc"))
+setenv("CXX", pathJoin(prefix, "compilers/bin/nvc++"))
+setenv("FC", pathJoin(prefix, "compilers/bin/nvfortran"))
+setenv("F90", pathJoin(prefix, "compilers/bin/nvfortran"))
+setenv("F77", pathJoin(prefix, "compilers/bin/nvfortran"))
+setenv("CPP", "cpp")
+
+prepend_path("PATH", pathJoin(prefix, "cuda/bin"))
+prepend_path("PATH", pathJoin(prefix, "compilers/bin"))
+prepend_path("PATH", pathJoin(prefix, "compilers/extras/qd/bin"))
+
+prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "cuda/lib64"))
+prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "cuda/extras/CUPTI/lib64"))
+prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "compilers/extras/qd/lib"))
+prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "compilers/lib"))
+prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "math_libs/lib64"))
+prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "comm_libs/nccl/lib"))
+prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "comm_libs/nvshmem/lib"))
+
+prepend_path("CPATH", pathJoin(prefix, "math_libs/include"))
+prepend_path("CPATH", pathJoin(prefix, "comm_libs/nccl/include"))
+prepend_path("CPATH", pathJoin(prefix, "comm_libs/nvshmem/include"))
+prepend_path("CPATH", pathJoin(prefix, "compilers/extras/qd/include/qd"))
+
+prepend_path("MANPATH", pathJoin(prefix, "compilers/man"))
+
+setenv(string.upper("{{ NSP_site_name }}_") .. package:upper() .. "_ROOT",  prefix)
+

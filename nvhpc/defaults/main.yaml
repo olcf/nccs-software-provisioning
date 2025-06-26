@@ -1,0 +1,4 @@
+# NSP_NVHPC_version
+NSP_NVHPC_cuda_version: multi
+
+NSP_NVHPC_create_module: true
