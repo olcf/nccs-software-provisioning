@@ -2,7 +2,7 @@ argument_specs:
   main:
     description:
       - The lmod role configures and under certain circumstances installs lmod.
-      - The main part of the configuration is a custom lmod hook that can be configured to look for modules in spack
+      - The main part of the configuration is for a lmod hook that can be configured to look for modules in spack
       - projections and add paths to ``MODULEPATH`` when appropriate. It also supports having custom lmod
       - "`rc.lua <https://lmod.readthedocs.io/en/latest/093_modulerc.html>`_,"
       - "`admin.list <https://lmod.readthedocs.io/en/latest/140_deprecating_modules.html>`_, and"
@@ -14,6 +14,9 @@ argument_specs:
 
               The ``lmod`` directory and accompanying files are completely optional. If no template files are provided
               the lmod role will skip generating them.
+      - ""
+      - In the same directory you may also place additional Lmod hooks. These hooks will only be copied if they
+      - "are registered with :ref:`NSP_LMOD_additional_hooks_variable`."
       # TODO
     options:
       NSP_LMOD_install_type:
@@ -33,18 +36,6 @@ argument_specs:
         default: false
         description: >-
           Build support for tcl module files (only applies if :ref:`NSP_LMOD_install_type_variable` = ``internal``).
-      NSP_LMOD_default_modules:
-        type: list
-        elements: str
-        required: false
-        default: [ ]
-        description: A list of modules to load in the ``DefApps`` module.
-        raw: |-
-          .. note::
-
-              If you are installing lmod with NSP then the ``DefApps`` module will be set to load automatically.
-              If you are using an external lmod installation you will have to configure loading ``DefApps`` outside
-              of NSP by setting the ``LMOD_SYSTEM_DEFAULT_MODULES`` environment variable.
       NSP_LMOD_default_module_paths:
         type: list
         elements: str
@@ -57,11 +48,23 @@ argument_specs:
 
               The path in ``NSP_module_root`` will automatically be added. So, there is no need to add it
               to ``NSP_LMOD_default_module_paths``.
-      NSP_LMOD_spack_modules:
+      NSP_LMOD_DefApps_modules:
+        type: list
+        elements: str
+        required: false
+        default: [ ]
+        description: A list of modules to load in the ``DefApps`` module.
+        raw: |-
+          .. note::
+
+              If you are installing lmod with NSP then the ``DefApps`` module will be set to load automatically.
+              If you are using an external lmod installation you will have to configure loading ``DefApps`` outside
+              of NSP by setting the ``LMOD_SYSTEM_DEFAULT_MODULES`` environment variable.
+      NSP_LMOD_hierarchy_root:
         type: path
         required: false
         default: "{{ [NSP_install_root, 'spack/modules'] | path_join }}"
-        description: Path to the spack generated module files.
+        description: Root path of the module hierarchy.
       NSP_LMOD_hierarchy:
         type: dict
         required: false
@@ -92,7 +95,7 @@ argument_specs:
           For each component we also define a list of ``paths``. These paths template the paths that the hook should
           add/remove from ``MODULEPATH``. Take for example the first path defined for compiler. If ``gcc/12.3.0`` were
           loaded then ``|compiler.name|-|compiler.version|`` would become ``gcc-12.3.0``. These paths are combined with
-          :ref:`NSP_LMOD_spack_modules_variable` to create the final path to add to ``MODULEPATH``. If
+          :ref:`NSP_LMOD_hierarchy_root_variable` to create the final path to add to ``MODULEPATH``. If
           :ref:`NSP_LMOD_enable_spack_compiler_projections_variable` is set then additional parts are added to the path
           to accommodate spack's automatic additions for compiler and version. Each path also has an associated
           ``weight``.
@@ -111,12 +114,23 @@ argument_specs:
 
               NSP_LMOD_nv_mappings:
                   gcc-native/12.3.0: {name: 'gcc', version: '%s'} # maps to gcc/12.3.0
+                  llvm/18.1.3: {name: 'clang', version: '%s-gfortran12'}
                   # %s substitutes in the value from the system module
 
           Sometimes, spack uses a different name for a package than the system does. For example, on Cray systems we
           now have ``gcc-native`` but spack just uses ``gcc``. By default the hook will not pick up on the difference.
           In order to fix this problem you can define an entry here that will remap a module name to the spack
           equivalent.
+      NSP_LMOD_enable_spack_compiler_projections:
+        type: bool
+        required: false
+        default: true
+        description: >-
+          Toggles the addition of paths in the hook that Spack adds in module projections for compiler and version.
+        raw: |-
+          .. caution::
+
+              When in doubt (and using with Spack), leave this variable with its default value.
       NSP_LMOD_path_names:
         type: dict
         required: false
@@ -132,16 +146,6 @@ argument_specs:
 
           All modules that reside somewhere under ``/opt/cray`` will appear in the ``[ Cray Programming Environment ]``
           section when using ``module avail``.
-      NSP_LMOD_enable_spack_compiler_projections:
-        type: bool
-        required: false
-        default: true
-        description: >-
-          Toggles the addition of paths in the hook that Spack adds in module projections for compiler and version.
-        raw: |-
-          .. caution::
-
-              When in doubt (and using with Spack), leave this variable with its default value.
       NSP_LMOD_enable_logging:
         type: bool
         required: false
@@ -152,3 +156,10 @@ argument_specs:
         required: false
         default: "http://localhost:8080/"
         description: API URL to send module loads to.
+      NSP_LMOD_additional_hooks:
+        type: list
+        required: false
+        default: [ ]
+        description: >-
+          A list of additional hooks to activate. Additional hooks must be located in the playbook directory
+          under a sub-directory called ``lmod``. The hook files must be named ``<hook_name>.lua.j2``.

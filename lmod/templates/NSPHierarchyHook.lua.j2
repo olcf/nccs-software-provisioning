@@ -1,0 +1,260 @@
+{{ ansible_managed | comment(beginning="--[[", end="]]--", decoration="", prefix_count=0, postfix_count=0) }}
+
+--------------------------------------------------------------------------
+-- NSP provided hooks
+
+-- global variable to keep track of module changes
+gl_module_changes = {}
+
+-- imports
+local MT = require('MT')
+local FrameStk = require('FrameStk')
+
+
+local HIERARCHY = {
+{% for component in NSP_LMOD_hierarchy %}
+    ['{{ component }}'] = {
+        members = {{ '{' }}{% for mod in NSP_LMOD_hierarchy[component].members %}'{{ mod }}', {% endfor %}{{ '}' }},
+        paths = {
+{% for pw in NSP_LMOD_hierarchy[component].paths %}
+            {{ '{' }}path = '{{ pw.path }}', weight = {{ pw.weight }}{{ '}' }},
+{% endfor %}
+        },
+        level = {{ NSP_LMOD_hierarchy[component].level }}
+    },
+{% endfor %}
+}
+
+local nv_mappings = {
+{% for mapping in NSP_LMOD_nv_mappings %}
+    ['{{ mapping }}'] = {{ '{' }}name = '{{ NSP_LMOD_nv_mappings[mapping].name }}', version = '{{ NSP_LMOD_nv_mappings[mapping].version }}'{{ '}' }},
+{% endfor %}
+}
+
+pm_mappings = {
+{% for mapping in NSP_LMOD_nv_mappings %}
+{% set mapping_parts = mapping.split('/') %}
+    { r = "{{ NSP_LMOD_nv_mappings[mapping].name.replace('%s', mapping_parts[0]) }}-{{ NSP_LMOD_nv_mappings[mapping].version.replace('%s', mapping_parts[1]) }}()", t = "{{ mapping }}%s" },
+{% endfor %}
+{% for component in NSP_LMOD_hierarchy  %}
+{% for module in NSP_LMOD_hierarchy [component].members %}
+    { r = "{{ module }}-(.*)", t = "{{ module }}/%s" },
+{% endfor %}
+{% endfor %}
+}
+
+local spack_modules_prefix = '{{ NSP_LMOD_hierarchy_root }}'
+
+local path_names = {
+{% for entry in NSP_LMOD_path_names %}
+    ['{{ entry }}'] = '{{ NSP_LMOD_path_names[entry] }}',
+{% endfor %}
+}
+
+-- functions
+function tb_has_value(tb, val)
+    --
+    -- check if an index table contains a value
+    --
+    for i, v in ipairs(tb) do
+        if v == val then
+            return true
+        end
+    end
+    return false
+end
+
+function map_nv(name, version)
+    --
+    -- map a module name and version to the spack name and version via. nv_mappings
+    --
+    if nv_mappings[name .. '/' .. version] ~= nil then
+        return string.format(nv_mappings[name .. '/' .. version].name, name), string.format(nv_mappings[name .. '/' .. version].version, version)
+    else
+        return name, version
+    end
+end
+
+function get_hierarchy_components(t_name, t_version)
+    --
+    -- get the hierarchy componentes that are loaded
+    -- with the module being loaded taking precedence
+    --
+
+    -- get the original modules
+    local mt = MT:singleton()
+    local origMT = mt:list('userName', 'any')
+
+    -- get the final set of modules
+    local fl_module_tb = {}
+    for i, v in ipairs(origMT) do
+        fl_module_tb[v.sn] = string.sub(v.fullName, #v.sn + 2, #v.fullName)
+    end
+    for i, v in pairs(gl_module_changes) do
+        if v.mode == 'load' then
+            fl_module_tb[i] = v.version
+        elseif v.mode == 'unload' then
+            fl_module_tb[i] = nil
+        end
+    end
+
+    -- pull list of componates from the hierarchy
+    local components = {}
+    for k, v in pairs(HIERARCHY) do
+        components[k] = {
+            active = false,
+            name = nil,
+            version = nil,
+            module = nil
+        }
+    end
+
+    -- check each componates status
+    for k, v in pairs(components) do
+        if tb_has_value(HIERARCHY[k].members, t_name) then
+            v.active = true
+            v.name, v.version = map_nv(t_name, t_version)
+            v.module = string.format('%s/%s', t_name, t_version)
+        else
+            for i, m in ipairs(HIERARCHY[k].members) do
+                if fl_module_tb[m] ~= nil then
+                    v.active = true
+                    v.name, v.version = map_nv(m, fl_module_tb[m])
+                    v.module = string.format('%s/%s', m, fl_module_tb[m])
+                    break
+                end
+            end
+        end
+    end
+
+    return components
+end
+
+function configure_spack_modulepaths(t_module, components, mode)
+    -- determin if the paths should be changed
+    local change = false
+    local t_component = nil
+    for k, v in pairs(HIERARCHY) do
+        if tb_has_value(v.members, t_module) then
+            change = true
+            t_component = k
+            break
+        end
+    end
+    if not change then return end
+
+    -- unload
+    if mode == 'unload' then
+        -- clean module paths
+        local module_path = os.getenv('MODULEPATH')
+        for path in string.split(module_path, ':') do
+            if string.find(path, string.gsub(string.format('%s.%s', components[t_component].name, components[t_component].version), '%-', '%%-')) ~= nil then
+                remove_path('MODULEPATH', path)
+            end
+        end
+
+    -- load
+    elseif mode == 'load' then
+        -- generate paths
+        local paths = {}
+        for i, v1 in ipairs(HIERARCHY[t_component].paths) do
+            -- sub paths
+            local p = {path = v1.path, weight = v1.weight}
+            for k, v2 in pairs(components) do
+                p.path = string.gsub(p.path, string.format('|%s.name|', k), tostring(v2.name))
+                p.path = string.gsub(p.path, string.format('|%s.version|', k), tostring(v2.version))
+            end
+{% if NSP_LMOD_enable_spack_compiler_projections %}
+            p.path = pathJoin(spack_modules_prefix, components['compiler'].name, components['compiler'].version, p.path) -- add spack Compiler folders
+{% else %}
+            p.path = pathJoin(spack_modules_prefix, p.path)
+{% endif %}
+
+            if not string.match(p.path, 'nil') then
+                table.insert(paths, p)
+            end
+        end
+
+        -- add new paths
+        for i, v in ipairs(paths) do
+            prepend_path{'MODULEPATH', v.path, priority=v.weight}
+        end
+    end
+
+end
+
+function observe_and_trigger(t)
+    --
+    -- log all module load/unload calls to the gt_module_changes
+    -- and trigger spack modulepath changes
+    --
+    local frameStk = FrameStk:singleton()
+    gl_module_changes[frameStk:sn()] = {
+        ['version'] = string.sub(frameStk:fullName(), #frameStk:sn() + 2, #frameStk:fullName()),
+        ['mode'] = mode()
+    }
+
+    local components = get_hierarchy_components(frameStk:sn(), string.sub(frameStk:fullName(), #frameStk:sn() + 2, #frameStk:fullName()))
+    configure_spack_modulepaths(frameStk:sn(), components, mode())
+
+end
+
+function label_paths(t)
+    -- Label NSP paths when human readable descriptions
+    local availStyle = masterTbl().availStyle
+    if availStyle ~= 'nsp-pretty' then
+        return
+    end
+
+    local hc = get_hierarchy_components(nil, nil)
+    local paths = {}
+    for k, v in pairs(t) do
+        local ss, spackish, proj, core, core_v
+        ss = string.gsub(spack_modules_prefix, '%-', '%%-')
+        spackish, proj = string.match(k, string.format('^(%s)/(.*)$', ss))
+        if proj ~= nil then core, core_v = string.match(proj, '^(Core)/([a-z0-9\\.]*)$') end
+
+        if spackish then
+            local label
+            if core ~= nil and core_v ~= nil then   -- handle Core
+                label = string.format("[ %s/%s ]", core, core_v)
+            else    -- deal with the rest of the paths
+{% if NSP_LMOD_enable_spack_compiler_projections %}
+                proj = string.gsub(proj, string.format('%s/%s/', hc['compiler'].name, hc['compiler'].version), '') -- strip spack Compiler folders
+{% endif %}
+                local m_set = {}
+                for comp, d in pairs(hc) do
+                    if d.active and string.match(k, string.gsub(string.format('%s-%s', d.name, d.version), '%-', '%%-')) then
+                        table.insert(m_set, { module = d.module, level = HIERARCHY[comp].level })
+                    end
+                end
+                table.sort(m_set, function (x, y) return x.level < y.level end)
+
+                label = '[ '
+                for i, dat in ipairs(m_set) do
+                    if i == 1 then
+                        label = label .. dat.module
+                    else
+                        label = label .. ', ' .. dat.module
+                    end
+                end
+                label = label .. ' ]'
+            end
+            t[k] = label
+        elseif k == '{{ NSP_module_root }}' then
+            t[k] = "[ Base Modules ]"
+        else
+            for regex, label in pairs(path_names) do
+                if string.match(k, string.format('.*%s.*', string.gsub(regex, '%-', '%%-'))) then
+                    t[k] = label
+                    break
+                end
+            end
+        end
+    end
+end
+
+-- register hooks
+NSP_Hook.register('load', observe_and_trigger)
+NSP_Hook.register('unload', observe_and_trigger)
+NSP_Hook.register('avail', label_paths)

@@ -1,0 +1,40 @@
+{{ ansible_managed | comment(beginning="--[[", end="]]--", decoration="", prefix_count=0, postfix_count=0) }}
+
+local cosmic = require("Cosmic"):singleton()
+
+GL_load_logs = {}
+
+local user = os.getenv("USER") or "unknown"
+local hostname = io.popen("hostname -f"):read("*a"):gsub("%s+", "") or "unknown"
+local system = cosmic:value("LMOD_SYSTEM_NAME") or "unknown"
+
+function register_module_loads(t)
+    local load_entry = {
+        ['username'] = user,
+        ['module_name'] = t.mname.__sn,
+        ['path_to_module'] = t.mname.__fn,
+        ['hostname'] = hostname,
+        ['system'] = system
+    }
+    if t.mname.__version then
+        load_entry['module_version'] = t.mname.__version
+    end
+    table.insert(GL_load_logs, load_entry)
+end
+
+function log_module_loads(UsrCmd)
+    -- check that we have something to do
+    if mode() ~= "load" or #GL_load_logs <= 0 then return end
+
+    -- log the loads
+    local curl_cmd = string.format(
+        "curl --max-time 3 -X 'POST' '{{ NSP_LMOD_logging_url }}' -H 'accept: application/json' -H 'Content-Type: application/json' -d '%s' > /dev/null 2>&1",
+        json.encode(GL_load_logs)
+    )
+    os.execute(curl_cmd)
+end
+
+{% if NSP_LMOD_enable_logging %}
+NSP_Hook.register('load', register_module_loads, "append")
+NSP_Hook.register('finalize', log_module_loads, "append")
+{% endif %}

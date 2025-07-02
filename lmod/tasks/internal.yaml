@@ -39,7 +39,7 @@
 
       export LMOD_SYSTEM_NAME={{ NSP_system_name }}
       export LMOD_SYSTEM_DEFAULT_MODULES=DefApps
-      export LMOD_PACKAGE_PATH={{ [NSP_install_root, 'lmod/etc'] | path_join }}
+      export LMOD_PACKAGE_PATH={{ [NSP_install_root, 'lmod/hooks'] | path_join }}
       export LMOD_AVAIL_STYLE=nsp-pretty:system
       export LMOD_MODULERCFILE={{ [NSP_install_root, 'lmod/etc/rc.lua'] | path_join }}
       export LMOD_ADMIN_FILE={{ [NSP_install_root, 'lmod/etc/admin.list'] | path_join }}
@@ -69,7 +69,7 @@
 
       setenv LMOD_SYSTEM_NAME {{ NSP_system_name }}
       setenv LMOD_SYSTEM_DEFAULT_MODULES DefApps
-      setenv LMOD_PACKAGE_PATH {{ [NSP_install_root, 'lmod/etc'] | path_join }}
+      setenv LMOD_PACKAGE_PATH {{ [NSP_install_root, 'lmod/hooks'] | path_join }}
       setenv LMOD_AVAIL_STYLE nsp-pretty:system
       setenv LMOD_MODULERCFILE {{ [NSP_install_root, 'lmod/etc/rc.lua'] | path_join }}
       setenv LMOD_ADMIN_FILE {{ [NSP_install_root, 'lmod/etc/admin.list'] | path_join }}

@@ -51,6 +51,7 @@ Next add the NSP repository as a submodule in the roles directory.
     [main (root-commit) 5310052] Adding NSP submodule.
     2 files changed, 4 insertions(+)
     create mode 100644 .gitmodules
+    create mode 120000 ansible.cfg
     create mode 160000 roles
 
 Add a New System
@@ -107,16 +108,16 @@ to fine tune Lmod, set up convenience variables and more. As a first step for ou
     :emphasize-lines: 11
 
     - name: Deploy Moria
-     hosts: localhost
+      hosts: localhost
 
-     vars:
-       NSP_system_name: moria
-       NSP_install_root: "{{ ['/tmp', NSP_system_name] | path_join }}"
-       NSP_help_email: example@example.com
-       NSP_site_name: MySiteName
+      vars:
+        NSP_system_name: moria
+        NSP_install_root: "{{ ['/tmp', NSP_system_name] | path_join }}"
+        NSP_help_email: example@example.com
+        NSP_site_name: MySiteName
 
-     roles:
-       - role: init
+      roles:
+        - role: init
 
 Various roles in NSP will add to the init scripts but if you have extra content, that you want added to the init
 scripts, you can do so by creating a ``profile.j2`` and/or ``cshrc.j2`` file in ``<system>/init``. For this tutorial we
@@ -239,8 +240,8 @@ After we run our playbook again we can source the init script and see our new so
 If you were to look at the init scripts you would see that they now have an additional section that was added by lmod.
 
 .. code-block:: bash
-   :caption: ``/tmp/moria/init/profile``
-   :emphasize-lines: 17-34
+    :caption: ``/tmp/moria/init/profile``
+    :emphasize-lines: 17-34
 
     #!/usr/bin/env bash
     ##
@@ -250,7 +251,7 @@ If you were to look at the init scripts you would see that they now have an addi
     #
     #| Info:
     #|   Role: init
-    #|   Template: profile.j2
+    #|   NSP Template: profile.j2
     #|   User: software
     ##
 
@@ -267,7 +268,7 @@ If you were to look at the init scripts you would see that they now have an addi
 
     export LMOD_SYSTEM_NAME=moria
     export LMOD_SYSTEM_DEFAULT_MODULES=DefApps
-    export LMOD_PACKAGE_PATH=/tmp/moria/lmod/etc
+    export LMOD_PACKAGE_PATH=/tmp/moria/lmod/hooks
     export LMOD_AVAIL_STYLE=nsp-pretty:system
     export LMOD_MODULERCFILE=/tmp/moria/lmod/etc/rc.lua
     export LMOD_ADMIN_FILE=/tmp/moria/lmod/etc/admin.list
@@ -679,7 +680,7 @@ Finally we will need to add the spack role to our playbook.
 
       vars:
         NSP_system_name: moria
-        NSP_install_root: "{{ ['/sw', NSP_system_name] | path_join }}"
+        NSP_install_root: "{{ ['/tmp', NSP_system_name] | path_join }}"
         NSP_help_email: example@example.com
         NSP_site_name: MySiteName
 
@@ -720,13 +721,13 @@ After running the playbook explore ``/tmp/moria/spack/configs``. To install our 
 
 .. code-block:: bash
 
-    cd /sw/moria/spack/configs
-    source spacktivate   # choose the core25.02 env
-    spack concretize
-    spack install
-    source spacktivate   # choose the sw25.02 env
-    spack concretize
-    spack install
+    $ cd /tmp/moria/spack/configs
+    $ source spacktivate   # choose the core25.02 env
+    $ spack concretize
+    $ spack install
+    $ source spacktivate   # choose the sw25.02 env
+    $ spack concretize
+    $ spack install
 
 All of our software should now be installed to ``/tmp/moria/spack/envs``; however, none of it shows up for
 ``module avail`` yet, but all of the modules are in ``/tmp/moria/spack/modules``.
@@ -748,18 +749,18 @@ environment that we installed.
     prepend_path{"MODULEPATH", "{{ [NSP_install_root, 'spack/modules/Core/25.02'] | path_join }}", priority=10}
 
 Modify the playbook to include configuration for our hook and the :ref:`files_role` role which is where we are keeping
-the ``Core`` module files. Also add some modules to lmod's :ref:`NSP_LMOD_default_modules_variable`.
+the ``Core`` module files. Also add some modules to lmod's :ref:`NSP_LMOD_DefApps_modules_variable`.
 
 .. code-block:: yaml
     :caption: ``erebor.yaml``
-    :emphasize-lines: 16-30,55-59
+    :emphasize-lines: 16-32,59-63
 
     - name: Deploy Moria
       hosts: localhost
 
       vars:
         NSP_system_name: moria
-        NSP_install_root: "{{ ['/sw', NSP_system_name] | path_join }}"
+        NSP_install_root: "{{ ['/tmp', NSP_system_name] | path_join }}"
         NSP_help_email: example@example.com
         NSP_site_name: MySiteName
 
@@ -769,7 +770,7 @@ the ``Core`` module files. Also add some modules to lmod's :ref:`NSP_LMOD_defaul
           vars:
             NSP_LMOD_install_type: internal
             NSP_LMOD_version: 8.7.37
-            NSP_LMOD_default_modules:
+            NSP_LMOD_DefApps_modules:
               - Core/25.02
               - gcc/14.2.0
             NSP_LMOD_hierarchy:
@@ -784,6 +785,8 @@ the ``Core`` module files. Also add some modules to lmod's :ref:`NSP_LMOD_defaul
                 paths:
                   - {path: '|mpi.name|-|mpi.version|/|compiler.name|-|compiler.version|', weight: 30}
                 level: 1
+            NSP_LMOD_nv_mappings:
+              llvm/19.1.0: {name: "clang", version: "%s-gfortran14"}
         - role: miniforge3
           vars:
             NSP_MINIFORGE3_version: 24.11.3
@@ -796,18 +799,20 @@ the ``Core`` module files. Also add some modules to lmod's :ref:`NSP_LMOD_defaul
             # if your system architecture is not x86_64 you will need to set `NSP_LLVM_targets`
         - role: spack
           vars:
+            _shared_templates: &shared_L
+              - compilers
+              - concretizer
+              - config
+              - modules
+              - packages
+            _specific_templates: &specific_L
+              - spack
             NSP_SPACK_versions:
               v0.23.1:
                 git_reference: 2bfcc69
             NSP_SPACK_environments:
-              core25.02:
-                spack_version: v0.23.1
-                shared_templates:
-                  - mirrors
-              sw25.02:
-                spack_version: v0.23.1
-                shared_templates:
-                  - mirrors
+              core25.02: { spack_version: v0.23.1, specific_templates: *specific_L, shared_templates: *shared_L }
+              sw25.02: { spack_version: v0.23.1, specific_templates: *specific_L, shared_templates: *shared_L }
         - role: files
           vars:
             NSP_FILES_inventory:

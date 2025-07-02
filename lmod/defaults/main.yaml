@@ -2,14 +2,17 @@
 # NSP_LMOD_version
 NSP_LMOD_enable_tcl: false
 
-NSP_LMOD_default_modules: [ ]
 NSP_LMOD_default_module_paths: [ ]
+NSP_LMOD_DefApps_modules: [ ]
 
-NSP_LMOD_spack_modules: "{{ [NSP_install_root, 'spack/modules'] | path_join }}"
+NSP_LMOD_hierarchy_root: "{{ [NSP_install_root, 'spack/modules'] | path_join }}"
 NSP_LMOD_hierarchy: { }
 NSP_LMOD_nv_mappings: { }
-NSP_LMOD_path_names: { }
 NSP_LMOD_enable_spack_compiler_projections: true
+
+NSP_LMOD_path_names: { }
 
 NSP_LMOD_enable_logging: false
 NSP_LMOD_logging_url: "http://localhost:8080/"
+
+NSP_LMOD_additional_hooks: [ ]

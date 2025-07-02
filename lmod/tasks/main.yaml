@@ -1,34 +1,10 @@
-- name: Create NSP_module_root Directory
+- name: Create NSP_module_root ({{ NSP_module_root }}) Directory
   ansible.builtin.file:
     path: "{{ NSP_module_root }}"
     state: directory
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_executable_permissions }}"
-  tags:
-    - lmod
-    - configuration
-
-- name: Create LMOD Directories
-  ansible.builtin.file:
-    path: "{{ [NSP_install_root, 'lmod', item] | path_join }}"
-    state: directory
-    owner: "{{ NSP_user }}"
-    group: "{{ NSP_group }}"
-    mode: "{{ NSP_executable_permissions }}"
-  loop:
-    - etc
-  tags:
-    - lmod
-    - configuration
-
-- name: Generate LMOD SitePackage File
-  ansible.builtin.template:
-    src: SitePackage.lua.j2
-    dest: "{{ [NSP_install_root, 'lmod/etc/SitePackage.lua'] | path_join }}"
-    owner: "{{ NSP_user }}"
-    group: "{{ NSP_group }}"
-    mode: "{{ NSP_file_permissions }}"
   tags:
     - lmod
     - configuration
@@ -44,38 +20,64 @@
     - lmod
     - configuration
 
-- name: Generate LMOD rc File
-  ansible.builtin.template:
-    src: "{{ [playbook_dir, 'lmod/rc.lua.j2'] | path_join }}"
-    dest: "{{ [NSP_install_root, 'lmod/etc/rc.lua'] | path_join }}"
+- name: Create LMOD Directories
+  ansible.builtin.file:
+    path: "{{ [NSP_install_root, 'lmod', item] | path_join }}"
+    state: directory
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
-    mode: "{{ NSP_file_permissions }}"
-  when: "[playbook_dir, 'lmod/rc.lua.j2'] | path_join is file"
+    mode: "{{ NSP_executable_permissions }}"
+  loop:
+    - etc
+    - hooks
   tags:
     - lmod
     - configuration
 
-- name: Generate LMOD admin File
+- name: Generate LMOD Configuration Files
   ansible.builtin.template:
-    src: "{{ [playbook_dir, 'lmod/admin.list.j2'] | path_join }}"
-    dest: "{{ [NSP_install_root, 'lmod/etc/admin.list'] | path_join }}"
+    src: "{{ [playbook_dir, 'lmod/{}.j2'.format(item)] | path_join }}"
+    dest: "{{ [NSP_install_root, 'lmod/etc/{}'.format(item)] | path_join }}"
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
-  when: "[playbook_dir, 'lmod/admin.list.j2'] | path_join is file"
+  loop:
+    - rc.lua
+    - admin.list
+    - lmodrc.lua
+  when: "[playbook_dir, 'lmod/{}.j2'.format(item)] | path_join is file"
   tags:
     - lmod
     - configuration
 
-- name: Generate LMOD lmodrc File
+- name: Load LMOD Hook Configuration
+  ansible.builtin.set_fact:
+    _LMOD_active_hooks: "{{ ['NSPHierarchyHook', 'NSPLoggingHook'] + NSP_LMOD_additional_hooks }}"
+  tags:
+    - lmod
+    - configuration
+
+- name: Generate SitePackage.lua File
   ansible.builtin.template:
-    src: "{{ [playbook_dir, 'lmod/lmodrc.lua.j2'] | path_join }}"
-    dest: "{{ [NSP_install_root, 'lmod/etc/lmodrc.lua'] | path_join }}"
+    src: "SitePackage.lua.j2"
+    dest: "{{ [NSP_install_root, 'lmod/hooks/SitePackage.lua'] | path_join }}"
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
-  when: "[playbook_dir, 'lmod/lmodrc.lua.j2'] | path_join is file"
+  tags:
+    - lmod
+    - configuration
+
+- name: Generate LMOD Hook Files
+  ansible.builtin.template:
+    src: "{{ [playbook_dir, 'lmod/{}.lua.j2'.format(item)] | path_join
+      if item in NSP_LMOD_additional_hooks else
+        '{}.lua.j2'.format(item) }}"
+    dest: "{{ [NSP_install_root, 'lmod/hooks/{}.lua'.format(item)] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  loop: "{{ _LMOD_active_hooks }}"
   tags:
     - lmod
     - configuration
