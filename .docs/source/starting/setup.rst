@@ -752,7 +752,7 @@ Modify the playbook to include configuration for our hook and the :ref:`files_ro
 the ``Core`` module files. Also add some modules to lmod's :ref:`NSP_LMOD_DefApps_modules_variable`.
 
 .. code-block:: yaml
-    :caption: ``erebor.yaml``
+    :caption: ``moria.yaml``
     :emphasize-lines: 16-32,59-63
 
     - name: Deploy Moria
