@@ -1,4 +1,5 @@
 {{ ansible_managed | comment(beginning="--[[", end="]]--", decoration="", prefix_count=0, postfix_count=0) }}
+{% set llvm_v_list = llvm_version.split('.') %}
 
 family("compiler")
 
@@ -17,19 +18,19 @@ prepend_path("PATH", pathJoin(prefix, "bin"))
 prepend_path("MANPATH", pathJoin(prefix, "share/man"))
 
 prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "lib"))
-prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "lib/clang/18/lib/x86_64-unknown-linux-gnu"))
-prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "lib/x86_64-unknown-linux-gnu"))
+prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "lib/clang/{{ llvm_v_list[0] }}/lib/{{ NSP_architecture }}-unknown-linux-gnu"))
+prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "lib/{{ NSP_architecture }}-unknown-linux-gnu"))
 
 prepend_path("LIBRARY_PATH", pathJoin(prefix, "lib"))
-prepend_path("LIBRARY_PATH", pathJoin(prefix, "lib/clang/18/lib/x86_64-unknown-linux-gnu"))
-prepend_path("LIBRARY_PATH", pathJoin(prefix, "lib/x86_64-unknown-linux-gnu"))
+prepend_path("LIBRARY_PATH", pathJoin(prefix, "lib/clang/{{ llvm_v_list[0] }}/lib/{{ NSP_architecture }}-unknown-linux-gnu"))
+prepend_path("LIBRARY_PATH", pathJoin(prefix, "lib/{{ NSP_architecture }}-unknown-linux-gnu"))
 
 prepend_path("CMAKE_PREFIX_PATH", prefix)
 
 prepend_path("C_INCLUDE_PATH", pathJoin(prefix, 'include'))
-prepend_path("C_INCLUDE_PATH", pathJoin(prefix, 'lib/clang/18/include'))
+prepend_path("C_INCLUDE_PATH", pathJoin(prefix, 'lib/clang/{{ llvm_v_list[0] }}/include'))
 
 prepend_path("CPLUS_INCLUDE_PATH", pathJoin(prefix, 'include'))
-prepend_path("CPLUS_INCLUDE_PATH", pathJoin(prefix, 'lib/clang/18/include'))
+prepend_path("CPLUS_INCLUDE_PATH", pathJoin(prefix, 'lib/clang/{{ llvm_v_list[0] }}/include'))
 
 setenv(string.upper("{{ NSP_site_name }}_") .. package:upper() .. "_ROOT",  prefix)
