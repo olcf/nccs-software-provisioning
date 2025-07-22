@@ -1,5 +1,6 @@
 {{ ansible_managed | comment(beginning="--[[", end="]]--", decoration="", prefix_count=0, postfix_count=0) }}
 
+local json = require("json")
 local cosmic = require("Cosmic"):singleton()
 
 GL_load_logs = {}
