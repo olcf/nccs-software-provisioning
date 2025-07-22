@@ -1,5 +1,5 @@
 {{ ansible_managed | comment(beginning="--[[", end="]]--", decoration="", prefix_count=0, postfix_count=0) }}
-{% set llvm_v_list = llvm_version.split('.') %}
+{% set llvm_v_list = NSP_LLVM_version.split('.') %}
 
 family("compiler")
 
