@@ -39,8 +39,18 @@ argument_specs:
         default:
           - "intel.oneapi.lin.ifort-compiler"
         description: The HPC toolkit components to install.
+      NSP_ONEAPI_install_name:
+        type: str
+        required: false
+        default: "oneapi"
+        description: Name of the directory to install OneAPI into. Common alternatives may be "intel", or "mkl", if only MKL is installed.
       NSP_ONEAPI_create_module:
         type: bool
         required: false
         default: true
         description: Toggles module generation.
+      NSP_ONEAPI_module_name:
+        type: str
+        required: false
+        default: "oneapi"
+        description: Name of the module generated. Common names may be "oneapi", "intel", or "mkl", if only MKL is installed.

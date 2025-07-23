@@ -47,7 +47,7 @@
       --download-cache {{ [NSP_scratch_directory, 'oneapi-{}/cache'.format(NSP_ONEAPI_version)] | path_join }}
       --download-dir {{ [NSP_scratch_directory, 'oneapi-{}/downloads'.format(NSP_ONEAPI_version)] | path_join }}
       --log-dir {{ [NSP_scratch_directory, 'oneapi-{}/logs'.format(NSP_ONEAPI_version)] | path_join }}
-      --install-dir {{ [NSP_install_root, 'oneapi', NSP_ONEAPI_version] | path_join }}
+      --install-dir {{ [NSP_install_root, NSP_ONEAPI_install_name, NSP_ONEAPI_version] | path_join }}
       --eula accept --components {{ ':'.join(NSP_ONEAPI_base_toolkit_components) }}"
   changed_when: true
   tags:
@@ -76,7 +76,7 @@
       --download-cache {{ [NSP_scratch_directory, 'oneapi-{}/cache'.format(NSP_ONEAPI_version)] | path_join }}
       --download-dir {{ [NSP_scratch_directory, 'oneapi-{}/downloads'.format(NSP_ONEAPI_version)] | path_join }}
       --log-dir {{ [NSP_scratch_directory, 'oneapi-{}/logs'.format(NSP_ONEAPI_version)] | path_join }}
-      --install-dir {{ [NSP_install_root, 'oneapi', NSP_ONEAPI_version] | path_join }}
+      --install-dir {{ [NSP_install_root, NSP_ONEAPI_install_name, NSP_ONEAPI_version] | path_join }}
       --eula accept --components {{ ':'.join(NSP_ONEAPI_hpc_toolkit_components) }}"
   changed_when: true
   tags:

@@ -1,19 +1,32 @@
 {{ ansible_managed | comment(beginning="--[[", end="]]--", decoration="", prefix_count=0, postfix_count=0) }}
 
+{% if "intel.oneapi.lin.dpcpp-cpp-compiler" in NSP_ONEAPI_base_toolkit_components or "intel.oneapi.lin.ifort-compiler" in NSP_ONEAPI_hpc_toolkit_components %}
 family("compiler")
+{% endif %}
 
 whatis("Intel OneAPI v{{ NSP_ONEAPI_version }}")
 
-help("Intel OneAPI v{{ NSP_ONEAPI_version }}")
+help("Intel OneAPI v{{ NSP_ONEAPI_version }} Suite, with the following components installed:
+{% for c in NSP_ONEAPI_base_toolkit_components %}
+{{ c }}
+{% endfor %}
+{% for c in NSP_ONEAPI_hpc_toolkit_components %}
+{{ c }}
+{% endfor %}
+")
 
 local base = "{{ NSP_install_root }}"
-local package = "oneapi"
+local package = "{{ NSP_ONEAPI_install_name }}"
 local version = "{{ NSP_ONEAPI_version }}"
 local prefix = pathJoin(base, package, version, "{{ '.'.join(NSP_ONEAPI_version.split('.')[:2]) }}")
 
 setenv("INTEL_PATH", prefix)
 setenv("INTEL_VERSION", version)
+
+{% if "intel.oneapi.lin.dpcpp-cpp-compiler" in NSP_ONEAPI_base_toolkit_components or "intel.oneapi.lin.ifort-compiler" in NSP_ONEAPI_hpc_toolkit_components %}
 setenv("INTEL_COMPILER_TYPE", "ONEAPI")
+{% endif %}
+
 prepend_path("PATH",  pathJoin(prefix, "bin" ))
 prepend_path("MANPATH", pathJoin(prefix, "share/man" ))
 prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "lib"))
