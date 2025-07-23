@@ -1,14 +1,14 @@
 - name: Launch ONEAPI v{{ NSP_ONEAPI_version }} Install
   ansible.builtin.include_tasks:
     file: install.yaml
-  when: not [NSP_install_root, 'oneapi', NSP_ONEAPI_version] | path_join is directory
+  when: not [NSP_install_root, NSP_ONEAPI_install_name, NSP_ONEAPI_version] | path_join is directory
   tags:
     - oneapi
     - installation
 
 - name: Create ONEAPI Module Directory
   ansible.builtin.file:
-    path: "{{ [NSP_module_root, 'oneapi'] | path_join }}"
+    path: "{{ [NSP_module_root, NSP_ONEAPI_module_name] | path_join }}"
     state: directory
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
@@ -21,7 +21,7 @@
 - name: Generate ONEAPI v{{ NSP_ONEAPI_version }} Module File
   ansible.builtin.template:
     src: module.lua.j2
-    dest: "{{ [NSP_module_root, 'oneapi', '{}.lua'.format(NSP_ONEAPI_version)] | path_join }}"
+    dest: "{{ [NSP_module_root, NSP_ONEAPI_module_name, '{}.lua'.format(NSP_ONEAPI_version)] | path_join }}"
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
