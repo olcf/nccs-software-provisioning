@@ -34,6 +34,7 @@
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "744"
+  when: NSP_ONEAPI_base_toolkit_components | length > 0
   tags:
     - oneapi
     - installation
@@ -50,6 +51,7 @@
       --install-dir {{ [NSP_install_root, NSP_ONEAPI_install_name, NSP_ONEAPI_version] | path_join }}
       --eula accept --components {{ ':'.join(NSP_ONEAPI_base_toolkit_components) }}"
   changed_when: true
+  when: NSP_ONEAPI_base_toolkit_components | length > 0
   tags:
     - oneapi
     - installation
@@ -63,6 +65,7 @@
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "744"
+  when: NSP_ONEAPI_hpc_toolkit_components | length > 0
   tags:
     - oneapi
     - installation
@@ -79,6 +82,7 @@
       --install-dir {{ [NSP_install_root, NSP_ONEAPI_install_name, NSP_ONEAPI_version] | path_join }}
       --eula accept --components {{ ':'.join(NSP_ONEAPI_hpc_toolkit_components) }}"
   changed_when: true
+  when: NSP_ONEAPI_hpc_toolkit_components | length > 0
   tags:
     - oneapi
     - installation
