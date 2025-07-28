@@ -105,7 +105,7 @@ to fine tune Lmod, set up convenience variables and more. As a first step for ou
 
 .. code-block:: yaml
     :caption: ``moria/playbook.yaml``
-    :emphasize-lines: 11
+    :emphasize-lines: 10-11
 
     - name: Deploy Moria
       hosts: localhost
@@ -375,48 +375,6 @@ We will name our spack environments according to the following schema ``core<yea
 ``sw<year>.<month>`` (in this tutorial we will use ``core25.02`` and ``sw25.02``). Create the following files:
 
 .. code-block:: jinja
-    :caption: ``moria/spack/environments/compilers.yaml.j2``
-
-    {{ ansible_managed | comment(beginning="##", end="##", decoration="#", prefix_count=0, postfix_count=0) }}
-
-    compilers:
-      # system GCC
-      - compiler:
-          spec: gcc@{{ system_gcc.version }}
-          paths:
-            cc: /usr/bin/gcc
-            cxx: /usr/bin/g++
-            f77: /usr/bin/gfortran
-            fc: /usr/bin/gfortran
-          operating_system: {{ os.identifier }}
-          modules: [ ]
-
-      # GCC compiler
-      - compiler:
-          spec: gcc@{{ gcc.version }}
-          paths:
-            cc: {{ [NSP_install_root, 'gcc', gcc.version, 'bin/gcc'] | path_join }}
-            cxx: {{ [NSP_install_root, 'gcc', gcc.version, 'bin/g++'] | path_join }}
-            f77: {{ [NSP_install_root, 'gcc', gcc.version, 'bin/gfortran'] | path_join }}
-            fc: {{ [NSP_install_root, 'gcc', gcc.version, 'bin/gfortran'] | path_join }}
-          operating_system: {{ os.identifier }}
-          modules:
-            - gcc/{{ gcc.version }}
-
-      # LLVM compiler
-    {% set gcc_v_list = gcc.version.split(".") %}
-      - compiler:
-          spec: clang@{{ llvm.version }}-gfortran{{ gcc_v_list[0] }}
-          paths:
-            cc: {{ [NSP_install_root, 'llvm', llvm.version, 'bin/clang'] | path_join }}
-            cxx: {{ [NSP_install_root, 'llvm', llvm.version, 'bin/clang++'] | path_join }}
-            f77: {{ [NSP_install_root, 'gcc', gcc.version, 'bin/gfortran'] | path_join }}
-            fc: {{ [NSP_install_root, 'gcc', gcc.version, 'bin/gfortran'] | path_join }}
-          operating_system: {{ os.identifier }}
-          modules:
-            - llvm/{{ llvm.version }}
-
-.. code-block:: jinja
     :caption: ``moria/spack/environments/concretizer.yaml.j2``
 
     {{ ansible_managed | comment(beginning="##", end="##", decoration="#", prefix_count=0, postfix_count=0) }}
@@ -559,6 +517,37 @@ We will name our spack environments according to the following schema ``core<yea
           blas: [openblas]
           lapack: [openblas]
           mpi: [openmpi]
+      gcc:
+        externals:
+        # System GCC 
+        - spec: gcc@{{ system_gcc.version }}
+          prefix: /usr
+          extra_attributes:
+            compilers:
+              c: /usr/bin/gcc
+              cxx: /usr/bin/g++
+              fortran: /usr/bin/gfortran
+          modules: [ ] 
+        # GCC Compiler
+        - spec: gcc@{{ gcc.version }}
+          prefix: {{ [NSP_install_root, 'gcc', gcc.version] | path_join }}
+          extra_attributes:
+            compilers:
+              c: {{ [NSP_install_root, 'gcc', gcc.version, 'bin/gcc'] | path_join }}
+              cxx: {{ [NSP_install_root, 'gcc', gcc.version, 'bin/g++'] | path_join }}
+              fortran: {{ [NSP_install_root, 'gcc', gcc.version, 'bin/gfortran'] | path_join }}
+          modules: [gcc/{{ gcc.version }}] 
+      # LLVM Compiler
+      llvm:
+        externals:
+        - spec: llvm@{{ llvm.version }}
+          prefix: {{ [NSP_install_root, 'llvm', llvm.version] | path_join }}
+          extra_attributes:
+            compilers:
+              c: {{ [NSP_install_root, 'llvm', llvm.version, 'bin/clang'] | path_join }}
+              cxx: {{ [NSP_install_root, 'llvm', llvm.version, 'bin/clang++'] | path_join }}
+              fortran: {{ [NSP_install_root, 'gcc', gcc.version, 'bin/gfortran'] | path_join }}
+          modules: [llvm/{{ llvm.version }}] 
 
 .. code-block:: jinja
     :caption: ``moria/spack/environments/core25.02/spack.yaml.j2``
@@ -572,7 +561,6 @@ We will name our spack environments according to the following schema ``core<yea
       include:
         - concretizer.yaml
         - modules.yaml
-        - compilers.yaml
         - config.yaml
         - packages.yaml
 
@@ -614,7 +602,6 @@ We will name our spack environments according to the following schema ``core<yea
       include:
       - concretizer.yaml
       - modules.yaml
-      - compilers.yaml
       - config.yaml
       - packages.yaml
 
@@ -673,7 +660,7 @@ Finally we will need to add the spack role to our playbook.
 
 .. code-block:: yaml
     :caption: ``moria/playbook.yaml``
-    :emphasize-lines: 26-41
+    :emphasize-lines: 26-40
 
     - name: Deploy Moria
       hosts: localhost
@@ -703,7 +690,6 @@ Finally we will need to add the spack role to our playbook.
         - role: spack
           vars:
             _shared_templates: &shared_L
-              - compilers
               - concretizer
               - config
               - modules
@@ -711,11 +697,11 @@ Finally we will need to add the spack role to our playbook.
             _specific_templates: &specific_L
               - spack
             NSP_SPACK_versions:
-              v0.23.1:
-                git_reference: 2bfcc69
+              v1.0.0:
+                git_reference: 73eaea1
             NSP_SPACK_environments:
-              core25.02: { spack_version: v0.23.1, specific_templates: *specific_L, shared_templates: *shared_L }
-              sw25.02: { spack_version: v0.23.1, specific_templates: *specific_L, shared_templates: *shared_L }
+              core25.02: { spack_version: v1.0.0, specific_templates: *specific_L, shared_templates: *shared_L }
+              sw25.02: { spack_version: v1.0.0, specific_templates: *specific_L, shared_templates: *shared_L }
 
 After running the playbook explore ``/tmp/moria/spack/configs``. To install our software via spack run the following.
 
@@ -753,7 +739,7 @@ the ``Core`` module files. Also add some modules to lmod's :ref:`NSP_LMOD_DefApp
 
 .. code-block:: yaml
     :caption: ``moria/playbook.yaml``
-    :emphasize-lines: 16-32,59-63
+    :emphasize-lines: 16-30,56-60
 
     - name: Deploy Moria
       hosts: localhost
@@ -785,8 +771,6 @@ the ``Core`` module files. Also add some modules to lmod's :ref:`NSP_LMOD_DefApp
                 paths:
                   - {path: '|mpi.name|-|mpi.version|/|compiler.name|-|compiler.version|', weight: 30}
                 level: 1
-            NSP_LMOD_nv_mappings:
-              llvm/19.1.0: {name: "clang", version: "%s-gfortran14"}
         - role: miniforge3
           vars:
             NSP_MINIFORGE3_version: 24.11.3
@@ -800,7 +784,6 @@ the ``Core`` module files. Also add some modules to lmod's :ref:`NSP_LMOD_DefApp
         - role: spack
           vars:
             _shared_templates: &shared_L
-              - compilers
               - concretizer
               - config
               - modules
@@ -808,11 +791,11 @@ the ``Core`` module files. Also add some modules to lmod's :ref:`NSP_LMOD_DefApp
             _specific_templates: &specific_L
               - spack
             NSP_SPACK_versions:
-              v0.23.1:
-                git_reference: 2bfcc69
+              v1.0.0:
+                git_reference: 73eaea1
             NSP_SPACK_environments:
-              core25.02: { spack_version: v0.23.1, specific_templates: *specific_L, shared_templates: *shared_L }
-              sw25.02: { spack_version: v0.23.1, specific_templates: *specific_L, shared_templates: *shared_L }
+              core25.02: { spack_version: v1.0.0, specific_templates: *specific_L, shared_templates: *shared_L }
+              sw25.02: { spack_version: v1.0.0, specific_templates: *specific_L, shared_templates: *shared_L }
         - role: files
           vars:
             NSP_FILES_inventory:
@@ -860,7 +843,7 @@ and test out the new stack.
 
 
     Due to MODULEPATH changes, the following have been reloaded:
-      1) openmpi/5.0.5
+      1) boost/1.86.0     2) openmpi/5.0.5
 
 .. code-block:: text
 
