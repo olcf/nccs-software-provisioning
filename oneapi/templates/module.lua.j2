@@ -6,14 +6,14 @@ family("compiler")
 
 whatis("Intel OneAPI v{{ NSP_ONEAPI_version }}")
 
-help("Intel OneAPI v{{ NSP_ONEAPI_version }} Suite, with the following components installed:
+help([[Intel OneAPI v{{ NSP_ONEAPI_version }} Suite, with the following components installed:
 {% for c in NSP_ONEAPI_base_toolkit_components %}
 {{ c }}
 {% endfor %}
 {% for c in NSP_ONEAPI_hpc_toolkit_components %}
 {{ c }}
 {% endfor %}
-")
+]])
 
 local base = "{{ NSP_install_root }}"
 local package = "{{ NSP_ONEAPI_install_name }}"
