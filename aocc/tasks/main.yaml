@@ -1,10 +1,16 @@
-- name: "Launch AOCC v{{ NSP_AOCC_version }} Install"
-  ansible.builtin.include_tasks: 
-    file: "install.yaml"
-  when: not [NSP_install_root, 'aocc', NSP_AOCC_version, 'bin'] | path_join is directory
+- name: Check for AOCC v{{ NSP_AOCC_version }} Install
+  ansible.builtin.stat:
+    path: "{{ [NSP_install_root, 'aocc', NSP_AOCC_version, 'bin'] | path_join }}"
+  register: aocc_status
   tags:
     - aocc
-    - installation
+
+- name: Launch AOCC v{{ NSP_AOCC_version }} Install
+  ansible.builtin.include_tasks:
+    file: install.yaml
+  when: not aocc_status.stat.exists
+  tags:
+    - aocc
 
 - name: Create AOCC Module Directory
   ansible.builtin.file:
@@ -16,7 +22,6 @@
   when: NSP_AOCC_create_module
   tags:
     - aocc
-    - configuration
 
 - name: Generate AOCC v{{ NSP_AOCC_version }} Module File
   ansible.builtin.template:
@@ -28,4 +33,3 @@
   when: NSP_AOCC_create_module
   tags:
     - aocc
-    - configuration
