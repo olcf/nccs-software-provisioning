@@ -13,6 +13,16 @@ local package = "miniforge3"
 local version = "{{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }}"
 local prefix = pathJoin(base, package, version)
 
+if (os.getenv("CONDA_SHLVL") == nil or os.getenv("CONDA_SHLVL") == "0") then
+    execute{cmd="source activate base",modeA={"load"}}
+else
+    execute{cmd="echo 'Deactivating conda environments'",modeA={"load"}}
+    execute{cmd="source activate base",modeA={"load"}}
+    for i=0,os.getenv("CONDA_SHLVL") do
+        execute{cmd="conda deactivate",modeA={"load"}}
+    end
+end
+
 prepend_path("PATH", pathJoin(prefix, "bin"), ":")
 prepend_path("MANPATH", pathJoin(prefix, "share/man"), ":")
 
