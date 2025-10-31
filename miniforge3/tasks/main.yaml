@@ -31,6 +31,7 @@
   tags:
     - miniforge3
     - configuration
+    - miniforge3_module
 
 - name: Generate MINIFORGE3 v{{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }} .condarc File
   ansible.builtin.template:

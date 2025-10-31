@@ -14,12 +14,20 @@ local version = "{{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }}"
 local prefix = pathJoin(base, package, version)
 
 if (os.getenv("CONDA_SHLVL") == nil or os.getenv("CONDA_SHLVL") == "0") then
-    execute{cmd="source activate base",modeA={"load"}}
+    if (os.getenv("SHELL") == "/bin/tcsh" or os.getenv("SHELL") == "/bin/csh") then
+        execute{cmd="source " .. prefix .. "/etc/profile.d/conda.csh >& /dev/null",modeA={"load"}}
+    else
+        execute{cmd="source activate base",modeA={"load"}}
+    end
 else
-    execute{cmd="echo 'Deactivating conda environments'",modeA={"load"}}
-    execute{cmd="source activate base",modeA={"load"}}
+    execute{cmd="echo 'Deactivating conda environments'",modeA={"load", "unload"}}
+    if (os.getenv("SHELL") == "/bin/tcsh" or os.getenv("SHELL") == "/bin/csh") then
+        execute{cmd="conda activate base",modeA={"load", "unload"}}
+    else
+        execute{cmd="source activate base",modeA={"load", "unload"}}
+    end
     for i=0,os.getenv("CONDA_SHLVL") do
-        execute{cmd="conda deactivate",modeA={"load"}}
+        execute{cmd="conda deactivate",modeA={"load", "unload"}}
     end
 end
 
@@ -29,7 +37,7 @@ prepend_path("MANPATH", pathJoin(prefix, "share/man"), ":")
 unsetenv("PYTHONSTARTUP")
 
 local user_home = os.getenv("HOME") or ""
-if user_home ~= "" then
+if (user_home ~= "") then
     setenv("PYTHONUSERBASE",
         pathJoin(user_home, ".local", package, version)
     )
