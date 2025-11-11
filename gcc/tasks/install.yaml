@@ -2,20 +2,28 @@
   ansible.builtin.file:
     path: "{{ [NSP_scratch_directory, 'gcc-{}'.format(NSP_GCC_version)] | path_join }}"
     state: absent
-  when: NSP_GCC_clean_build and [NSP_scratch_directory, 'gcc-{}'.format(NSP_GCC_version)] | path_join is directory
+  when: NSP_GCC_clean_build
   tags:
     - gcc
-    - installation
+
+- name: Check for GCC v{{ NSP_GCC_version }} Source Files
+  ansible.builtin.stat:
+    path: "{{ [NSP_scratch_directory, 'gcc-{}'.format(NSP_GCC_version)] | path_join }}"
+  register: gcc_source_status
+  tags:
+    - gcc
 
 - name: Download and Unpack GCC v{{ NSP_GCC_version }} Tarball
   ansible.builtin.unarchive:
     remote_src: true
     src: "https://gcc.gnu.org/pub/gcc/releases/gcc-{{ NSP_GCC_version }}/gcc-{{ NSP_GCC_version }}.tar.gz"
     dest: "{{ NSP_scratch_directory }}"
-  when: not [NSP_scratch_directory, 'gcc-{}'.format(NSP_GCC_version)] | path_join is directory
+    group: "{{ NSP_group }}"
+    owner: "{{ NSP_user }}"
+    mode: "{{ NSP_file_permissions }}"
+  when: not gcc_source_status.stat.exists
   tags:
     - gcc
-    - installation
 
 - name: Build and Install GCC v{{ NSP_GCC_version }}
   ansible.builtin.shell:
@@ -30,13 +38,11 @@
   changed_when: true
   tags:
     - gcc
-    - installation
 
-- name: Clean up Scratch after GCC v{{ NSP_GCC_version }} Build
+- name: Clean Up Scratch After GCC v{{ NSP_GCC_version }} Build
   ansible.builtin.include_role:
     name: nsp
     tasks_from: clear_scratch
   when: NSP_keep_scratch_clear
   tags:
     - gcc
-    - installation
