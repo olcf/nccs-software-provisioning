@@ -50,7 +50,7 @@
   tags:
     - aocc
 
-- name: Clean up Scratch after AOCC v{{ NSP_AOCC_version }} Install
+- name: Clean Up Scratch After AOCC v{{ NSP_AOCC_version }} Install
   ansible.builtin.include_role:
     name: nsp
     tasks_from: clear_scratch
