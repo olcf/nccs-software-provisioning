@@ -1,31 +1,31 @@
 argument_specs:
   main:
     description:
-      - The miniforge3 role installs miniforge3 with the specified packages in the base environment.
-      - And optionally generates a module file.
+      - The miniforge3 role installs miniforge3 with the specified packages in the base environment
+      - and optionally generates a module file.
     options:
       NSP_MINIFORGE3_version:
         type: str
         required: true
-        description: "The version to install."
+        description: The version to install.
       NSP_MINIFORGE3_revision:
         type: str
         required: false
         default: "0"
-        description: "The version revision to install."
+        description: The version revision to install.
       NSP_MINIFORGE3_base_packages:
         type: list
         elements: str
         required: false
         default: [ ]
-        description: "A list of packages to install in the base environment."
+        description: A list of packages to install in the base environment.
       NSP_MINIFORGE3_clean_install:
-        type: "bool"
+        type: bool
         required: false
         default: true
-        description: "Delete installer and re-download."
+        description: Delete installer and re-download.
       NSP_MINIFORGE3_create_module:
-        type: "bool"
+        type: bool
         required: false
         default: true
-        description: "Toggles module generation."
+        description: Toggles module generation.
