@@ -7,7 +7,6 @@
     mode: "{{ NSP_executable_permissions }}"
   tags:
     - lmod
-    - configuration
 
 - name: Generate LMOD DefApps File
   ansible.builtin.template:
@@ -18,7 +17,6 @@
     mode: "{{ NSP_file_permissions }}"
   tags:
     - lmod
-    - configuration
 
 - name: Create LMOD Directories
   ansible.builtin.file:
@@ -32,7 +30,6 @@
     - hooks
   tags:
     - lmod
-    - configuration
 
 - name: Generate LMOD Configuration Files
   ansible.builtin.template:
@@ -48,14 +45,12 @@
   when: "[playbook_dir, 'lmod/{}.j2'.format(item)] | path_join is file"
   tags:
     - lmod
-    - configuration
 
 - name: Load LMOD Hook Configuration
   ansible.builtin.set_fact:
     _LMOD_active_hooks: "{{ ['NSPHierarchyHook', 'NSPLoggingHook'] + NSP_LMOD_additional_hooks }}"
   tags:
     - lmod
-    - configuration
 
 - name: Generate SitePackage.lua File
   ansible.builtin.template:
@@ -66,7 +61,6 @@
     mode: "{{ NSP_file_permissions }}"
   tags:
     - lmod
-    - configuration
 
 - name: Generate LMOD Hook Files
   ansible.builtin.template:
@@ -80,7 +74,6 @@
   loop: "{{ _LMOD_active_hooks }}"
   tags:
     - lmod
-    - configuration
 
 - name: Include Internal LMOD Tasks
   ansible.builtin.include_tasks:
@@ -88,8 +81,6 @@
   when: NSP_LMOD_install_type == "internal"
   tags:
     - lmod
-    - installation
-    - configuration
 
 - name: Included External LMOD Tasks
   ansible.builtin.include_tasks:
@@ -97,4 +88,3 @@
   when: NSP_LMOD_install_type == "external"
   tags:
     - lmod
-    - configuration
