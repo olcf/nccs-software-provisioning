@@ -12,7 +12,6 @@
     state: absent
   tags:
     - nvhpc
-    - installation
 
 - name: Download and Unpack NVHPC v{{ NSP_NVHPC_version }} Tarball
   ansible.builtin.unarchive:
@@ -31,7 +30,6 @@
   changed_when: true
   tags:
     - nvhpc
-    - installation
 
 - name: Install NVHPC v{{ NSP_NVHPC_version }}
   ansible.builtin.shell:
@@ -52,13 +50,11 @@
   changed_when: true
   tags:
     - nvhpc
-    - installation
 
-- name: Clean up Scratch after NVHPC v{{ NSP_NVHPC_version }} Build
+- name: Clean Up Scratch After NVHPC v{{ NSP_NVHPC_version }} Build
   ansible.builtin.include_role:
     name: nsp
     tasks_from: clear_scratch
   when: NSP_keep_scratch_clear
   tags:
     - nvhpc
-    - installation
