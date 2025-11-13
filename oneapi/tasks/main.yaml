@@ -1,10 +1,16 @@
+- name: Check ONEAPI v{{ NSP_ONEAPI_version }} Install
+  ansible.builtin.stat:
+    path: "{{ [NSP_install_root, NSP_ONEAPI_install_name, NSP_ONEAPI_version] | path_join }}"
+  register: oneapi_status
+  tags:
+    - oneapi
+
 - name: Launch ONEAPI v{{ NSP_ONEAPI_version }} Install
   ansible.builtin.include_tasks:
     file: install.yaml
-  when: not [NSP_install_root, NSP_ONEAPI_install_name, NSP_ONEAPI_version] | path_join is directory
+  when: not oneapi_status.stat.exists
   tags:
     - oneapi
-    - installation
 
 - name: Create ONEAPI Module Directory
   ansible.builtin.file:
@@ -16,7 +22,6 @@
   when: NSP_ONEAPI_create_module
   tags:
     - oneapi
-    - configuration
 
 - name: Generate ONEAPI v{{ NSP_ONEAPI_version }} Module File
   ansible.builtin.template:
@@ -28,4 +33,3 @@
   when: NSP_ONEAPI_create_module
   tags:
     - oneapi
-    - configuration

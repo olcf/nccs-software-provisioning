@@ -43,7 +43,9 @@ argument_specs:
         type: str
         required: false
         default: "oneapi"
-        description: Name of the directory to install OneAPI into. Common alternatives may be "intel", or "mkl", if only MKL is installed.
+        description: >-
+          Name of the directory to install OneAPI into. Common alternatives may be "intel",
+          or "mkl",if only MKL is installed.
       NSP_ONEAPI_create_module:
         type: bool
         required: false
@@ -53,4 +55,5 @@ argument_specs:
         type: str
         required: false
         default: "oneapi"
-        description: Name of the module generated. Common names may be "oneapi", "intel", or "mkl", if only MKL is installed.
+        description: >-
+          Name of the module generated. Common names may be "oneapi", "intel", or "mkl", if only MKL is installed.
