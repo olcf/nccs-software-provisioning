@@ -7,7 +7,6 @@
     loop_var: _SPACK_version
   tags:
     - spack
-    - configuration
 
 - name: Deploy Spack Extensions
   ansible.builtin.copy:
@@ -20,7 +19,6 @@
   when: "[playbook_dir, 'spack/extensions'] | path_join is directory"
   tags:
     - spack
-    - configuration
 
 - name: Configure Spack Environments
   ansible.builtin.include_tasks:
@@ -31,7 +29,6 @@
     loop_var: _SPACK_environment
   tags:
     - spack
-    - configuration
 
 - name: Create Spacktivate Script
   ansible.builtin.template:
@@ -42,4 +39,3 @@
     mode: "{{ NSP_executable_permissions }}"
   tags:
     - spack
-    - configuration

@@ -3,7 +3,7 @@ argument_specs:
     description:
       - The spack role clones and patches Spack and templates environments for deployment.
       - ""
-      - If you have any spack extentions they should be placed in the playbook directory under ``spack/extentions``.
+      - If you have any spack extensions they should be placed in the playbook directory under ``spack/extensions``.
       - Extensions will be deployed in ``"{{ [NSP_SPACK_config_directory, 'extensions'] | path_join }}"`` .
       - ""
       - All Spack patch files should go in the playbook directory under ``spack/patches``.
@@ -18,9 +18,15 @@ argument_specs:
         required: false
         default: "https://github.com/spack/spack.git"
         description: "The Spack repo to clone."
+      NSP_SPACK_package_repo:
+        type: str
+        required: false
+        default: "https://github.com/spack/spack-packages.git"
+        description: "The Spack package repo to clone."
       NSP_SPACK_versions:
         type: dict
-        required: true
+        required: false
+        default: { }
         description: >-
           Defines available spack versions for the environments. Specifying a ``git_reference`` is mandatory but the
           patch file is optional.
@@ -33,7 +39,8 @@ argument_specs:
                   patch: v0.23.1.patch
       NSP_SPACK_environments:
         type: dict
-        required: true
+        required: false
+        default: { }
         description: "Defines spack environments."
         raw: |-
           For example:
@@ -43,6 +50,8 @@ argument_specs:
               NSP_SPACK_environments:
                 example_env:
                   spack_version: v0.23.1
+                  packages_git_reference: 4b8bb35
+                  packages_patch: example_env-packages.patch
                   specific_templates:
                     - spack
                   shared_templates:
@@ -59,6 +68,12 @@ argument_specs:
 
           ``spack_version`` should reference a spack version defined in
           :ref:`NSP_SPACK_versions_variable`.
+
+          For each environment this role will automatically clone one Spack package repo as defined in
+          :ref:`NSP_SPACK_package_repo_variable`. You can use this repo in your template files using the
+          variable ``_SPACK_environment_package_repo_path``. To set the git reference of the package repo
+          for an environment set the ``packages_git_reference`` option. To set an optional patch file
+          set ``packages_patch``.
 
           We like to split our spack configuration for each environment into multiple files. ``specific_templates``
           are templates that are specific to each environment. They should be placed under
