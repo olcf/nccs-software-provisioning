@@ -2,21 +2,25 @@
   ansible.builtin.file:
     path: "{{ [NSP_scratch_directory, 'llvm-project-llvmorg-{}'.format(NSP_LLVM_version)] | path_join }}"
     state: absent
-  when: "NSP_LLVM_clear_source and [NSP_scratch_directory, 'llvm-project-llvmorg-{}'.format(NSP_LLVM_version)]
-    | path_join is directory"
+  when: NSP_LLVM_clear_source
   tags:
     - llvm
-    - installation
+
+- name: Check for LLVM v{{ NSP_LLVM_version }} Source Files
+  ansible.builtin.stat:
+    path: "{{ [NSP_scratch_directory, 'llvm-project-llvmorg-{}'.format(NSP_LLVM_version)] | path_join }}"
+  register: llvm_source_status
+  tags:
+    - llvm
 
 - name: Download and Unpack LLVM v{{ NSP_LLVM_version }} Tarball
   ansible.builtin.unarchive:
     remote_src: true
     src: "https://github.com/llvm/llvm-project/archive/refs/tags/llvmorg-{{ NSP_LLVM_version }}.tar.gz"
     dest: "{{ NSP_scratch_directory }}"
-  when: not [NSP_scratch_directory, 'llvm-project-llvmorg-{}'.format(NSP_LLVM_version)] | path_join is directory
+  when: not llvm_source_status.stat.exists
   tags:
     - llvm
-    - installation
 
 - name: Build and Install LLVM v{{ NSP_LLVM_version }}
   ansible.builtin.shell:
@@ -35,13 +39,11 @@
   changed_when: true
   tags:
     - llvm
-    - installation
 
-- name: Clean up Scratch after LLVM v{{ NSP_LLVM_version }} Build
+- name: Clean Up Scratch After LLVM v{{ NSP_LLVM_version }} Build
   ansible.builtin.include_role:
     name: nsp
     tasks_from: clear_scratch
   when: NSP_keep_scratch_clear
   tags:
     - llvm
-    - installation

@@ -2,10 +2,8 @@
   ansible.builtin.file:
     path: "{{ [NSP_scratch_directory, 'oneapi-{}'.format(NSP_ONEAPI_version)] | path_join }}"
     state: absent
-  when: "[NSP_scratch_directory, 'oneapi-{}'.format(NSP_ONEAPI_version)] | path_join is directory"
   tags:
     - oneapi
-    - installation
 
 - name: Create Scratch Subdirectory for ONEAPI v{{ NSP_ONEAPI_version }}
   ansible.builtin.file:
@@ -16,7 +14,6 @@
     mode: "{{ NSP_executable_permissions }}"
   tags:
     - oneapi
-    - installation
 
 - name: Check for 'intel' Directory in Home
   ansible.builtin.stat:
@@ -24,7 +21,6 @@
   register: intel_home_directory
   tags:
     - oneapi
-    - installation
 
 # Base Toolkit
 - name: Download ONEAPI v{{ NSP_ONEAPI_version }} Base Toolkit
@@ -37,7 +33,6 @@
   when: NSP_ONEAPI_base_toolkit_components | length > 0
   tags:
     - oneapi
-    - installation
 
 - name: Install ONEAPI v{{ NSP_ONEAPI_version }} Base Toolkit
   ansible.builtin.command:
@@ -54,7 +49,6 @@
   when: NSP_ONEAPI_base_toolkit_components | length > 0
   tags:
     - oneapi
-    - installation
 ###
 
 # HPC Toolkit
@@ -68,7 +62,6 @@
   when: NSP_ONEAPI_hpc_toolkit_components | length > 0
   tags:
     - oneapi
-    - installation
 
 - name: Install ONEAPI v{{ NSP_ONEAPI_version }} HPC Toolkit
   ansible.builtin.command:
@@ -85,7 +78,6 @@
   when: NSP_ONEAPI_hpc_toolkit_components | length > 0
   tags:
     - oneapi
-    - installation
 ###
 
 - name: Delete 'intel' Directory in Home
@@ -95,13 +87,11 @@
   when: not intel_home_directory.stat.exists
   tags:
     - oneapi
-    - installation
 
-- name: Clean up Scratch after ONEAPI v{{ NSP_ONEAPI_version }} Build
+- name: Clean Up Scratch After ONEAPI v{{ NSP_ONEAPI_version }} Build
   ansible.builtin.include_role:
     name: nsp
     tasks_from: clear_scratch
   when: NSP_keep_scratch_clear
   tags:
     - oneapi
-    - installation

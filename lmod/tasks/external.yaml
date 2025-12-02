@@ -21,7 +21,6 @@
     prepend_newline: true
   tags:
     - lmod
-    - configuration
 
 - name: Insert LMOD Init cshrc Configuration
   ansible.builtin.blockinfile:
@@ -46,4 +45,3 @@
     prepend_newline: true
   tags:
     - lmod
-    - configuration

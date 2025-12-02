@@ -1,14 +1,17 @@
 - name: Load {{ _SPACK_environment.key }} Configuration
   ansible.builtin.set_fact:
     _SPACK_environment_name: "{{ _SPACK_environment.key }}"
-    _SPACK_environment_configuration: # noqa: jinja[spacing]
-      "{{ {
-            'shared_templates': [ ],
-            'specific_templates': [ ]
-          } | ansible.builtin.combine(_SPACK_environment.value, list_merge='replace', recursive=true) }}"
+    _SPACK_environment_configuration: >- # noqa: jinja[spacing]
+      {{ {
+          'packages_git_reference': 'develop',
+          'packages_patch': False,
+          'shared_templates': [ ],
+          'specific_templates': [ ]
+        } | ansible.builtin.combine(_SPACK_environment.value, list_merge='replace', recursive=true) }}
+    _SPACK_environment_package_repo_path: "{{ [NSP_SPACK_config_directory,
+      'packages-{}'.format(_SPACK_environment.key)] | path_join }}"
   tags:
     - spack
-    - configuration
     - "{{ _SPACK_environment.key }}"
 
 - name: Load {{ _SPACK_environment_name }} Variables
@@ -17,7 +20,6 @@
   when: "[playbook_dir, 'spack/environments', _SPACK_environment_name, 'variables.yaml'] | path_join is file"
   tags:
     - spack
-    - configuration
     - "{{ _SPACK_environment.key }}"
 
 - name: Create {{ _SPACK_environment_name }} Configuration Folder
@@ -29,7 +31,6 @@
     mode: "{{ NSP_executable_permissions }}"
   tags:
     - spack
-    - configuration
     - "{{ _SPACK_environment.key }}"
 
 - name: Generate {{ _SPACK_environment_name }} Configuration File(s)
@@ -48,7 +49,6 @@
              _SPACK_environment_configuration.shared_templates) | unique }}"
   tags:
     - spack
-    - configuration
     - "{{ _SPACK_environment.key }}"
 
 - name: Copy {{ _SPACK_environment_name }} Spack Lock File
@@ -61,5 +61,55 @@
   when: "[playbook_dir, 'spack/environments', _SPACK_environment_name, 'spack.lock'] | path_join is file"
   tags:
     - spack
-    - installation
+    - "{{ _SPACK_environment.key }}"
+
+- name: Check for {{ _SPACK_environment_name }} Packages Repo
+  ansible.builtin.stat:
+    path: "{{ [NSP_SPACK_config_directory, 'packages-{}'.format(_SPACK_environment_name)] | path_join }}"
+  register: packages_status
+  tags:
+    - spack
+    - "{{ _SPACK_environment.key }}"
+
+- name: Clean Up {{ _SPACK_environment_name }} Packages Repo
+  ansible.builtin.shell:
+    cmd: |
+      set -o pipefail;
+      exit_code=0;
+      for f in $(git -C {{ [NSP_SPACK_config_directory, 'packages-{}'.format(_SPACK_environment_name)] | path_join }} \
+        status -s | awk '$1 == "??" {print $2}'); do
+          rm -rf {{ [NSP_SPACK_config_directory, 'packages-{}'.format(_SPACK_environment_name)] | path_join }}/${f};
+          exit_code=3;
+      done;
+      exit ${exit_code};
+    executable: /bin/bash
+  register: result
+  changed_when: result.rc == 3
+  failed_when: result.rc != 0 and result.rc != 3
+  when: packages_status.stat.exists and not ansible_check_mode
+  tags:
+    - spack
+    - "{{ _SPACK_environment.key }}"
+
+- name: Clone {{ _SPACK_environment_name }} Packages Repo
+  ansible.builtin.git:
+    repo: "{{ NSP_SPACK_package_repo }}"
+    dest: "{{ [NSP_SPACK_config_directory, 'packages-{}'.format(_SPACK_environment_name)] | path_join }}"
+    clone: "{{ NSP_SPACK_clone }}"
+    force: true
+    update: true
+    version: "{{ _SPACK_environment_configuration.packages_git_reference }}"
+  when: not ansible_check_mode
+  tags:
+    - spack
+    - "{{ _SPACK_environment.key }}"
+
+- name: Patch {{ _SPACK_environment_name }} Packages Repo
+  ansible.posix.patch:
+    src: "{{ [playbook_dir, 'spack/patches', _SPACK_environment_configuration.packages_patch] | path_join }}"
+    basedir: "{{ [NSP_SPACK_config_directory, 'packages-{}'.format(_SPACK_environment_name)] | path_join }}"
+    strip: 1
+  when: _SPACK_environment_configuration.packages_patch and not ansible_check_mode
+  tags:
+    - spack
     - "{{ _SPACK_environment.key }}"

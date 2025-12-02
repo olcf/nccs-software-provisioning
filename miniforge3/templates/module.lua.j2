@@ -1,4 +1,4 @@
-{{ ansible_managed | comment(beginning="--[[", end="]]--", decoration="", prefix_count=0, postfix_count=0) }}
+{{ ansible_managed | comment(beginning='--[[', end=']]--', decoration='', prefix_count=0, postfix_count=0) }}
 
 family("python")
 
@@ -13,21 +13,21 @@ local package = "miniforge3"
 local version = "{{ NSP_MINIFORGE3_version }}-{{ NSP_MINIFORGE3_revision }}"
 local prefix = pathJoin(base, package, version)
 
-if (os.getenv("CONDA_SHLVL") == nil or os.getenv("CONDA_SHLVL") == "0") then
-    if (os.getenv("SHELL") == "/bin/tcsh" or os.getenv("SHELL") == "/bin/csh") then
-        execute{cmd="source " .. prefix .. "/etc/profile.d/conda.csh >& /dev/null",modeA={"load"}}
+if os.getenv("CONDA_SHLVL") == nil or os.getenv("CONDA_SHLVL") == "0" then
+    if myShellType() == "csh" then
+        execute{cmd="source " .. prefix .. "/etc/profile.d/conda.csh >& /dev/null", modeA={"load"}}
     else
-        execute{cmd="source activate base",modeA={"load"}}
+        execute{cmd="source activate base", modeA={"load"}}
     end
 else
-    execute{cmd="echo 'Deactivating conda environments'",modeA={"load", "unload"}}
-    if (os.getenv("SHELL") == "/bin/tcsh" or os.getenv("SHELL") == "/bin/csh") then
-        execute{cmd="conda activate base",modeA={"load", "unload"}}
+    execute{cmd="echo 'Deactivating conda environments'", modeA={"load", "unload"}}
+    if myShellType() == "csh" then
+        execute{cmd="conda activate base", modeA={"load", "unload"}}
     else
-        execute{cmd="source activate base",modeA={"load", "unload"}}
+        execute{cmd="source activate base", modeA={"load", "unload"}}
     end
-    for i=0,os.getenv("CONDA_SHLVL") do
-        execute{cmd="conda deactivate",modeA={"load", "unload"}}
+    for i=0, os.getenv("CONDA_SHLVL") do
+        execute{cmd="conda deactivate", modeA={"load", "unload"}}
     end
 end
 

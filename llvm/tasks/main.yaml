@@ -1,10 +1,16 @@
+- name: Check for LLVM v{{ NSP_LLVM_version }} Install
+  ansible.builtin.stat:
+    path: "{{ [NSP_install_root, 'llvm', NSP_LLVM_version] | path_join }}"
+  register: llvm_status
+  tags:
+    - llvm
+
 - name: Launch LLVM v{{ NSP_LLVM_version }} Install
   ansible.builtin.include_tasks:
     file: install.yaml
-  when: not [NSP_install_root, 'llvm', NSP_LLVM_version, 'bin'] | path_join is directory
+  when: not llvm_status.stat.exists
   tags:
     - llvm
-    - installation
 
 - name: Create LLVM Module Directory
   ansible.builtin.file:
@@ -16,17 +22,14 @@
   when: NSP_LLVM_create_module
   tags:
     - llvm
-    - configuration
 
 - name: Generate LLVM v{{ NSP_LLVM_version }} Module File
   ansible.builtin.template:
     src: module.lua.j2
-    dest: "{{ [NSP_module_root, 'llvm', '{}.lua'.format(NSP_LLVM_version)] | path_join }}"
+    dest: "{{ [NSP_module_root, 'llvm/{}.lua'.format(NSP_LLVM_version)] | path_join }}"
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
   when: NSP_LLVM_create_module
   tags:
     - llvm
-    - configuration
-

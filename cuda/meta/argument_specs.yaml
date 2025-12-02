@@ -15,7 +15,7 @@ argument_specs:
         type: str
         required: false
         default: "linux"
-        description: The CUDA architecture specified in the download URL.
+        description: The CUDA architecture specified in the download URL ('linux' or 'linux_sbsa').
       NSP_CUDA_create_module:
         type: bool
         required: false

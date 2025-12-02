@@ -1,4 +1,4 @@
-{{ ansible_managed | comment(beginning="--[[", end="]]--", decoration="", prefix_count=0, postfix_count=0) }}
+{{ ansible_managed | comment(beginning='--[[', end=']]--', decoration='', prefix_count=0, postfix_count=0) }}
 
 {% if "intel.oneapi.lin.dpcpp-cpp-compiler" in NSP_ONEAPI_base_toolkit_components or "intel.oneapi.lin.ifort-compiler" in NSP_ONEAPI_hpc_toolkit_components %}
 family("compiler")
