@@ -1,0 +1,60 @@
+- name: Create XALT Configuration Directory
+  ansible.builtin.file:
+    path: "{{ [NSP_install_root, 'xalt/etc'] | path_join }}"
+    state: directory
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  tags:
+    - xalt
+
+- name: Generate XALT Config.py
+  ansible.builtin.template:
+    src: "{{ [playbook_dir, 'xalt/Config.py.j2'] }}"
+    dest: "{{ [NSP_install_root, 'xalt/etc/Config.py'] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  tags:
+    - xalt
+
+- name: Copy Kafka Certs
+  ansible.builtin.copy:
+    src: "{{ [playbook_dir, 'xalt', item] }}"
+    dest: "{{ [NSP_install_root, 'xalt/etc', item] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  loop:
+    - cacert.pem
+    - fullchain.pem
+  tags:
+    - xalt
+
+- name: Launch XALT v{{ NSP_XALT_version }} Install
+  ansible.builtin.include_tasks:
+    file: install.yaml
+  tags:
+    - xalt
+
+- name: Create XALT Module Directory
+  ansible.builtin.file:
+    path: "{{ [NSP_module_root, 'xalt'] | path_join }}"
+    state: directory
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  when: NSP_XALT_create_module
+  tags:
+    - xalt
+
+- name: Generate XALT v{{ NSP_XALT_version }} Module File
+  ansible.builtin.template:
+    src: module.lua.j2
+    dest: "{{ [NSP_module_root, 'xalt', '{}.lua'.format(NSP_XALT_version)] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  when: NSP_XALT_create_module
+  tags:
+    - xalt

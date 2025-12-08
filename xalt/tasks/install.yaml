@@ -1,0 +1,61 @@
+- name: Clone XALT Repository
+  ansible.builtin.git:
+    repo: "{{ NSP_XALT_git_repo }}"
+    dest: "{{ [NSP_scratch_directory, 'xalt'] | path_join }}"
+    clone: true
+    force: true
+    update: true
+    version: "{{ NSP_XALT_git_reference }}"
+  when: not ansible_check_mode
+  tags:
+    - xalt
+
+- name: Build and Install XALT v{{ NSP_XALT_git_reference }}
+  ansible.builtin.shell:
+    cmd: |
+      autoreconf
+      ./configure CC=/usr/bin/gcc \
+        --prefix={{ [NSP_install_root, 'xalt', NSP_XALT_git_reference] | path_join }} \
+        --with-transmission=kafka \
+        --with-containerSupport=no \
+        --with-functionTracking=no \
+        --with-trackGPU=no \
+        --with-mode=751 \
+        --with-trackMPI=yes \
+        --with-trackScalarPrgms=yes \
+        --with-supportCURL=no \
+        --with-cmdlineRecord=yes \
+        --with-computeSHA1=no \
+        --with-etcDir={{ [NSP_install_root, 'xalt/etc'] | path_join }} \
+        --with-config={{ [NSP_install_root, 'xalt/etc/config.py'] | path_join }} \
+        --with-MySQL=no \
+        --with-hostnameParser=no \
+        --with-staticLibs=no \
+        --with-preloadOnly=yes \
+        --with-siteControlledPrefix=yes \
+        --with-32bit=no \
+        --with-tmpdir=/dev/shm \
+        --with-signalHandler=no \
+        --with-syshostConfig=nth_name:2
+      make install
+    chdir: "{{ [NSP_scratch_directory, 'xalt'] | path_join }}"
+  changed_when: true
+  tags:
+    - xalt
+
+- name: Update XALT v{{ NSP_XALT_git_reference }} libxalt_init.so Permissions
+  ansible.builtin.file:
+    path: "{{ [NSP_install_root, 'xalt', NSP_XALT_git_reference, 'lib64/libxalt_init.so'] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  tags:
+    - xalt
+
+- name: Clean Up Scratch After XALT v{{ NSP_XALT_git_reference }} Build
+  ansible.builtin.include_role:
+    name: nsp
+    tasks_from: clear_scratch
+  when: NSP_keep_scratch_clear
+  tags:
+    - xalt

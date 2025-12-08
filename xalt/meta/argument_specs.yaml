@@ -1,0 +1,25 @@
+argument_specs:
+  main:
+    description:
+      - Installs and configures XALT. It expects three files in the ``xalt`` directory
+      - by your playbook ``Config.py``, ``cacerts.pem`` and ``fullchain.pem``.
+    options:
+      NSP_XALT_git_repo:
+        type: str
+        required: false
+        default: https://github.com/xalt/xalt.git
+        description: XALT repository to install from.
+      NSP_XALT_git_reference:
+        type: str
+        required: true
+        description: The git reference to install from.
+      NSP_XALT_create_module:
+        type: bool
+        required: false
+        default: true
+        description: Toggle module generation.
+      NSP_XALT_module_version:
+        type: str
+        required: false
+        default: "{{ NSP_XALT_git_reference }}"
+        description: Version name to use for module.
