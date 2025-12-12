@@ -35,4 +35,4 @@ argument_specs:
         type: bool
         required: false
         default: true
-        description: Clear previous build source files.
+        description: Clear source files from previous build.

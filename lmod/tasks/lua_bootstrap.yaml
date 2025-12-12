@@ -4,7 +4,6 @@
     state: absent
   tags:
     - lmod
-    - installation
 
 - name: Download and Unpack Lua Bootstrap Tarball
   ansible.builtin.unarchive:
@@ -13,7 +12,6 @@
     dest: "{{ NSP_scratch_directory }}"
   tags:
     - lmod
-    - installation
 
 - name: Build & Install Lua Bootstrap
   ansible.builtin.shell:
@@ -26,13 +24,11 @@
   changed_when: true
   tags:
     - lmod
-    - installation
 
-- name: Clean up Scratch after Lua Bootstrap Build
+- name: Clean Up Scratch After Lua Bootstrap Build
   ansible.builtin.include_role:
     name: nsp
     tasks_from: clear_scratch
   when: NSP_keep_scratch_clear
   tags:
     - lmod
-    - installation

@@ -1,4 +1,4 @@
-- name: Ensure Init Directory Exists
+- name: Create Init Directory
   ansible.builtin.file:
     path: "{{ [NSP_install_root, 'init'] | path_join }}"
     state: directory
@@ -7,7 +7,13 @@
     mode: "{{ NSP_executable_permissions }}"
   tags:
     - init
-    - configuration
+
+- name: Check profile Status
+  ansible.builtin.stat:
+    path: "{{ [NSP_install_root, 'init', 'profile'] | path_join }}"
+  register: profile_status
+  tags:
+    - init
 
 - name: Generate profile
   ansible.builtin.template:
@@ -16,10 +22,9 @@
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
-  when: NSP_INIT_wipe or not [NSP_install_root, 'init', 'profile'] | path_join is file
+  when: NSP_INIT_wipe or not profile_status.stat.exists
   tags:
     - init
-    - configuration
 
 - name: Add Contents to profile
   ansible.builtin.blockinfile:
@@ -34,7 +39,13 @@
   when: "[playbook_dir, 'init/profile.j2'] | path_join is file"
   tags:
     - init
-    - configuration
+
+- name: Check cshrc Status
+  ansible.builtin.stat:
+    path: "{{ [NSP_install_root, 'init', 'cshrc'] | path_join }}"
+  register: cshrc_status
+  tags:
+    - init
 
 - name: Generate cshrc
   ansible.builtin.template:
@@ -43,10 +54,9 @@
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
-  when: NSP_INIT_wipe or not [NSP_install_root, 'init', 'cshrc'] | path_join is file
+  when: NSP_INIT_wipe or cshrc_status.stat.exists
   tags:
     - init
-    - configuration
 
 - name: Add Contents to cshrc
   ansible.builtin.blockinfile:
@@ -61,4 +71,3 @@
   when: "[playbook_dir, 'init/cshrc.j2'] | path_join is file"
   tags:
     - init
-    - configuration

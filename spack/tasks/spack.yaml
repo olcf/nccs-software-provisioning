@@ -1,7 +1,15 @@
-- name: Cleanup Spack Repository {{ _SPACK_version.key }}({{ _SPACK_version.value.git_reference }})
+- name: Check for Spack Repository {{ _SPACK_version.key }}({{ _SPACK_version.value.git_reference }})
+  ansible.builtin.stat:
+    path: "{{ [NSP_SPACK_config_directory, 'spack-{}'.format(_SPACK_version.key)] | path_join }}"
+  register: spack_status
+  tags:
+    - spack
+    - "{{ _SPACK_version.key }}"
+
+- name: Clean Up Spack Repository {{ _SPACK_version.key }}({{ _SPACK_version.value.git_reference }})
   ansible.builtin.shell:
     cmd: |
-      set -o pipefail
+      set -o pipefail;
       exit_code=0;
       for f in $(git -C {{ [NSP_SPACK_config_directory, 'spack-{}'.format(_SPACK_version.key)] | path_join }} \
         status -s | awk '$1 == "??" {print $2}'); do
@@ -13,11 +21,9 @@
   register: result
   changed_when: result.rc == 3
   failed_when: result.rc != 0 and result.rc != 3
-  when: "[NSP_SPACK_config_directory, 'spack-{}'.format(_SPACK_version.key)] | path_join is directory
-    and not ansible_check_mode"
+  when: spack_status.stat.exists and not ansible_check_mode
   tags:
     - spack
-    - configuration
     - "{{ _SPACK_version.key }}"
 
 - name: Clone Spack Repository {{ _SPACK_version.key }}({{ _SPACK_version.value.git_reference }})
@@ -31,7 +37,6 @@
   when: not ansible_check_mode
   tags:
     - spack
-    - configuration
     - "{{ _SPACK_version.key }}"
 
 - name: Patch Spack Repository {{ _SPACK_version.key }}({{ _SPACK_version.value.git_reference }})
@@ -42,5 +47,4 @@
   when: _SPACK_version.value.patch is defined and _SPACK_version.value.patch and not ansible_check_mode
   tags:
     - spack
-    - configuration
     - "{{ _SPACK_version.key }}"

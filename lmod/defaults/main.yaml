@@ -1,6 +1,6 @@
 # NSP_LMOD_install_type
 # NSP_LMOD_version
-NSP_LMOD_enable_tcl: false
+NSP_LMOD_enable_tcl: true
 
 NSP_LMOD_default_module_paths: [ ]
 NSP_LMOD_DefApps_modules: [ ]

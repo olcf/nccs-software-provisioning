@@ -7,7 +7,6 @@
     mode: "{{ NSP_executable_permissions }}"
   tags:
     - files
-    - configuration
 
 - name: Generate {{ _FILES_entry.dest }}
   ansible.builtin.template:
@@ -17,7 +16,5 @@
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions if not _FILES_entry.file_permissions is defined
       else _FILES_entry.file_permissions }}"
-  when: "[playbook_dir, 'files', _FILES_entry.src] | path_join is file"
   tags:
     - files
-    - configuration

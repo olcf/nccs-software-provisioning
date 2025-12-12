@@ -1,4 +1,4 @@
-{{ ansible_managed | comment(beginning="--[[", end="]]--", decoration="", prefix_count=0, postfix_count=0) }}
+{{ ansible_managed | comment(beginning='--[[', end=']]--', decoration='', prefix_count=0, postfix_count=0) }}
 
 family("compiler")
 
@@ -42,4 +42,3 @@ prepend_path("CPATH", pathJoin(prefix, "compilers/extras/qd/include/qd"))
 prepend_path("MANPATH", pathJoin(prefix, "compilers/man"))
 
 setenv(string.upper("{{ NSP_site_name }}_") .. package:upper() .. "_ROOT",  prefix)
-

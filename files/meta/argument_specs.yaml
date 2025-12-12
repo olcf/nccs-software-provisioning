@@ -6,7 +6,7 @@ argument_specs:
     options:
       NSP_FILES_inventory:
         type: list
-        elements: path
+        elements: dict
         required: false
         default: [ ]
         description: >-

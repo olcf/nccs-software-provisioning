@@ -1,56 +1,49 @@
 - name: Clear Previous CUDA v{{ NSP_CUDA_version }} Toolkit Run Script
   ansible.builtin.file:
-    path: "{{ [NSP_scratch_directory, 'cuda_{}_{}_{}.run'.format(
-      NSP_CUDA_version,
-      NSP_CUDA_driver,
-      NSP_CUDA_architecture
-      )] | path_join }}" # noqa: jinja[spacing]
+    path: # noqa: jinja[spacing]
+      "{{ [NSP_scratch_directory, 'cuda_{}_{}_{}.run'.format(
+        NSP_CUDA_version,
+        NSP_CUDA_driver,
+        NSP_CUDA_architecture
+      )] | path_join }}"
     state: absent
-  when: "[NSP_scratch_directory, 'cuda_{}_{}_{}.run'.format(
-    NSP_CUDA_version,
-    NSP_CUDA_driver,
-    NSP_CUDA_architecture
-    )] | path_join is file"
   tags:
     - cuda
-    - installation
 
 - name: Download CUDA v{{ NSP_CUDA_version }} Toolkit Run Script
   ansible.builtin.get_url:
-    url: "{{ 'https://developer.download.nvidia.com/compute/cuda/{}/local_installers/cuda_{}_{}_{}.run'.format(
-      NSP_CUDA_version,
-      NSP_CUDA_version,
-      NSP_CUDA_driver,
-      NSP_CUDA_architecture
-      ) }}" # noqa: jinja[spacing]
+    url: # noqa: jinja[spacing]
+      "{{ 'https://developer.download.nvidia.com/compute/cuda/{}/local_installers/cuda_{}_{}_{}.run'.format(
+        NSP_CUDA_version,
+        NSP_CUDA_version,
+        NSP_CUDA_driver,
+        NSP_CUDA_architecture
+      ) }}"
     dest: "{{ NSP_scratch_directory }}"
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
-    mode: "744"
+    mode: "{{ NSP_executable_permissions }}"
   tags:
     - cuda
-    - installation
 
 - name: Install CUDA v{{ NSP_CUDA_version }} Toolkit
   ansible.builtin.command:
-    cmd: "{{ [NSP_scratch_directory, 'cuda_{}_{}_{}.run'.format(
-      NSP_CUDA_version,
-      NSP_CUDA_driver,
-      NSP_CUDA_architecture
+    cmd: # noqa: jinja[spacing]
+      "{{ [NSP_scratch_directory, 'cuda_{}_{}_{}.run'.format(
+        NSP_CUDA_version,
+        NSP_CUDA_driver,
+        NSP_CUDA_architecture
       )] | path_join }} --silent --toolkit
       --toolkitpath={{ [NSP_install_root, 'cuda', NSP_CUDA_version] | path_join }}
-      --tmpdir={{ NSP_scratch_directory }}" # noqa: jinja[spacing]
-    chdir: "{{ NSP_scratch_directory }}"
+      --tmpdir={{ NSP_scratch_directory }}"
   changed_when: true
   tags:
     - cuda
-    - installation
 
-- name: Clean up Scratch after CUDA v{{ NSP_CUDA_version }} Install
+- name: Clean Up Scratch After CUDA v{{ NSP_CUDA_version }} Install
   ansible.builtin.include_role:
     name: nsp
     tasks_from: clear_scratch
   when: NSP_keep_scratch_clear
   tags:
     - cuda
-    - installation
