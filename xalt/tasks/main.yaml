@@ -8,10 +8,10 @@
   tags:
     - xalt
 
-- name: Generate XALT Config.py
+- name: Generate XALT config.py
   ansible.builtin.template:
-    src: "{{ [playbook_dir, 'xalt/Config.py.j2'] }}"
-    dest: "{{ [NSP_install_root, 'xalt/etc/Config.py'] | path_join }}"
+    src: "{{ [playbook_dir, 'xalt/config.py.j2'] | path_join }}"
+    dest: "{{ [NSP_install_root, 'xalt/etc/config.py'] | path_join }}"
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
@@ -20,18 +20,18 @@
 
 - name: Copy Kafka Certs
   ansible.builtin.copy:
-    src: "{{ [playbook_dir, 'xalt', item] }}"
+    src: "{{ [playbook_dir, 'xalt', item] | path_join }}"
     dest: "{{ [NSP_install_root, 'xalt/etc', item] | path_join }}"
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
   loop:
-    - cacert.pem
+    - cacerts.pem
     - fullchain.pem
   tags:
     - xalt
 
-- name: Launch XALT v{{ NSP_XALT_version }} Install
+- name: Launch XALT ({{ NSP_XALT_git_reference }}) Install
   ansible.builtin.include_tasks:
     file: install.yaml
   tags:
@@ -48,10 +48,10 @@
   tags:
     - xalt
 
-- name: Generate XALT v{{ NSP_XALT_version }} Module File
+- name: Generate XALT ({{ NSP_XALT_git_reference }}) Module File
   ansible.builtin.template:
     src: module.lua.j2
-    dest: "{{ [NSP_module_root, 'xalt', '{}.lua'.format(NSP_XALT_version)] | path_join }}"
+    dest: "{{ [NSP_module_root, 'xalt', '{}.lua'.format(NSP_XALT_module_version)] | path_join }}"
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"

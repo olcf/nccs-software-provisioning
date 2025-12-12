@@ -1,8 +1,14 @@
 argument_specs:
   main:
     description:
-      - Installs and configures XALT. It expects three files in the ``xalt`` directory
-      - by your playbook ``Config.py``, ``cacerts.pem`` and ``fullchain.pem``.
+      - This role installs and configures XALT. It expects three files in the ``xalt`` directory
+      - by your playbook ``config.py.j2``, ``cacerts.pem`` and ``fullchain.pem``. ``config.py.j2``
+      - holds the `tuning parameters <https://xalt.readthedocs.io/en/latest/030_site_filtering.html>`_
+      - for XALT data collection.
+      - "``cacerts.pem`` and ``fullchain.pem`` are certificates used to validate the kafka servers."
+      - There is one more optional file ``secrets.yaml``. This file can hold any of the ``NSP_XALT_kafka``
+      - variables in the event you want to encrypt them with ansible-vault
+      - without encrypting the entire playbook.
     options:
       NSP_XALT_git_repo:
         type: str
@@ -23,3 +29,23 @@ argument_specs:
         required: false
         default: "{{ NSP_XALT_git_reference }}"
         description: Version name to use for module.
+      NSP_XALT_kafka_topic:
+        type: str
+        required: false
+        default: ""
+        description: XALT kafka topic.
+      NSP_XALT_kafka_servers:
+        type: str
+        required: false
+        default: ""
+        description: XALT kafka servers.
+      NSP_XALT_kafka_username:
+        type: str
+        required: false
+        default: ""
+        description: XALT kafka username.
+      NSP_XALT_kafka_password:
+        type: str
+        required: false
+        default: ""
+        description: XALT kafka password.
