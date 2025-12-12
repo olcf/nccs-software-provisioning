@@ -1,0 +1,10 @@
+NSP_XALT_git_repo: https://github.com/xalt/xalt.git
+# NSP_XALT_git_reference
+
+NSP_XALT_create_module: true
+NSP_XALT_module_version: "{{ NSP_XALT_git_reference }}"
+
+# NSP_XALT_kafka_topic
+# NSP_XALT_kafka_servers
+# NSP_XALT_kafka_username
+# NSP_XALT_kafka_password
