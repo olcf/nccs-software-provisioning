@@ -24,13 +24,6 @@
   tags:
     - xalt
 
-- name: Load XALT Kafka Secrets
-  ansible.builtin.include_vars:
-    file: "{{ [playbook_dir, 'xalt/secrets.yaml'] | path_join }}"
-  when: "[playbook_dir, 'xalt/secrets.yaml'] | path_join is file"
-  tags:
-    - xalt
-
 - name: Remove Previous XALT ({{ NSP_XALT_git_reference }}) Install
   ansible.builtin.file:
     path: "{{ [NSP_install_root, 'xalt', NSP_XALT_git_reference] | path_join }}"

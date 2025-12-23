@@ -3,7 +3,7 @@
 local base = "{{ [NSP_install_root, 'xalt', NSP_XALT_git_reference] | path_join }}"
 local bin = pathJoin(base, "bin")
 
-prepend_path{"PATH", bin, priority="100"}
+-- prepend_path{"PATH", bin, priority="100"}
 prepend_path("LD_PRELOAD", pathJoin(base, "lib64/libxalt_init.so"))
 
 setenv("XALT_DIR", base)
