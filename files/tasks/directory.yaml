@@ -7,7 +7,6 @@
     mode: "{{ NSP_executable_permissions }}"
   tags:
     - files
-    - configuration
 
 - name: Create Directories in {{ _FILES_entry.dest }}
   ansible.builtin.file:
@@ -22,7 +21,6 @@
   when: item.state == "directory"
   tags:
     - files
-    - configuration
 
 - name: Generate Files in {{ _FILES_entry.dest }}
   ansible.builtin.template:
@@ -38,4 +36,3 @@
   when: item.state == "file"
   tags:
     - files
-    - configuration

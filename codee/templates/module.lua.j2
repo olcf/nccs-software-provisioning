@@ -1,7 +1,7 @@
-{{ ansible_managed | comment(beginning="--[[", end="]]--", decoration="", prefix_count=0, postfix_count=0) }}
+{{ ansible_managed | comment(beginning='--[[', end=']]--', decoration='', prefix_count=0, postfix_count=0) }}
 
-whatis([[Name : A code modernization and optimization platform]])
-whatis([[Version : {{ NSP_CODEE_version }}]])
+whatis("Codee : A code modernization and optimization platform")
+whatis("Version : {{ NSP_CODEE_version }}")
 
 prepend_path("PATH", "{{ [NSP_install_root, 'codee', NSP_CODEE_version, 'bin'] | path_join }}")
 

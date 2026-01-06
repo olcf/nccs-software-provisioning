@@ -1,10 +1,16 @@
+- name: Check for CUDA v{{ NSP_CUDA_version }} Install
+  ansible.builtin.stat:
+    path: "{{ [NSP_install_root, 'cuda', NSP_CUDA_version] | path_join }}"
+  register: cuda_status
+  tags:
+    - cuda
+
 - name: Launch CUDA v{{ NSP_CUDA_version }} Install
   ansible.builtin.include_tasks:
     file: install.yaml
-  when: not [NSP_install_root, 'cuda', NSP_CUDA_version] | path_join is directory
+  when: not cuda_status.stat.exists
   tags:
     - cuda
-    - installation
 
 - name: Create CUDA Module Directory
   ansible.builtin.file:
@@ -16,7 +22,6 @@
   when: NSP_CUDA_create_module
   tags:
     - cuda
-    - configuration
 
 - name: Generate CUDA v{{ NSP_CUDA_version }} Module File
   ansible.builtin.template:
@@ -28,4 +33,3 @@
   when: NSP_CUDA_create_module
   tags:
     - cuda
-    - configuration

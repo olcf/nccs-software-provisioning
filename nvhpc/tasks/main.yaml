@@ -7,7 +7,6 @@
   register: install_status
   tags:
     - nvhpc
-    - installation
 
 - name: Install NVHPC v{{ NSP_NVHPC_version }}
   ansible.builtin.include_tasks:
@@ -15,7 +14,6 @@
   when: not install_status.stat.exists
   tags:
     - nvhpc
-    - installation
 
 - name: Create NVHPC Module Directory
   ansible.builtin.file:
@@ -27,7 +25,6 @@
   when: NSP_NVHPC_create_module
   tags:
     - nvhpc
-    - configuration
 
 - name: Generate NVHPC v{{ NSP_NVHPC_version }} Module File
   ansible.builtin.template:
@@ -39,4 +36,3 @@
   when: NSP_NVHPC_create_module
   tags:
     - nvhpc
-    - configuration

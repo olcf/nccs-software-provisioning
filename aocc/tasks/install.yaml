@@ -1,44 +1,59 @@
-- name: Clear Previous AOCC v{{ NSP_AOCC_version }} Build Files
+- name: Clear Previous AOCC v{{ NSP_AOCC_version }} Source Files
   ansible.builtin.file:
-    path: "{{ [NSP_scratch_directory, 'aocc-{}'.format(NSP_AOCC_version)] | path_join }}"
+    path: "{{ [NSP_scratch_directory, 'aocc-compiler-{}'.format(NSP_AOCC_version)] | path_join }}"
     state: absent
-  when: NSP_AOCC_clean_build and [NSP_scratch_directory, 'aocc-{}'.format(NSP_AOCC_version)] | path_join is directory
+  when: NSP_AOCC_clear_source
   tags:
     - aocc
-    - installation
+
+- name: Check for AOCC v{{ NSP_AOCC_version }} Source Files
+  ansible.builtin.stat:
+    path: "{{ [NSP_scratch_directory, 'aocc-compiler-{}'.format(NSP_AOCC_version)] | path_join }}"
+  register: aocc_source_status
+  tags:
+    - aocc
+
+- name: Download and Unpack AOCC v{{ NSP_AOCC_version }} Tarball
+  ansible.builtin.unarchive:
+    remote_src: true
+    src: # noqa: jinja[spacing]
+      "{{ 'https://download.amd.com/developer/eula/aocc/aocc-{}-{}/aocc-compiler-{}.tar'.format(
+        NSP_AOCC_version.split('.')[0],
+        NSP_AOCC_version.split('.')[1],
+        NSP_AOCC_version
+      ) }}"
+    dest: "{{ NSP_scratch_directory }}"
+    group: "{{ NSP_group }}"
+    owner: "{{ NSP_user }}"
+    mode: "{{ NSP_executable_permissions }}"
+  when: not aocc_source_status.stat.exists
+  tags:
+    - aocc
 
 - name: Create AOCC Install Directory
   ansible.builtin.file:
     path: "{{ [NSP_install_root, 'aocc'] | path_join }}"
     state: directory
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
   tags:
     - aocc
-    - installation
 
-- name: "Download and Unpack AOCC v{{ NSP_AOCC_version }} Tarball"
-  ansible.builtin.unarchive:
-    remote_src: true
-    src: "https://download.amd.com/developer/eula/aocc/aocc-{{ NSP_AOCC_version.split('.')[0] }}-{{ NSP_AOCC_version.split('.')[1] }}/aocc-compiler-{{ NSP_AOCC_version }}.tar"
-    dest: "{{ NSP_scratch_directory }}"
-  when: not [NSP_scratch_directory, 'aocc-{}'.format(NSP_AOCC_version)] | path_join is directory
-  tags:
-    - aocc
-    - configuration
-
-- name: "Build and Install AOCC v{{ NSP_AOCC_version }}"
+- name: Install AOCC v{{ NSP_AOCC_version }}
   ansible.builtin.shell: |
-    mv "{{ [NSP_scratch_directory, 'aocc-compiler-{}'.format(NSP_AOCC_version)] | path_join }}" "{{ [NSP_install_root, 'aocc', NSP_AOCC_version] | path_join }}"
+    mv "{{ [NSP_scratch_directory, 'aocc-compiler-{}'.format(NSP_AOCC_version)] | path_join }}" \
+      "{{ [NSP_install_root, 'aocc', NSP_AOCC_version] | path_join }}"
     cd "{{ [NSP_install_root, 'aocc', NSP_AOCC_version] | path_join }}"
     bash install.sh
+  changed_when: true
   tags:
     - aocc
-    - configuration
 
-- name: Clean up Scratch after AOCC v{{ NSP_AOCC_version }} Build
+- name: Clean Up Scratch After AOCC v{{ NSP_AOCC_version }} Install
   ansible.builtin.include_role:
     name: nsp
     tasks_from: clear_scratch
   when: NSP_keep_scratch_clear
   tags:
     - aocc
-    - installation

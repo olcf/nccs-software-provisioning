@@ -2,7 +2,7 @@ argument_specs:
   main:
     description:
       - The init role initializes the system init scripts and adds your content to them.
-      - To add contents, create a directory called ``init`` in the directory that contains your playbook.
+      - To add contents, create a directory called ``init`` in your playbook directory.
       - In the ``init`` directory create the files ``profile.j2`` and ``cshrc.j2`` with your desired content.
       - ""
       - |-
