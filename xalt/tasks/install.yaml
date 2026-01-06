@@ -1,0 +1,98 @@
+- name: Check for Librdkafka Bootstrap
+  ansible.builtin.stat:
+    path: "{{ [NSP_install_root, 'xalt/librdkafka/lib/librdkafka.so'] | path_join }}"
+  register: librdkafka_bootstrap_status
+  tags:
+    - xalt
+
+- name: Configure Librdkafka Bootstrap
+  ansible.builtin.include_tasks:
+    file: librdkafka_bootstrap.yaml
+  when: not librdkafka_bootstrap_status.stat.exists
+  tags:
+    - xalt
+
+- name: Clone XALT Repository
+  ansible.builtin.git:
+    repo: "{{ NSP_XALT_git_repo }}"
+    dest: "{{ [NSP_scratch_directory, 'xalt'] | path_join }}"
+    clone: true
+    force: true
+    update: true
+    version: "{{ NSP_XALT_git_reference }}"
+  when: not ansible_check_mode
+  tags:
+    - xalt
+
+- name: Remove Previous XALT ({{ NSP_XALT_git_reference }}) Install
+  ansible.builtin.file:
+    path: "{{ [NSP_install_root, 'xalt', NSP_XALT_git_reference] | path_join }}"
+    state: absent
+  tags:
+    - xalt
+
+- name: Build and Install XALT ({{ NSP_XALT_git_reference }})
+  ansible.builtin.shell:
+    cmd: |
+      set -e
+      mkdir build
+      cd build
+      export LD_LIBRARY_PATH={{ [NSP_install_root, 'xalt/librdkafka/lib'] | path_join }}
+      ../configure \
+        CC=/usr/bin/gcc \
+        CFLAGS=-I{{ [NSP_install_root, 'xalt/librdkafka/include'] | path_join }} \
+        LDFLAGS=-L{{ [NSP_install_root, 'xalt/librdkafka/lib'] | path_join }} \
+        --prefix={{ [NSP_install_root, 'xalt', NSP_XALT_git_reference] | path_join }} \
+        --with-transmission=kafka \
+        --with-containerSupport=no \
+        --with-functionTracking=no \
+        --with-trackGPU=no \
+        --with-mode=751 \
+        --with-trackMPI=yes \
+        --with-trackScalarPrgms=yes \
+        --with-supportCURL=no \
+        --with-supportKAFKA=yes \
+        --with-cmdlineRecord=yes \
+        --with-computeSHA1=no \
+        --with-etcDir={{ [NSP_install_root, 'xalt/etc'] | path_join }} \
+        --with-config={{ [NSP_install_root, 'xalt/etc/config.py'] | path_join }} \
+        --with-MySQL=no \
+        --with-hostnameParser=no \
+        --with-staticLibs=no \
+        --with-preloadOnly=yes \
+        --with-siteControlledPrefix=yes \
+        --with-32bit=no \
+        --with-tmpdir=/dev/shm \
+        --with-signalHandler=no \
+        --with-syshostConfig=nth_name:2
+      make EXTRA_FLAGS='"-I{{ [NSP_install_root, 'xalt/librdkafka/include'] | path_join }} \
+        -DKAFKA_TOPIC=\\\"{{ NSP_XALT_kafka_topic }}\\\" \
+        -DKAFKA_SERVERS=\\\"{{ NSP_XALT_kafka_servers }}\\\" \
+        -DKAFKA_USERNAME=\\\"{{ NSP_XALT_kafka_username }}\\\" \
+        -DKAFKA_PASSWORD=\\\"{{ NSP_XALT_kafka_password }}\\\" \
+        -DKAFKA_CA_LOCATION=\\\""{{ [NSP_install_root, 'xalt/etc/cacerts.pem'] | path_join }}"\\\" \
+        -DKAFKA_CERTIFICATE_LOCATION=\\\""{{ [NSP_install_root, 'xalt/etc/fullchain.pem'] | path_join }}"\\\""' \
+        install
+      cd ..
+      rm -rf build
+    chdir: "{{ [NSP_scratch_directory, 'xalt'] | path_join }}"
+  changed_when: true
+  tags:
+    - xalt
+
+- name: Update XALT ({{ NSP_XALT_git_reference }}) libxalt_init.so Permissions
+  ansible.builtin.file:
+    path: "{{ [NSP_install_root, 'xalt', NSP_XALT_git_reference, 'lib64/libxalt_init.so'] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  tags:
+    - xalt
+
+- name: Clean Up Scratch After XALT ({{ NSP_XALT_git_reference }}) Build
+  ansible.builtin.include_role:
+    name: nsp
+    tasks_from: clear_scratch
+  when: NSP_keep_scratch_clear
+  tags:
+    - xalt

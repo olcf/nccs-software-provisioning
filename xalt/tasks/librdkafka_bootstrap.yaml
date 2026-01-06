@@ -1,0 +1,36 @@
+- name: Clear Previous Librdkafka Files
+  ansible.builtin.file:
+    path: "{{ [NSP_scratch_directory, 'librdkafka-2.12.1'] | path_join }}"
+    state: absent
+  tags:
+    - xalt
+
+- name: Download and Unpack Librdkafka Tarball
+  ansible.builtin.unarchive:
+    remote_src: true
+    src: "https://github.com/confluentinc/librdkafka/archive/refs/tags/v2.12.1.tar.gz"
+    dest: "{{ NSP_scratch_directory }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  tags:
+    - xalt
+
+- name: Build and Install Librdkafka
+  ansible.builtin.shell:
+    cmd: |
+      ./configure --prefix={{ [NSP_install_root, 'xalt/librdkafka'] | path_join }}
+      make
+      make install
+    chdir: "{{ [NSP_scratch_directory, 'librdkafka-2.12.1'] | path_join }}"
+  changed_when: true
+  tags:
+    - xalt
+
+- name: Clean Up Scratch After XALT Bootstrap Build
+  ansible.builtin.include_role:
+    name: nsp
+    tasks_from: clear_scratch
+  when: NSP_keep_scratch_clear
+  tags:
+    - xalt
