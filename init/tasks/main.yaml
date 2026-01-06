@@ -54,7 +54,7 @@
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
-  when: NSP_INIT_wipe or cshrc_status.stat.exists
+  when: NSP_INIT_wipe or not cshrc_status.stat.exists
   tags:
     - init
 
