@@ -20,7 +20,7 @@
     dest: "{{ NSP_scratch_directory }}"
     group: "{{ NSP_group }}"
     owner: "{{ NSP_user }}"
-    mode: "{{ NSP_file_permissions }}"
+    mode: "{{ NSP_executable_permissions }}"
   when: not gcc_source_status.stat.exists
   tags:
     - gcc
