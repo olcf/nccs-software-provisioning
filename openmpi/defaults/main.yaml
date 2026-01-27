@@ -1,0 +1,14 @@
+# NSP_OMPI_version
+
+#NSP_OMPI_enabled_languages:
+#  - "c"
+#  - "c++"
+#  - "fortran"
+
+NSP_OMPI_create_module: true
+
+NSP_OMPI_clean_build: true
+
+NSP_OMPI_OFI_clean_build: true
+
+NSP_OMPI_XPMEM_PATH: '/usr'

@@ -1,0 +1,48 @@
+{{ ansible_managed | comment(beginning='--[[', end=']]--', decoration='', prefix_count=0, postfix_count=0) }}
+
+family("mpi")
+
+whatis("OpenMPI v{{ NSP_OMPI_version }}")
+whatis("Using Libfabric v{{ NSP_OMPI_OFI_version }}")
+whatis("NOTE: This module is EXPERIMENTAL.")
+
+help("OpenMPI v{{ NSP_OMPI_version }}")
+
+conflict("libfabric")
+
+load("craype-accel-amd-gfx90a", "rocm/{{ NSP_OMPI_ROCM_version }}", "xpmem")
+
+local base = "{{ NSP_install_root }}"
+local package = "openmpi"
+local ofi_version = "{{ NSP_OMPI_OFI_version }}"
+local version = "{{ NSP_OMPI_version }}"
+local ofi_prefix = pathJoin(base, package,"libfabric", ofi_version)
+local prefix = pathJoin(base, package, version)
+
+prepend_path("PATH", pathJoin(ofi_prefix, "bin"))
+prepend_path("PATH", pathJoin(prefix, "bin"))
+prepend_path("LIBRARY_PATH", pathJoin(ofi_prefix, "lib"))
+prepend_path("LIBRARY_PATH", pathJoin(prefix, "lib"))
+prepend_path("LD_LIBRARY_PATH", pathJoin(ofi_prefix, "lib"))
+prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "lib"))
+prepend_path("MANPATH", pathJoin(ofi_prefix, "share/man"))
+prepend_path("MANPATH", pathJoin(prefix, "share/man"))
+prepend_path("PKG_CONFIG_PATH", pathJoin(ofi_prefix, "lib/pkgconfig"))
+prepend_path("PKG_CONFIG_PATH", pathJoin(prefix, "lib/pkgconfig"))
+
+setenv("FI_SHM_USE_XPMEM", 1)
+setenv("FI_LNX_PROV_LINKS",  "shm+cxi:cxi0|shm+cxi:cxi1|shm+cxi:cxi2|shm+cxi:cxi3")
+setenv("PRTE_MCA_ras_slurm_use_entire_allocation", 1)
+setenv("PRTE_MCA_ras_base_launch_orted_on_hn", 1)
+setenv("PRTE_MCA_prte_routed_radix", 128)
+setenv("PMIX_MCA_gds", "hash")
+setenv("OMPI_MCA_opal_common_ofi_provider_include", "lnx")
+setenv("OMPI_MCA_mtl_ofi_av", "table")
+setenv("OMPI_MCA_btl", "^tcp,openib,ofi")
+setenv("OMPI_MCA_pml", "^ucx")
+setenv("OMPI_MCA_mtl", "ofi")
+
+setenv(string.upper("{{ NSP_site_name }}_") .. "OMPI_LIBFABRIC_DIR", ofi_prefix)
+setenv(string.upper("{{ NSP_site_name }}_") .. "OMPI_LIBFABRIC_INSTALL_DIR", ofi_prefix)
+setenv(string.upper("{{ NSP_site_name }}_") .. "OMPI_ROOT",  prefix)
+

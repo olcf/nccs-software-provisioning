@@ -1,0 +1,37 @@
+argument_specs:
+  main:
+    description:
+      - Installs OpenMPI and optionally generates a module file.
+    options:
+      NSP_OMPI_OFI_clean_build:
+        type: bool
+        required: false
+        default: true
+        description: Clean previous Libfabric build files.
+      NSP_OMPI_version:
+        type: str
+        required: true
+        description: The version of OpenMPI to install.
+      NSP_OMPI_create_module:
+        type: bool
+        required: false
+        default: true
+        description: Toggles module generation.
+      NSP_OMPI_clean_build:
+        type: bool
+        required: false
+        default: true
+        description: Clean previous OpenMPI build files.
+      NSP_OMPI_OFI_version:
+        type: str
+        required: true
+        description: Version of Libfabric to install and configure OpenMPI with.
+      NSP_OMPI_ROCM_version:
+        type: str
+        required: true
+        description: Version of ROCM used for Libfabric/OpenMPI configuration.
+      NSP_OMPI_XPMEM_PATH:
+        type: str
+        required: false
+        default: '/usr'
+        description: Path to XPMEM used for Libfabric/OpenMPI configuration.
