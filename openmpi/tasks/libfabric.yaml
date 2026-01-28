@@ -1,0 +1,48 @@
+- name: Clear Previous Libfabric v{{ NSP_OMPI_OFI_version }} Build Files
+  ansible.builtin.file:
+    path: "{{ [NSP_scratch_directory, 'libfabric-{}'.format(NSP_OMPI_version)] | path_join }}"
+    state: absent
+  when: NSP_OMPI_OFI_clean_build
+  tags:
+    - ompi-ofi
+
+- name: Check for Libfabric v{{ NSP_OMPI_OFI_version }} Source Files
+  ansible.builtin.stat:
+    path: "{{ [NSP_scratch_directory, 'libfabric-{}'.format(NSP_OMPI_version)] | path_join }}"
+  register: ompi_ofi_source_status
+  tags:
+    - ompi-ofi
+
+- name: Download and Unpack Libfabric v{{ NSP_OMPI_OFI_version }} Tarball
+  ansible.builtin.unarchive:
+    remote_src: true
+    src: "https://github.com/ofiwg/libfabric/releases/download/v{{ NSP_OMPI_OFI_version }}/libfabric-{{ NSP_OMPI_OFI_version }}.tar.bz2"
+    dest: "{{ NSP_scratch_directory }}"
+    group: "{{ NSP_group }}"
+    owner: "{{ NSP_user }}"
+    mode: "{{ NSP_file_permissions }}"
+  when: not ompi_ofi_source_status.stat.exists
+  tags:
+    - ompi-ofi
+
+- name: Build and Install Libfabric v{{ NSP_OMPI_OFI_version }}
+  ansible.builtin.shell:
+    cmd: |
+      rm -rf build && mkdir build && cd build
+      ../configure --disable-opx --enable-cxi --enable-lnx \
+        --enable-xpmem={{ NSP_OMPI_XPMEM_PATH }} --with-rocr={{ ['/opt/rocm-', NSP_OMPI_ROCM_version] | join }} \
+        --prefix {{ [NSP_install_root, 'openmpi', 'libfabric', NSP_OMPI_OFI_version] | path_join }}
+      make -j{{ NSP_max_threads }}
+      make install
+    chdir: "{{ [NSP_scratch_directory, 'libfabric-{}'.format(NSP_OMPI_OFI_version)] | path_join }}"
+  changed_when: true
+  tags:
+    - ompi-ofi
+
+- name: Clean Up Scratch After Libfabric v{{ NSP_OMPI_OFI_version }} Build
+  ansible.builtin.include_role:
+    name: nsp
+    tasks_from: clear_scratch
+  when: NSP_keep_scratch_clear
+  tags:
+    - ompi-ofi
