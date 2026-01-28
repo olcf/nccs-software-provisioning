@@ -1,6 +1,6 @@
 - name: Check for Libfabric v{{ NSP_OMPI_OFI_version }} Install
   ansible.builtin.stat:
-    path: "{{ [NSP_install_root, 'libfabric-ompi', NSP_OMPI_version, 'bin/libfabric'] | path_join }}"
+    path: "{{ [NSP_install_root, 'libfabric-ompi', NSP_OMPI_version, 'bin/fi_info'] | path_join }}"
   register: libfabric_ompi_status
   tags:
     - ompi-ofi
@@ -14,7 +14,7 @@
 
 - name: Check for OpenMPI v{{ NSP_OMPI_version }} Install
   ansible.builtin.stat:
-    path: "{{ [NSP_install_root, 'openmpi', NSP_OMPI_version, 'bin/openmpi'] | path_join }}"
+    path: "{{ [NSP_install_root, 'openmpi', NSP_OMPI_version, 'bin/ompi_info'] | path_join }}"
   register: openmpi_status
   tags:
     - ompi
