@@ -30,7 +30,10 @@
   ansible.builtin.shell:
     cmd: |
       mkdir build && cd build
-      ../configure CC=amdclang CXX=amdclang++ FC=amdflang \
+      ../configure \
+        CC={{ [NSP_MPICH_rocm_prefix, 'bin/amdclang'] | path_join }} \
+        CXX={{ [NSP_MPICH_rocm_prefix, 'bin/amdclang++'] | path_join }} \
+        FC={{ [NSP_MPICH_rocm_prefix, 'bin/amdflang'] | path_join }} \
         --prefix={{ [NSP_install_root, 'mpich', NSP_MPICH_version] | path_join }} \
         --with-device=ch4:ofi \
         --with-libfabric={{ NSP_MPICH_ofi_prefix }} \
