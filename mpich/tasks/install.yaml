@@ -26,6 +26,14 @@
   tags:
     - mpich
 
+- name: Apply amdflang Patch
+  ansible.posix.patch:
+    src: amdflang.patch
+    basedir: "{{ [NSP_scratch_directory, 'mpich-{}'.format(NSP_MPICH_version)] | path_join }}"
+    strip: 1
+  tags:
+    - mpich
+
 - name: Build and Install MPICH v{{ NSP_MPICH_version }}
   ansible.builtin.shell:
     cmd: |
