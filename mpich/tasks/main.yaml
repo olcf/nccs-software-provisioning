@@ -1,0 +1,37 @@
+- name: Check for MPICH v{{ NSP_MPICH_version }} Install
+  ansible.builtin.stat:
+    path: "{{ [NSP_install_root, 'mpich',
+      NSP_MPICH_version + NSP_MPICH_installation_suffix, 'bin/mpicc'] | path_join }}"
+  register: mpich_status
+  tags:
+    - mpich
+
+- name: Launch MPICH v{{ NSP_MPICH_version }} Install
+  ansible.builtin.include_tasks:
+    file: install.yaml
+  when: not mpich_status.stat.exists
+  tags:
+    - mpich
+
+- name: Create MPICH Module Directory
+  ansible.builtin.file:
+    path: "{{ [NSP_module_root, 'mpich'] | path_join }}"
+    state: directory
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  when: NSP_MPICH_create_module
+  tags:
+    - mpich
+
+- name: Generate MPICH v{{ NSP_MPICH_version }} Module File
+  ansible.builtin.template:
+    src: module.lua.j2
+    dest: "{{ [NSP_module_root, 'mpich/{}.lua'.format(NSP_MPICH_version +
+      NSP_MPICH_installation_suffix)] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  when: NSP_MPICH_create_module
+  tags:
+    - mpich

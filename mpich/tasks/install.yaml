@@ -1,0 +1,62 @@
+- name: Clear Previous MPICH v{{ NSP_MPICH_version }} Build Files
+  ansible.builtin.file:
+    path: "{{ [NSP_scratch_directory, 'mpich-{}'.format(NSP_MPICH_version)] | path_join }}"
+    state: absent
+  when: NSP_MPICH_clean_build
+  tags:
+    - mpich
+
+- name: Check for MPICH v{{ NSP_MPICH_version }} Source Files
+  ansible.builtin.stat:
+    path: "{{ [NSP_scratch_directory, 'mpich-{}'.format(NSP_MPICH_version)] | path_join }}"
+  register: mpich_source_status
+  tags:
+    - mpich
+
+- name: Download and Unpack MPICH v{{ NSP_MPICH_version }} Tarball
+  ansible.builtin.unarchive:
+    remote_src: true
+    src: "https://github.com/pmodels/mpich/releases/download/
+      v{{ NSP_MPICH_version }}/mpich-{{ NSP_MPICH_version }}.tar.gz"
+    dest: "{{ NSP_scratch_directory }}"
+    group: "{{ NSP_group }}"
+    owner: "{{ NSP_user }}"
+    mode: "{{ NSP_executable_permissions }}"
+  when: not mpich_source_status.stat.exists
+  tags:
+    - mpich
+
+- name: Build and Install MPICH v{{ NSP_MPICH_version }}
+  ansible.builtin.shell:
+    cmd: |
+      ./configure \
+        --prefix={{ [NSP_install_root, 'mpich', NSP_MPICH_version + NSP_MPICH_installation_suffix] | path_join }} \
+        --with-device=ch4:ofi \
+        --with-libfabric={{ NSP_MPICH_ofi_prefix }} \
+        --with-hip={{ NSP_MPICH_rocm_prefix }} \
+        --with-pm=none \
+        --with-pmi=pmi2 \
+        --with-pmi2={{ NSP_MPICH_pmi2_prefix }} \
+        --enable-yield=sched_yield \
+        --with-namepublisher=file \
+        --enable-fortran \
+        --disable-cxx \
+        --disable-allowport \
+        --enable-threads=runtime \
+        --enable-thread-cs=global \
+        --with-ch4-shmmods=xpmem \
+        --with-hwloc
+      make -j{{ NSP_max_threads }}
+      make install
+    chdir: "{{ [NSP_scratch_directory, 'mpich-{}'.format(NSP_MPICH_version)] | path_join }}"
+  changed_when: true
+  tags:
+    - mpich
+
+- name: Clean Up Scratch After MPICH v{{ NSP_MPICH_version }} Build
+  ansible.builtin.include_role:
+    name: nsp
+    tasks_from: clear_scratch
+  when: NSP_keep_scratch_clear
+  tags:
+    - mpich

@@ -1,0 +1,36 @@
+argument_specs:
+  main:
+    description:
+      - Installs MPICH and optionally generates a module file.
+    options:
+      NSP_MPICH_version:
+        type: str
+        required: true
+        description: The version to install.
+      NSP_MPICH_installation_suffix:
+        type: str
+        required: false
+        default: ""
+        description: Installation suffix (also applied to module).
+      NSP_MPICH_ofi_prefix:
+        type: str
+        required: true
+        description: The path to Libfabric.
+      NSP_MPICH_rocm_prefix:
+        type: str
+        required: true
+        description: The path to ROCm.
+      NSP_MPICH_pmi2_prefix:
+        type: str
+        required: true
+        description: The path to pmi2.
+      NSP_MPICH_create_module:
+        type: bool
+        required: false
+        default: true
+        description: Toggles module generation.
+      NSP_MPICH_clear_source:
+        type: bool
+        required: false
+        default: true
+        description: Clear previous build source files.

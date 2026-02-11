@@ -1,0 +1,10 @@
+# NSP_MPICH_version
+NSP_MPICH_installation_suffix: ""
+
+# NSP_MPICH_ofi_prefix
+# NSP_MPICH_rocm_prefix
+# NSP_MPICH_pmi2_prefix
+
+NSP_MPICH_create_module: true
+
+NSP_MPICH_clean_build: true

@@ -1,0 +1,23 @@
+{{ ansible_managed | comment(beginning='--[[', end=']]--', decoration='', prefix_count=0, postfix_count=0) }}
+
+family("mpi")
+
+depends_on("rocm", "libfabric")
+
+whatis("MPICH MPI implementation v{{ NSP_MPICH_version }}")
+
+help("MPICH MPI implementation v{{ NSP_MPICH_version }}")
+
+local base = "{{ NSP_install_root }}"
+local package = "mpich"
+local version = "{{ NSP_MPICH_version + NSP_MPICH_installation_prefix }}"
+local prefix = pathJoin(base, package, version)
+
+prepend_path("PATH", pathJoin(prefix, "bin"))
+prepend_path("LIBRARY_PATH", pathJoin(prefix, "lib64"))
+prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "lib64"))
+
+setenv("MPIR_CVAR_ENABLE_GPU", "1")
+setenv("MPIR_CVAR_CH4_OFI_ENABLE_HMEM", "1")
+
+setenv(string.upper("{{ NSP_site_name }}_") .. package:upper() .. "_ROOT",  prefix)
