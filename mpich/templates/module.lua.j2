@@ -4,6 +4,14 @@ family("mpi")
 
 depends_on("rocm", "libfabric")
 
+if mode() == "load" and not isloaded("rocm/{{ NSP_MPICH_rocm_version }}") then
+    LmodWarning("You do not have rocm/{{ NSP_MPICH_rocm_version }} loaded. It is possible to use this module without rocm/{{ NSP_MPICH_rocm_version }} but it is not supported")
+end
+
+if mode() == "load" and not isloaded("libfabric/{{ NSP_MPICH_ofi_version }}") then
+    LmodWarning("You do not have libfabric/{{ NSP_MPICH_ofi_version }} loaded. It is possible to use this module without libfabric/{{ NSP_MPICH_ofi_version }} but it is not supported")
+end
+
 whatis("MPICH MPI implementation v{{ NSP_MPICH_version }}")
 
 help("MPICH MPI implementation v{{ NSP_MPICH_version }}")
@@ -14,8 +22,8 @@ local version = "{{ NSP_MPICH_version }}"
 local prefix = pathJoin(base, package, version)
 
 prepend_path("PATH", pathJoin(prefix, "bin"))
-prepend_path("LIBRARY_PATH", pathJoin(prefix, "lib64"))
-prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "lib64"))
+prepend_path("LIBRARY_PATH", pathJoin(prefix, "lib"))
+prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "lib"))
 
 setenv("MPIR_CVAR_ENABLE_GPU", "1")
 setenv("MPIR_CVAR_CH4_OFI_ENABLE_HMEM", "1")

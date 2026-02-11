@@ -51,9 +51,10 @@
         --disable-static
       make -j{{ NSP_max_threads }}
       make install
+      rm {{ [NSP_install_root, 'mpich', NSP_MPICH_version, 'lib'] | path_join }}/*\.la
       for library in $(ls {{ [NSP_install_root, 'mpich', NSP_MPICH_version, 'lib'] | path_join }}); do
-        if amdhip64so=$(patchelf --print-needed {{ [NSP_install_root, 'mpich', NSP_MPICH_version, 'lib'] | path_join }}/${library} | grep libamdhip64.so); then
-          patchelf --replace-needed ${amdhip64so} libamdhip64.so {{ [NSP_install_root, 'mpich', NSP_MPICH_version, 'lib'] | path_join }}/${library};
+        if amdhip64so=$({{ NSP_MPICH_patchelf }} --print-needed {{ [NSP_install_root, 'mpich', NSP_MPICH_version, 'lib'] | path_join }}/${library} | grep libamdhip64.so); then
+          {{ NSP_MPICH_patchelf }} --replace-needed ${amdhip64so} libamdhip64.so {{ [NSP_install_root, 'mpich', NSP_MPICH_version, 'lib'] | path_join }}/${library};
         fi;
       done
     chdir: "{{ [NSP_scratch_directory, 'mpich-{}'.format(NSP_MPICH_version)] | path_join }}"
