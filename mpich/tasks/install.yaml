@@ -37,6 +37,7 @@
 - name: Build and Install MPICH v{{ NSP_MPICH_version }}
   ansible.builtin.shell:
     cmd: |
+      bash autogen.sh
       mkdir build && cd build
       ../configure \
         CC={{ [NSP_MPICH_rocm_prefix, 'bin/amdclang'] | path_join }} \

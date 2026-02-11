@@ -37,7 +37,7 @@ argument_specs:
         required: false
         default: true
         description: Toggles module generation.
-      NSP_MPICH_clear_source:
+      NSP_MPICH_clean_build:
         type: bool
         required: false
         default: true
