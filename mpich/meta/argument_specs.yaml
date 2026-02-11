@@ -7,10 +7,23 @@ argument_specs:
         type: str
         required: true
         description: The version to install.
+      NSP_MPICH_patchelf:
+        type: str
+        required: false
+        default: /usr/bin/patchelf
+        description: The path to the patchelf executable.
+      NSP_MPICH_ofi_version:
+        type: str
+        required: true
+        description: The version of Libfabric.
       NSP_MPICH_ofi_prefix:
         type: str
         required: true
         description: The path to Libfabric.
+      NSP_MPICH_rocm_version:
+        type: str
+        required: true
+        description: The version of ROCm.
       NSP_MPICH_rocm_prefix:
         type: str
         required: true

@@ -1,6 +1,10 @@
 # NSP_MPICH_version
 
+NSP_MPICH_patchelf: /usr/bin/patchelf
+
+# NSP_MPICH_ofi_version
 # NSP_MPICH_ofi_prefix
+# NSP_MPICH_rocm_version
 # NSP_MPICH_rocm_prefix
 # NSP_MPICH_pmi2_prefix
 
