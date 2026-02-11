@@ -16,8 +16,8 @@
 - name: Download and Unpack MPICH v{{ NSP_MPICH_version }} Tarball
   ansible.builtin.unarchive:
     remote_src: true
-    src: "https://github.com/pmodels/mpich/releases/download/
-      v{{ NSP_MPICH_version }}/mpich-{{ NSP_MPICH_version }}.tar.gz"
+    src: "{{ 'https://github.com/pmodels/mpich/releases/download/v{}/mpich-{}.tar.gz'.format(
+      NSP_MPICH_version, NSP_MPICH_version) }}"
     dest: "{{ NSP_scratch_directory }}"
     group: "{{ NSP_group }}"
     owner: "{{ NSP_user }}"
