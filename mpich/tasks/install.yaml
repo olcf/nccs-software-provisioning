@@ -29,8 +29,9 @@
 - name: Build and Install MPICH v{{ NSP_MPICH_version }}
   ansible.builtin.shell:
     cmd: |
-      ./configure \
-        --prefix={{ [NSP_install_root, 'mpich', NSP_MPICH_version + NSP_MPICH_installation_suffix] | path_join }} \
+      mkdir build && cd build
+      ../configure CC=$(which amdclang) CXX=$(which amdclang++) FC=$(which amdflang) \
+        --prefix={{ [NSP_install_root, 'mpich', NSP_MPICH_version] | path_join }} \
         --with-device=ch4:ofi \
         --with-libfabric={{ NSP_MPICH_ofi_prefix }} \
         --with-hip={{ NSP_MPICH_rocm_prefix }} \

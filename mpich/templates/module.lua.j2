@@ -10,7 +10,7 @@ help("MPICH MPI implementation v{{ NSP_MPICH_version }}")
 
 local base = "{{ NSP_install_root }}"
 local package = "mpich"
-local version = "{{ NSP_MPICH_version + NSP_MPICH_installation_prefix }}"
+local version = "{{ NSP_MPICH_version }}"
 local prefix = pathJoin(base, package, version)
 
 prepend_path("PATH", pathJoin(prefix, "bin"))

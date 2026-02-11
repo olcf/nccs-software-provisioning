@@ -7,11 +7,6 @@ argument_specs:
         type: str
         required: true
         description: The version to install.
-      NSP_MPICH_installation_suffix:
-        type: str
-        required: false
-        default: ""
-        description: Installation suffix (also applied to module).
       NSP_MPICH_ofi_prefix:
         type: str
         required: true
