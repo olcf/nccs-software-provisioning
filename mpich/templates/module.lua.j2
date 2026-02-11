@@ -1,15 +1,19 @@
 {{ ansible_managed | comment(beginning='--[[', end=']]--', decoration='', prefix_count=0, postfix_count=0) }}
 
+add_property("state", "experimental")
+
 family("mpi")
 
 depends_on("rocm", "libfabric")
 
-if mode() == "load" and not isloaded("rocm/{{ NSP_MPICH_rocm_version }}") then
-    LmodWarning("You do not have rocm/{{ NSP_MPICH_rocm_version }} loaded. It is possible to use this module without rocm/{{ NSP_MPICH_rocm_version }} but it is not supported")
-end
+if mode() == "load" then 
+    if not isloaded("rocm/{{ NSP_MPICH_rocm_version }}") then
+        LmodWarning("You do not have rocm/{{ NSP_MPICH_rocm_version }} loaded! It is possible to use this module without rocm/{{ NSP_MPICH_rocm_version }} but it is not supported.")
+    end
 
-if mode() == "load" and not isloaded("libfabric/{{ NSP_MPICH_ofi_version }}") then
-    LmodWarning("You do not have libfabric/{{ NSP_MPICH_ofi_version }} loaded. It is possible to use this module without libfabric/{{ NSP_MPICH_ofi_version }} but it is not supported")
+    if not isloaded("libfabric/{{ NSP_MPICH_ofi_version }}") then
+        LmodWarning("You do not have libfabric/{{ NSP_MPICH_ofi_version }} loaded! It is possible to use this module without libfabric/{{ NSP_MPICH_ofi_version }} but it is not supported.")
+    end
 end
 
 whatis("MPICH MPI implementation v{{ NSP_MPICH_version }}")
