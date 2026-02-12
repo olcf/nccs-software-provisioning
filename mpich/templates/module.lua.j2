@@ -6,8 +6,10 @@ family("mpi")
 
 depends_on("rocm", "libfabric")
 
-LmodMessage("This module was built with rocm/{{ NSP_MPICH_rocm_version }}. It is possible to use this module with a different ROCm version but it is not supported!")
-LmodMessage("This module was built with libfabric/{{ NSP_MPICH_ofi_version }}. It is possible to use this module with a different Libfabric version but it is not supported!")
+if mode() == "load then
+    LmodMessage("This module was built with rocm/{{ NSP_MPICH_rocm_version }}. It is possible to use this module with a different ROCm version but it is not supported!")
+    LmodMessage("This module was built with libfabric/{{ NSP_MPICH_ofi_version }}. It is possible to use this module with a different Libfabric version but it is not supported!")
+end
 
 whatis("MPICH MPI implementation v{{ NSP_MPICH_version }}")
 
@@ -24,5 +26,6 @@ prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "lib"))
 
 setenv("MPIR_CVAR_ENABLE_GPU", "1")
 setenv("MPIR_CVAR_CH4_OFI_ENABLE_HMEM", "1")
+setenv("MPICH_ROOT", prefix)
 
 setenv(string.upper("{{ NSP_site_name }}_") .. package:upper() .. "_ROOT",  prefix)
