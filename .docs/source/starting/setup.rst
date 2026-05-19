@@ -377,7 +377,7 @@ We will name our spack environments according to the following schema ``core<yea
 .. code-block:: jinja
     :caption: ``moria/spack/environments/concretizer.yaml.j2``
 
-    {{ ansible_managed | comment(beginning="##", end="##", decoration="#", prefix_count=0, postfix_count=0) }}
+    {{ NSP_template_header | comment(beginning="##", end="##", decoration="#", prefix_count=0, postfix_count=0) }}
 
     concretizer:
       reuse: false
@@ -391,7 +391,7 @@ We will name our spack environments according to the following schema ``core<yea
 .. code-block:: jinja
     :caption: ``moria/spack/environments/config.yaml.j2``
 
-    {{ ansible_managed | comment(beginning="##", end="##", decoration="#", prefix_count=0, postfix_count=0) }}
+    {{ NSP_template_header | comment(beginning="##", end="##", decoration="#", prefix_count=0, postfix_count=0) }}
 
     config:
       install_tree:
@@ -447,7 +447,7 @@ We will name our spack environments according to the following schema ``core<yea
 .. code-block:: jinja
     :caption: ``moria/spack/environments/modules.yaml.j2``
 
-    {{ ansible_managed | comment(beginning="##", end="##", decoration="#", prefix_count=0, postfix_count=0) }}
+    {{ NSP_template_header | comment(beginning="##", end="##", decoration="#", prefix_count=0, postfix_count=0) }}
 
     modules:
       prefix_inspections:
@@ -508,7 +508,7 @@ We will name our spack environments according to the following schema ``core<yea
 .. code-block:: jinja
     :caption: ``moria/spack/environments/packages.yaml.j2``
 
-    {{ ansible_managed | comment(beginning="##", end="##", decoration="#", prefix_count=0, postfix_count=0) }}
+    {{ NSP_template_header | comment(beginning="##", end="##", decoration="#", prefix_count=0, postfix_count=0) }}
 
     packages:
       all:
@@ -552,7 +552,7 @@ We will name our spack environments according to the following schema ``core<yea
 .. code-block:: jinja
     :caption: ``moria/spack/environments/core25.02/spack.yaml.j2``
 
-    {{ ansible_managed | comment(beginning="##", end="##", decoration="#", prefix_count=0, postfix_count=0) }}
+    {{ NSP_template_header | comment(beginning="##", end="##", decoration="#", prefix_count=0, postfix_count=0) }}
 
     # OLCF {{ NSP_system_name }} {{ _SPACK_environment_name }} Spack Environment
 
@@ -593,7 +593,7 @@ We will name our spack environments according to the following schema ``core<yea
 .. code-block:: jinja
     :caption: ``moria/spack/environments/sw25.02/spack.yaml.j2``
 
-    {{ ansible_managed | comment(beginning="##", end="##", decoration="#", prefix_count=0, postfix_count=0) }}
+    {{ NSP_template_header | comment(beginning="##", end="##", decoration="#", prefix_count=0, postfix_count=0) }}
 
     # OLCF {{ NSP_system_name }} {{ _SPACK_environment_name }} Spack Environment
 
@@ -728,7 +728,7 @@ environment that we installed.
 .. code-block:: jinja
     :caption: ``moria/files/Core/25.02.lua``
 
-    {{ ansible_managed | comment(beginning="--[[", end="]]--", decoration="", prefix_count=0, postfix_count=0) }}
+    {{ NSP_template_header | comment(beginning="--[[", end="]]--", decoration="", prefix_count=0, postfix_count=0) }}
 
     help("Add path for Core 25.02 modules to MODULEPATH")
 
