@@ -31,6 +31,19 @@
   tags:
     - lmod
 
+- name: Generate LMOD Init Scripts
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ [NSP_install_root, 'lmod/etc/{}'.format(item)] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  loop:
+    - profile
+    - cshrc
+  tags:
+    - lmod
+
 - name: Generate LMOD Configuration Files
   ansible.builtin.template:
     src: "{{ [playbook_dir, 'lmod/{}.j2'.format(item)] | path_join }}"
@@ -79,12 +92,5 @@
   ansible.builtin.include_tasks:
     file: internal.yaml
   when: NSP_LMOD_install_type == "internal"
-  tags:
-    - lmod
-
-- name: Included External LMOD Tasks
-  ansible.builtin.include_tasks:
-    file: external.yaml
-  when: NSP_LMOD_install_type == "external"
   tags:
     - lmod

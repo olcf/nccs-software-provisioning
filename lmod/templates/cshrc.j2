@@ -1,0 +1,30 @@
+#!/usr/bin/env csh
+{{ NSP_template_header | comment(beginning='##', end='##', decoration='#', prefix_count=0, postfix_count=0) }}
+
+# common variables
+setenv LMOD_SYSTEM_NAME {{ NSP_system_name }}
+setenv LMOD_PACKAGE_PATH {{ [NSP_install_root, 'lmod/hooks'] | path_join }}
+setenv LMOD_AVAIL_STYLE nsp-pretty:system
+setenv LMOD_MODULERCFILE {{ [NSP_install_root, 'lmod/etc/rc.lua'] | path_join }}
+setenv LMOD_ADMIN_FILE {{ [NSP_install_root, 'lmod/etc/admin.list'] | path_join }}
+setenv LMOD_RC {{ [NSP_install_root, 'lmod/etc/lmodrc.lua'] | path_join }}
+
+{% if NSP_LMOD_install_type == "internal" %}
+# LMOD configuration for internal install
+setenv LMOD_SYSTEM_DEFAULT_MODULES DefApps
+
+type module >&/dev/null
+if ($status == 0) then
+    clearLmod -q >&/dev/null
+    unset LMOD_MODULEPATH_INIT
+endif
+
+source {{ [NSP_install_root, 'lmod/lmod/init/cshrc'] | path_join }}
+module --initial_load --no_redirect restore
+{% elif NSP_LMOD_install_type == "external" %}
+# LMOD configuration for external install
+type module >&/dev/null
+if ($status == 0) then
+    module --initial_load --no_redirect restore
+endif
+{% endif %}
