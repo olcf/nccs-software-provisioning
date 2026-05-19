@@ -1,2 +1,18 @@
 #!/usr/bin/env bash
-{{ ansible_managed | comment(beginning='##', end='##', decoration='#', prefix_count=0, postfix_count=0) }}
+{{ NSP_template_header | comment(beginning='##', end='##', decoration='#', prefix_count=0, postfix_count=0) }}
+
+########################################
+# NSP Helpers
+########################################
+
+nsp_initialize_lmod() {
+    if [ -f {{ [NSP_install_root, 'lmod/etc/profile'] | path_join }} ]; then
+        source {{ [NSP_install_root, 'lmod/etc/profile'] | path_join }}
+    fi
+}
+
+########################################
+# User Content
+########################################
+
+{{ lookup('template', [playbook_dir, 'init/profile.j2'] | path_join, errors='ignore') | default('') }}

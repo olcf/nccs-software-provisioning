@@ -40,52 +40,53 @@ if __name__ == "__main__":
                     roles_rst.append("")
 
                     # options
-                    roles_rst.extend(["`Variables`", "^^^^^^^^^^^", ""])
-                    for option in specs["argument_specs"]["main"]["options"]:
-                        roles_rst.extend([
-                            ".. _{}_variable:".format(option),
-                            "",
-                            "``{}``".format(option),
-                            '"' * (len(option) + 4),
-                            "",
-                            ":Type: **{}**".format(
-                                specs["argument_specs"]["main"]["options"][option]["type"]
-                            ),
-                            "",
-                            ":Required: **{}**".format(
-                                json_dumps(
-                                    specs["argument_specs"]["main"]["options"][option]["required"]
-                                )
-                            ),
-                            "",
-                        ])
-                        if "choices" in specs["argument_specs"]["main"]["options"][option]:
+                    if "options" in specs["argument_specs"]["main"]:
+                        roles_rst.extend(["`Variables`", "^^^^^^^^^^^", ""])
+                        for option in specs["argument_specs"]["main"]["options"]:
                             roles_rst.extend([
-                                ":Allowed Values: ``{}``".format(
-                                    json_dumps(specs["argument_specs"]["main"]["options"][option]["choices"])
-                                )
-                            ])
-                        if (not specs["argument_specs"]["main"]["options"][option]["required"] and
-                                "default" in  specs["argument_specs"]["main"]["options"][option]):
-                            roles_rst.extend([
-                                ":Default: ``{}``".format(
+                                ".. _{}_variable:".format(option),
+                                "",
+                                "``{}``".format(option),
+                                '"' * (len(option) + 4),
+                                "",
+                                ":Type: **{}**".format(
+                                    specs["argument_specs"]["main"]["options"][option]["type"]
+                                ),
+                                "",
+                                ":Required: **{}**".format(
                                     json_dumps(
-                                        specs["argument_specs"]["main"]["options"][option]["default"]
+                                        specs["argument_specs"]["main"]["options"][option]["required"]
                                     )
                                 ),
                                 "",
                             ])
-                        roles_rst.extend([
-                            ":Description: {}".format(
-                                specs["argument_specs"]["main"]["options"][option]["description"]
-                            ),
-                            "",
-                        ])
-                        if "raw" in specs["argument_specs"]["main"]["options"][option]:
+                            if "choices" in specs["argument_specs"]["main"]["options"][option]:
+                                roles_rst.extend([
+                                    ":Allowed Values: ``{}``".format(
+                                        json_dumps(specs["argument_specs"]["main"]["options"][option]["choices"])
+                                    )
+                                ])
+                            if (not specs["argument_specs"]["main"]["options"][option]["required"] and
+                                    "default" in  specs["argument_specs"]["main"]["options"][option]):
+                                roles_rst.extend([
+                                    ":Default: ``{}``".format(
+                                        json_dumps(
+                                            specs["argument_specs"]["main"]["options"][option]["default"]
+                                        )
+                                    ),
+                                    "",
+                                ])
                             roles_rst.extend([
-                                specs["argument_specs"]["main"]["options"][option]["raw"],
+                                ":Description: {}".format(
+                                    specs["argument_specs"]["main"]["options"][option]["description"]
+                                ),
                                 "",
                             ])
+                            if "raw" in specs["argument_specs"]["main"]["options"][option]:
+                                roles_rst.extend([
+                                    specs["argument_specs"]["main"]["options"][option]["raw"],
+                                    "",
+                                ])
 
     print("--- writing out documentation for NSP roles ---")
     out_dir = Path(__file__).parent.joinpath("source/reference")
