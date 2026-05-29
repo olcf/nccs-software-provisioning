@@ -3,11 +3,11 @@
 
 # common variables
 export LMOD_SYSTEM_NAME={{ NSP_system_name }}
-export LMOD_PACKAGE_PATH={{ [NSP_install_root, 'lmod/hooks'] | path_join }}
+export LMOD_PACKAGE_PATH={{ [NSP_LMOD_install_root, 'hooks'] | path_join }}
 export LMOD_AVAIL_STYLE=nsp-pretty:system
-export LMOD_MODULERCFILE={{ [NSP_install_root, 'lmod/etc/rc.lua'] | path_join }}
-export LMOD_ADMIN_FILE={{ [NSP_install_root, 'lmod/etc/admin.list'] | path_join }}
-export LMOD_RC={{ [NSP_install_root, 'lmod/etc/lmodrc.lua'] | path_join }}
+export LMOD_MODULERCFILE={{ [NSP_LMOD_install_root, 'etc/rc.lua'] | path_join }}
+export LMOD_ADMIN_FILE={{ [NSP_LMOD_install_root, 'etc/admin.list'] | path_join }}
+export LMOD_RC={{ [NSP_LMOD_install_root, 'etc/lmodrc.lua'] | path_join }}
 
 
 {% if NSP_LMOD_install_type == "internal" %}
@@ -20,7 +20,7 @@ if [ "$?" -eq 0 ]; then
     unset LMOD_MODULEPATH_INIT
 fi
 
-source {{ [NSP_install_root, 'lmod/lmod/init/profile'] | path_join }}
+source {{ [NSP_LMOD_install_root, 'lmod/init/profile'] | path_join }}
 module --initial_load --no_redirect restore
 {% elif NSP_LMOD_install_type == "external" %}
 # LMOD configuration for external install

@@ -1,6 +1,6 @@
 - name: Check for LMOD v{{ NSP_LMOD_version }} Install
   ansible.builtin.stat:
-    path: "{{ [NSP_install_root, 'lmod', NSP_LMOD_version] | path_join }}"
+    path: "{{ [NSP_LMOD_install_root, NSP_LMOD_version] | path_join }}"
   register: lmod_status
   tags:
     - lmod
@@ -14,7 +14,7 @@
 
 - name: Create LMOD Cache Directory
   ansible.builtin.file:
-    path: "{{ [NSP_install_root, 'lmod/cache/cacheDir'] | path_join }}"
+    path: "{{ [NSP_LMOD_install_root, 'cache/cacheDir'] | path_join }}"
     state: directory
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
@@ -25,7 +25,7 @@
 - name: Create LMOD Default Module Paths File
   ansible.builtin.template:
     src: modulepath.default.j2
-    dest: "{{ [NSP_install_root, 'lmod/etc/modulepath.default'] | path_join }}"
+    dest: "{{ [NSP_LMOD_install_root, 'etc/modulepath.default'] | path_join }}"
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"

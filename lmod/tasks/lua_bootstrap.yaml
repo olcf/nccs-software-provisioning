@@ -16,10 +16,10 @@
 - name: Build & Install Lua Bootstrap
   ansible.builtin.shell:
     cmd: |
-      ./configure --prefix={{ [NSP_install_root, 'lmod/bootstrap/lua/5.1.4.9'] | path_join }}
+      ./configure --prefix={{ [NSP_LMOD_install_root, 'bootstrap/lua/5.1.4.9'] | path_join }}
       make && make install
-      ln -s {{ [NSP_install_root, 'lmod/bootstrap/lua/5.1.4.9'] | path_join }} \
-        {{ [NSP_install_root, 'lmod/bootstrap/lua/lua'] | path_join }}
+      ln -s {{ [NSP_LMOD_install_root, 'bootstrap/lua/5.1.4.9'] | path_join }} \
+        {{ [NSP_LMOD_install_root, 'bootstrap/lua/lua'] | path_join }}
     chdir: "{{ [NSP_scratch_directory, 'lua-5.1.4.9'] | path_join }}"
   changed_when: true
   tags:

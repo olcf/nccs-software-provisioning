@@ -3,11 +3,11 @@
 
 # common variables
 setenv LMOD_SYSTEM_NAME {{ NSP_system_name }}
-setenv LMOD_PACKAGE_PATH {{ [NSP_install_root, 'lmod/hooks'] | path_join }}
+setenv LMOD_PACKAGE_PATH {{ [NSP_LMOD_install_root, 'hooks'] | path_join }}
 setenv LMOD_AVAIL_STYLE nsp-pretty:system
-setenv LMOD_MODULERCFILE {{ [NSP_install_root, 'lmod/etc/rc.lua'] | path_join }}
-setenv LMOD_ADMIN_FILE {{ [NSP_install_root, 'lmod/etc/admin.list'] | path_join }}
-setenv LMOD_RC {{ [NSP_install_root, 'lmod/etc/lmodrc.lua'] | path_join }}
+setenv LMOD_MODULERCFILE {{ [NSP_LMOD_install_root, 'etc/rc.lua'] | path_join }}
+setenv LMOD_ADMIN_FILE {{ [NSP_LMOD_install_root, 'etc/admin.list'] | path_join }}
+setenv LMOD_RC {{ [NSP_LMOD_install_root, 'etc/lmodrc.lua'] | path_join }}
 
 {% if NSP_LMOD_install_type == "internal" %}
 # LMOD configuration for internal install
@@ -19,7 +19,7 @@ if ($status == 0) then
     unset LMOD_MODULEPATH_INIT
 endif
 
-source {{ [NSP_install_root, 'lmod/lmod/init/cshrc'] | path_join }}
+source {{ [NSP_LMOD_install_root, 'lmod/init/cshrc'] | path_join }}
 module --initial_load --no_redirect restore
 {% elif NSP_LMOD_install_type == "external" %}
 # LMOD configuration for external install
