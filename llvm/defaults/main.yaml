@@ -6,13 +6,13 @@ NSP_LLVM_targets:
 NSP_LLVM_projects:
   - clang
   - lld
-  - openmp
   - compiler-rt
 
 NSP_LLVM_runtimes:
   - libcxx
   - libcxxabi
   - libunwind
+  - openmp
 
 NSP_LLVM_create_module: true
 
