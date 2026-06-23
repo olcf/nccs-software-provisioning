@@ -5,6 +5,7 @@ local bin = pathJoin(base, "bin")
 
 -- prepend_path{"PATH", bin, priority="100"}
 prepend_path("LD_PRELOAD", pathJoin(base, "lib64/libxalt_init.so"))
+prepend_path("APPTAINERENV_LD_PRELOAD", pathJoin(base,"xalt_container_lib/lib64/libxalt_init.so"))
 
 setenv("XALT_DIR", base)
 setenv("XALT_EXECUTABLE_TRACKING", "yes")

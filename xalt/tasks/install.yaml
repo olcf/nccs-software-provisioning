@@ -35,7 +35,16 @@
   ansible.builtin.shell:
     cmd: |
       set -e
-      mkdir build
+
+      autoreconf -iv
+
+      def_url="https://github.com/xalt/xalt.git"
+      esc_def_url="${def_url//\//\\/}"
+      alt_url="{{ NSP_XALT_git_repo }}"
+      esc_alt_url="${alt_url//\//\\/}"
+      sed -i "s/${esc_def_url}/${esc_alt_url}/g" proj_mgmt/Apptainer.def.in
+
+      mkdir -p build
       cd build
       export LD_LIBRARY_PATH={{ [NSP_install_root, 'xalt/librdkafka/lib'] | path_join }}
       ../configure \
@@ -44,7 +53,7 @@
         LDFLAGS=-L{{ [NSP_install_root, 'xalt/librdkafka/lib'] | path_join }} \
         --prefix={{ [NSP_install_root, 'xalt', NSP_XALT_git_reference] | path_join }} \
         --with-transmission=kafka \
-        --with-containerSupport=no \
+        --with-containerSupport={{ NSP_XALT_container_support }} \
         --with-functionTracking=no \
         --with-trackGPU=no \
         --with-mode=751 \
@@ -74,6 +83,7 @@
         -DKAFKA_CERTIFICATE_LOCATION=\\\""{{ [NSP_install_root, 'xalt/etc/fullchain.pem'] | path_join }}"\\\""' \
         install
       cd ..
+
       rm -rf build
     chdir: "{{ [NSP_scratch_directory, 'xalt'] | path_join }}"
   changed_when: true

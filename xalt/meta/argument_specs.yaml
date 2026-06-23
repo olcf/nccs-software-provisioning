@@ -26,6 +26,15 @@ argument_specs:
         required: false
         default: "{{ NSP_XALT_git_reference }}"
         description: Version name to use for module.
+      NSP_XALT_container_support:
+        type: str
+        choices:
+          - no
+          - apptainer
+          - podman
+        required: false
+        default: no
+        description: What type of container support to build with.
       NSP_XALT_kafka_topic:
         type: str
         required: true
