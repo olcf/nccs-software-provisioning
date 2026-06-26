@@ -1,10 +1,10 @@
 
-NSP_OFI_NCCL_libfabric_root: "/opt/cray/libfabric/2.3.1"
-NSP_OFI_NCCL_gpu_modules:
-  rocm/6.4.2: "/opt/rocm-6.4.2"
-  rocm/7.1.1: "/opt/rocm-7.1.1"
-NSP_OFI_NCCL_install_name: "rccl-plugins/aws-ofi-nccl"
-NSP_OFI_NCCL_version: "1.19.2"
-NSP_OFI_NCCL_module_name: "rccl-net-plugin"
-NSP_OFI_NCCL_module_version: "1.0"
-NSP_OFI_NCCL_gpu_vendor: "amd"
+# NSP_OFI_NCCL_libfabric_root: "/opt/cray/libfabric/2.3.1"
+# NSP_OFI_NCCL_gpu_modules:
+#  rocm/6.4.2: "/opt/rocm-6.4.2"
+#  rocm/7.1.1: "/opt/rocm-7.1.1"
+# NSP_OFI_NCCL_install_name: "rccl-plugins/aws-ofi-nccl"
+# NSP_OFI_NCCL_version: "1.19.2"
+# NSP_OFI_NCCL_module_name: "rccl-net-plugin"
+# NSP_OFI_NCCL_module_version: "1.0"
+# NSP_OFI_NCCL_gpu_vendor: "amd"

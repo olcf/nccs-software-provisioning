@@ -3,7 +3,7 @@
     path: "{{ [NSP_scratch_directory, 'aws-ofi-nccl-{}'.format(NSP_OFI_NCCL_version)] | path_join }}"
     state: absent
   tags:
-    - ofi-nccl
+    - aws-ofi-nccl
 
 - name: Create Scratch Subdirectory for OFI_NCCL v{{ NSP_OFI_NCCL_version }}
   ansible.builtin.file:
@@ -13,7 +13,7 @@
     group: "{{ NSP_group }}"
     mode: "{{ NSP_executable_permissions }}"
   tags:
-    - ofi-nccl
+    - aws-ofi-nccl
 
 - name: Download OFI_NCCL v{{ NSP_OFI_NCCL_version }}
   ansible.builtin.unarchive:
@@ -24,7 +24,7 @@
     owner: "{{ NSP_user }}"
     mode: "{{ NSP_executable_permissions }}"
   tags:
-    - ofi-nccl
+    - aws-ofi-nccl
 
 - name: Install OFI_NCCL v{{ NSP_OFI_NCCL_version }} for {{ gpu_module }}
   ansible.builtin.shell:
@@ -41,7 +41,7 @@
   changed_when: true
   when: NSP_OFI_NCCL_gpu_vendor == "amd"
   tags:
-    - ofi-nccl
+    - aws-ofi-nccl
 
 - name: Install OFI_NCCL v{{ NSP_OFI_NCCL_version }} for {{ gpu_module }}
   ansible.builtin.shell:
@@ -56,7 +56,7 @@
   changed_when: true
   when: NSP_OFI_NCCL_gpu_vendor == "nvidia"
   tags:
-    - ofi-nccl
+    - aws-ofi-nccl
 
 - name: Clean Up Scratch After OFI_NCCL v{{ NSP_OFI_NCCL_version }} Build
   ansible.builtin.include_role:
@@ -64,4 +64,4 @@
     tasks_from: clear_scratch
   when: NSP_keep_scratch_clear
   tags:
-    - ofi-nccl
+    - aws-ofi-nccl

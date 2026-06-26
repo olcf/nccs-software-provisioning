@@ -29,9 +29,9 @@ argument_specs:
         description: An extension to the default help message for the module.
       NSP_OFI_NCCL_gpu_vendor:
         type: str
-        required: false
+        required: true
         description: "The name of the GPU vendor, 'amd' or 'nvidia'."
       NSP_OFI_NCCL_extra_envvars:
         type: dict
-        required: true
+        required: false
         description: A list of key-value environment variable pairs to set in the resulting modulefile.

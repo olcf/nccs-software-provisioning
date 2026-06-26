@@ -3,6 +3,8 @@
     path: "{{ [NSP_install_root, NSP_OFI_NCCL_install_name, NSP_OFI_NCCL_version, item.key] | path_join }}"
   loop: "{{ NSP_OFI_NCCL_gpu_modules | dict2items }}"
   register: path_check
+  tags:
+    - aws-ofi-nccl
 
 - name: Launch OFI_NCCL v{{ NSP_OFI_NCCL_version }} Install
   ansible.builtin.include_tasks:
@@ -13,7 +15,7 @@
   loop: "{{ path_check.results }}"
   when: not item.stat.exists
   tags:
-    - ofi-nccl
+    - aws-ofi-nccl
 
 - name: Create OFI_NCCL Module Directory
   ansible.builtin.file:
@@ -23,7 +25,7 @@
     group: "{{ NSP_group }}"
     mode: "{{ NSP_executable_permissions }}"
   tags:
-    - ofi-nccl
+    - aws-ofi-nccl
 
 - name: Generate OFI_NCCL v{{ NSP_OFI_NCCL_version }} Module File
   ansible.builtin.template:
@@ -33,4 +35,4 @@
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
   tags:
-    - ofi-nccl
+    - aws-ofi-nccl
