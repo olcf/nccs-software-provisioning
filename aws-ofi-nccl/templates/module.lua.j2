@@ -1,0 +1,41 @@
+{{ ansible_managed | comment(beginning='--[[', end=']]--', decoration='', prefix_count=0, postfix_count=0) }}
+
+whatis("AWS NCCL/RCCL OFI interfaces, version {{ NSP_OFI_NCCL_version }}")
+
+help([[AWS NCCL/RCCL OFI v{{ NSP_OFI_NCCL_version }}, required for running RCCL/NCCL on Slingshot interconnects.
+This plugin was installed for the following GPU SDK versions:
+{% for m in NSP_OFI_NCCL_gpu_modules %}
+- {{ m }}
+{% endfor %}
+{{ NSP_OFI_NCCL_help_msg }}
+]])
+
+local base = "{{ NSP_install_root }}"
+local package = "{{ NSP_OFI_NCCL_install_name }}"
+local version = "{{ NSP_OFI_NCCL_version }}"
+local prefix = pathJoin(base, package, version)
+
+-- Always require ROCm to be loaded
+prereq_any({{ NSP_OFI_NCCL_gpu_modules.keys() | map('tojson') | join(',') }})
+
+if ("1" == "0") then
+    LmodError("A dummy error message to enable using elseif's for GPU-enabling module versions.")
+{% for m in NSP_OFI_NCCL_gpu_modules %}
+elseif isloaded("{{ m }}") then
+    gpu_module = "{{ m }}"
+{% endfor %}
+end
+
+local plugin_install_dir = pathJoin(prefix, gpu_module)
+
+if (not isDir(plugin_install_dir)) then
+	LmodError("Could not find the rccl-net-plugin install for ",gpu_module,". Please submit a ticket to help@olcf.ornl.gov to report this error. Please include which ROCm/CUDA version you are trying to load this module for.")
+end
+
+prepend_path("LD_LIBRARY_PATH", pathJoin(plugin_install_dir, 'lib'))
+
+{% for k, v in NSP_OFI_NCCL_extra_envvars.items() %}
+setenv("{{ k }}", "{{ v }}")
+{% endfor %}
+
+setenv(string.upper("{{ NSP_site_name }}_") .. "OFI_NCCL_ROOT",  plugin_install_dir)

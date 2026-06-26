@@ -1,0 +1,36 @@
+- name: Check OFI_NCCL if the installation root exists for each GPU library version
+  ansible.builtin.stat:
+    path: "{{ [NSP_install_root, NSP_OFI_NCCL_install_name, NSP_OFI_NCCL_version, item.key] | path_join }}"
+  loop: "{{ NSP_OFI_NCCL_gpu_modules | dict2items }}"
+  register: path_check
+
+- name: Launch OFI_NCCL v{{ NSP_OFI_NCCL_version }} Install
+  ansible.builtin.include_tasks:
+    file: install.yaml
+  vars:
+    gpu_install_path: "{{ item.item.value }}"
+    gpu_module: "{{ item.item.key }}"
+  loop: "{{ path_check.results }}"
+  when: not item.stat.exists
+  tags:
+    - ofi-nccl
+
+- name: Create OFI_NCCL Module Directory
+  ansible.builtin.file:
+    path: "{{ [NSP_module_root, NSP_OFI_NCCL_module_name] | path_join }}"
+    state: directory
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  tags:
+    - ofi-nccl
+
+- name: Generate OFI_NCCL v{{ NSP_OFI_NCCL_version }} Module File
+  ansible.builtin.template:
+    src: module.lua.j2
+    dest: "{{ [NSP_module_root, NSP_OFI_NCCL_module_name, '{}.lua'.format(NSP_OFI_NCCL_module_version)] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  tags:
+    - ofi-nccl
