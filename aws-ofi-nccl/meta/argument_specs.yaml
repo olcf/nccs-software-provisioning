@@ -1,0 +1,37 @@
+argument_specs:
+  main:
+    description:
+      - Installs AWS's NCCL/RCCL bindings for the Open Fabrics Interface (aws-ofi-nccl)
+    options:
+      NSP_OFI_NCCL_version:
+        type: str
+        required: true
+        description: The version of aws-ofi-nccl to install.
+      NSP_OFI_NCCL_module_name:
+        type: str
+        required: true
+        description: The name of the resulting module. Common names may be "aws-ofi-rccl" or "rccl-net-plugin"
+      NSP_OFI_NCCL_module_version:
+        type: str
+        required: true
+        description: The version of the resulting module.
+      NSP_OFI_NCCL_libfabric_root:
+        type: str
+        required: true
+        description: The version of the libfabric installation to use for compilation.
+      NSP_OFI_NCCL_gpu_modules:
+        type: dict
+        required: true
+        description: The list of versions of the ROCm or CUDA-providing module to use for compilation.
+      NSP_OFI_NCCL_help_msg:
+        type: str
+        required: false
+        description: An extension to the default help message for the module.
+      NSP_OFI_NCCL_gpu_vendor:
+        type: str
+        required: true
+        description: "The name of the GPU vendor, 'amd' or 'nvidia'."
+      NSP_OFI_NCCL_extra_envvars:
+        type: dict
+        required: false
+        description: A list of key-value environment variable pairs to set in the resulting modulefile.

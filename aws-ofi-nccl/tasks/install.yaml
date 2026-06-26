@@ -1,0 +1,67 @@
+- name: Clear Previous OFI_NCCL v{{ NSP_OFI_NCCL_version }} Files
+  ansible.builtin.file:
+    path: "{{ [NSP_scratch_directory, 'aws-ofi-nccl-{}'.format(NSP_OFI_NCCL_version)] | path_join }}"
+    state: absent
+  tags:
+    - aws-ofi-nccl
+
+- name: Create Scratch Subdirectory for OFI_NCCL v{{ NSP_OFI_NCCL_version }}
+  ansible.builtin.file:
+    path: "{{ [NSP_scratch_directory, 'aws-ofi-nccl-{}'.format(NSP_OFI_NCCL_version)] | path_join }}"
+    state: directory
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  tags:
+    - aws-ofi-nccl
+
+- name: Download OFI_NCCL v{{ NSP_OFI_NCCL_version }}
+  ansible.builtin.unarchive:
+    remote_src: true
+    src: "https://github.com/aws/aws-ofi-nccl/releases/download/v{{ NSP_OFI_NCCL_version }}/aws-ofi-nccl-{{ NSP_OFI_NCCL_version }}.tar.gz"
+    dest: "{{ NSP_scratch_directory }}"
+    group: "{{ NSP_group }}"
+    owner: "{{ NSP_user }}"
+    mode: "{{ NSP_executable_permissions }}"
+  tags:
+    - aws-ofi-nccl
+
+- name: Install OFI_NCCL v{{ NSP_OFI_NCCL_version }} for {{ gpu_module }}
+  ansible.builtin.shell:
+    cmd: |
+      cd {{ [NSP_scratch_directory, 'aws-ofi-nccl-{}'.format(NSP_OFI_NCCL_version)] | path_join }}
+      ./autogen.sh
+      ./configure \
+        --with-rocm={{ gpu_install_path }} \
+        --with-libfabric={{ NSP_OFI_NCCL_libfabric_root }} \
+        --prefix={{ [NSP_install_root, NSP_OFI_NCCL_install_name, NSP_OFI_NCCL_version, gpu_module] | path_join }}
+      make install
+      cd {{ [NSP_install_root, NSP_OFI_NCCL_install_name, NSP_OFI_NCCL_version, gpu_module, 'lib'] | path_join }}
+      ln -s librccl-net.so libnccl-net.so
+  changed_when: true
+  when: NSP_OFI_NCCL_gpu_vendor == "amd"
+  tags:
+    - aws-ofi-nccl
+
+- name: Install OFI_NCCL v{{ NSP_OFI_NCCL_version }} for {{ gpu_module }}
+  ansible.builtin.shell:
+    cmd: |
+      cd {{ [NSP_scratch_directory, 'aws-ofi-nccl-{}'.format(NSP_OFI_NCCL_version)] | path_join }}
+      ./autogen.sh
+      ./configure
+        --with-cuda={{ gpu_install_path }} \
+        --with-libfabric={{ NSP_OFI_NCCL_libfabric_root }} \
+        --prefix={{ [NSP_install_root, NSP_OFI_NCCL_install_name, NSP_OFI_NCCL_version, gpu_module] | path_join }}"
+      make install
+  changed_when: true
+  when: NSP_OFI_NCCL_gpu_vendor == "nvidia"
+  tags:
+    - aws-ofi-nccl
+
+- name: Clean Up Scratch After OFI_NCCL v{{ NSP_OFI_NCCL_version }} Build
+  ansible.builtin.include_role:
+    name: nsp
+    tasks_from: clear_scratch
+  when: NSP_keep_scratch_clear
+  tags:
+    - aws-ofi-nccl
