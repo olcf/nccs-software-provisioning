@@ -65,6 +65,23 @@ argument_specs:
         required: false
         default: "{{ ansible_architecture }}"
         description: Hardware architecture to target.
+      NSP_template_header:
+        type: str
+        required: false
+        default: |-
+          | WARNING! This file is managed by Ansible.
+          | Do NOT make manual changes to this file.
+          | Please email {{ NSP_help_email }} to request a change.
+
+          | Info:
+          |   Role: {{ ansible_role_name }}
+          {% if (template_path is defined) and (playbook_dir is defined) and (playbook_dir in template_path) %}
+          |   {{ NSP_site_name }} Template: {{ template_path.replace(playbook_dir, '').lstrip('/') }}
+          {% elif template_path is defined %}
+          |   NSP Template: {{ template_path }}
+          {% endif %}
+          |   User: {{ ansible_user_id }}
+        description: A jinja string to use as the header in templates.
   clear_scratch:
     description:
       - "Clears the scratch directory."

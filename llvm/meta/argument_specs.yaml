@@ -14,7 +14,6 @@ argument_specs:
         default:
           - clang
           - lld
-          - openmp
           - compiler-rt
         description: LLVM projects to build.
       NSP_LLVM_runtimes:
@@ -25,6 +24,7 @@ argument_specs:
           - libcxx
           - libcxxabi
           - libunwind
+          - openmp
         description: Library runtimes to build.
       NSP_LLVM_create_module:
         type: bool

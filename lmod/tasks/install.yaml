@@ -1,6 +1,6 @@
 - name: Check for Lua Bootstrap
   ansible.builtin.stat:
-    path: "{{ [NSP_install_root, 'lmod/bootstrap/lua/lua/bin/lua'] | path_join }}"
+    path: "{{ [NSP_LMOD_install_root, 'bootstrap/lua/lua/bin/lua'] | path_join }}"
   register: lua_bootstrap_status
   tags:
     - lmod
@@ -30,18 +30,21 @@
 - name: Build & Install LMOD v{{ NSP_LMOD_version }}
   ansible.builtin.shell:
     cmd: |
-      export PATH={{ [NSP_install_root, 'lmod/bootstrap/lua/lua/bin'] | path_join }}:$PATH
+      export PATH={{ [NSP_LMOD_install_root, 'bootstrap/lua/lua/bin'] | path_join }}:$PATH
       ./configure \
-      --prefix='{{ NSP_install_root }}' \
+      --prefix="{{ [NSP_scratch_directory, 'Lmod-{}/install'.format(NSP_LMOD_version)] | path_join }}" \
       --with-siteName='{{ NSP_site_name }}' \
       --with-syshost='{{ NSP_system_name }}' \
       --with-tcl='{{ 'yes' if NSP_LMOD_enable_tcl else 'no' }}' \
       --with-fastTCLInterp='{{ 'yes' if NSP_LMOD_enable_tcl else 'no' }}' \
-      --with-spiderCacheDir={{ [NSP_install_root, 'lmod/cache/cacheDir'] | path_join }} \
-      --with-updateSystemFn={{ [NSP_install_root, 'lmod/cache/system.txt'] | path_join }} \
-      --with-ModulePathInit={{ [NSP_install_root, 'lmod/etc/modulepath.default'] | path_join }} \
-      --with-lmodConfigDir={{ [NSP_install_root, 'lmod/etc'] | path_join }}
+      --with-spiderCacheDir={{ [NSP_LMOD_install_root, 'cache/cacheDir'] | path_join }} \
+      --with-updateSystemFn={{ [NSP_LMOD_install_root, 'cache/system.txt'] | path_join }} \
+      --with-ModulePathInit={{ [NSP_LMOD_install_root, 'etc/modulepath.default'] | path_join }} \
+      --with-lmodConfigDir={{ [NSP_LMOD_install_root, 'etc'] | path_join }}
       make install
+      mv -f "{{ [NSP_scratch_directory, 'Lmod-{}'.format(NSP_LMOD_version), 'install/lmod', NSP_LMOD_version] | path_join }}" "{{ [NSP_LMOD_install_root, NSP_LMOD_version] | path_join }}"
+      ln -s "{{ NSP_LMOD_version }}" "{{ [NSP_LMOD_install_root, 'lmod'] | path_join }}"
+      find "{{ [NSP_LMOD_install_root, NSP_LMOD_version] | path_join }}" -type f -print0 | xargs -0 sed -i 's|{{ [NSP_scratch_directory, 'Lmod-{}'.format(NSP_LMOD_version), 'install/lmod/lmod'] | path_join }}|{{ [NSP_LMOD_install_root, NSP_LMOD_version] | path_join }}|g'
     chdir: "{{ [NSP_scratch_directory, 'Lmod-{}'.format(NSP_LMOD_version)] | path_join }}"
   changed_when: true
   tags:

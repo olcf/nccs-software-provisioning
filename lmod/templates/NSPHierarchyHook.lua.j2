@@ -1,4 +1,4 @@
-{{ ansible_managed | comment(beginning='--[[', end=']]--', decoration='', prefix_count=0, postfix_count=0) }}
+{{ NSP_template_header | comment(beginning='--[[', end=']]--', decoration='', prefix_count=0, postfix_count=0) }}
 
 --------------------------------------------------------------------------
 -- NSP provided hooks
@@ -241,8 +241,6 @@ function label_paths(t)
                 label = label .. ' ]'
             end
             t[k] = label
-        elseif k == '{{ NSP_module_root }}' then
-            t[k] = "[ Base Modules ]"
         else
             for regex, label in pairs(path_names) do
                 if string.match(k, string.format('.*%s.*', string.gsub(regex, '%-', '%%-'))) then

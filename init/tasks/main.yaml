@@ -8,13 +8,6 @@
   tags:
     - init
 
-- name: Check profile Status
-  ansible.builtin.stat:
-    path: "{{ [NSP_install_root, 'init', 'profile'] | path_join }}"
-  register: profile_status
-  tags:
-    - init
-
 - name: Generate profile
   ansible.builtin.template:
     src: profile.j2
@@ -22,28 +15,6 @@
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
-  when: NSP_INIT_wipe or not profile_status.stat.exists
-  tags:
-    - init
-
-- name: Add Contents to profile
-  ansible.builtin.blockinfile:
-    block: "{{ lookup('template', [playbook_dir, 'init/profile.j2'] | path_join) }}"
-    path: "{{ [NSP_install_root, 'init', 'profile'] | path_join }}"
-    marker: "# {mark} INIT MANAGED"
-    append_newline: true
-    prepend_newline: true
-    owner: "{{ NSP_user }}"
-    group: "{{ NSP_group }}"
-    mode: "{{ NSP_file_permissions }}"
-  when: "[playbook_dir, 'init/profile.j2'] | path_join is file"
-  tags:
-    - init
-
-- name: Check cshrc Status
-  ansible.builtin.stat:
-    path: "{{ [NSP_install_root, 'init', 'cshrc'] | path_join }}"
-  register: cshrc_status
   tags:
     - init
 
@@ -54,20 +25,5 @@
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
-  when: NSP_INIT_wipe or not cshrc_status.stat.exists
-  tags:
-    - init
-
-- name: Add Contents to cshrc
-  ansible.builtin.blockinfile:
-    block: "{{ lookup('template', [playbook_dir, 'init/cshrc.j2'] | path_join) }}"
-    path: "{{ [NSP_install_root, 'init', 'cshrc'] | path_join }}"
-    marker: "# {mark} INIT MANAGED"
-    append_newline: true
-    prepend_newline: true
-    owner: "{{ NSP_user }}"
-    group: "{{ NSP_group }}"
-    mode: "{{ NSP_file_permissions }}"
-  when: "[playbook_dir, 'init/cshrc.j2'] | path_join is file"
   tags:
     - init

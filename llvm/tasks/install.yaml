@@ -28,6 +28,8 @@
       cmake \
       -S llvm \
       -B build \
+      -DCMAKE_C_COMPILER=/usr/bin/gcc \
+      -DCMAKE_CXX_COMPILER=/usr/bin/g++ \
       -DCMAKE_INSTALL_PREFIX={{ [NSP_install_root, 'llvm', NSP_LLVM_version] | path_join }} \
       -DCMAKE_BUILD_TYPE=Release \
       -DLLVM_TARGETS_TO_BUILD='{{ ';'.join(NSP_LLVM_targets) }}' \

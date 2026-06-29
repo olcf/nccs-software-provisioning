@@ -1,3 +1,4 @@
+NSP_LMOD_install_root: "{{ [NSP_install_root, 'lmod'] | path_join }}"
 # NSP_LMOD_install_type
 # NSP_LMOD_version
 NSP_LMOD_enable_tcl: true

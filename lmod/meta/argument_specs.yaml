@@ -19,6 +19,11 @@ argument_specs:
       - "are registered with :ref:`NSP_LMOD_additional_hooks_variable`."
       # TODO
     options:
+      NSP_LMOD_install_root:
+        type: str
+        required: false
+        default: "{{ [NSP_install_root, 'lmod'] | path_join }}"
+        description: Install path for Lmod.
       NSP_LMOD_install_type:
         type: str
         choices:
