@@ -43,6 +43,7 @@
       --with-lmodConfigDir={{ [NSP_LMOD_install_root, 'etc'] | path_join }}
       make install
       mv -f "{{ [NSP_scratch_directory, 'Lmod-{}'.format(NSP_LMOD_version), 'install/lmod', NSP_LMOD_version] | path_join }}" "{{ [NSP_LMOD_install_root, NSP_LMOD_version] | path_join }}"
+      rm "{{ [NSP_LMOD_install_root, 'lmod'] | path_join }}"
       ln -s "{{ NSP_LMOD_version }}" "{{ [NSP_LMOD_install_root, 'lmod'] | path_join }}"
       find "{{ [NSP_LMOD_install_root, NSP_LMOD_version] | path_join }}" -type f -print0 | xargs -0 sed -i 's|{{ [NSP_scratch_directory, 'Lmod-{}'.format(NSP_LMOD_version), 'install/lmod/lmod'] | path_join }}|{{ [NSP_LMOD_install_root, NSP_LMOD_version] | path_join }}|g'
     chdir: "{{ [NSP_scratch_directory, 'Lmod-{}'.format(NSP_LMOD_version)] | path_join }}"
