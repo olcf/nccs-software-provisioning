@@ -5,11 +5,7 @@
 # NSP Helpers
 ########################################
 
-nsp_initialize_lmod() {
-    if ( -f "{{ [NSP_install_root, 'lmod/etc/profile'] | path_join }}" ) then
-        source "{{ [NSP_install_root, 'lmod/etc/profile'] | path_join }}"
-    endif
-}
+alias nsp_initialize_lmod 'if ( -f {{ [NSP_install_root, "lmod/etc/cshrc"] | path_join }} ) source {{ [NSP_install_root, "lmod/etc/cshrc"] | path_join }}'
 
 ########################################
 # User Content
