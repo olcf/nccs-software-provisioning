@@ -4,4 +4,4 @@ NSP_OMPI_clean_build: true
 
 NSP_OMPI_OFI_clean_build: true
 
-NSP_OMPI_XPMEM_PATH: '/usr'
+NSP_OMPI_XPMEM_PATH: '/opt/xpmem'
