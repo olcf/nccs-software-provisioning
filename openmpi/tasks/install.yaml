@@ -28,8 +28,8 @@
 - name: Build and Install OpenMPI v{{ NSP_OMPI_version }}
   ansible.builtin.shell:
     cmd: |
-      module load rocm/{{ NSP_OMPI_ROCM_version }}
       rm -rf build && mkdir build && cd build
+      LD_LIBRARY_PATH={{ ['/opt/rocm-', NSP_OMPI_ROCM_version, '/lib'] | join }}:$LD_LIBRARY_PATH \
       ../configure --without-gpfs --enable-debug --with-slurm --enable-mpi-fortran \
         --enable-mpirun-prefix-by-default --disable-vt --enable-mpi1-compatibility \
         --with-xpmem={{ NSP_OMPI_XPMEM_PATH }} --with-rocm={{ ['/opt/rocm-', NSP_OMPI_ROCM_version] | join }} \
