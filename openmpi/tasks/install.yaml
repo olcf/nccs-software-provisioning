@@ -28,6 +28,7 @@
 - name: Build and Install OpenMPI v{{ NSP_OMPI_version }}
   ansible.builtin.shell:
     cmd: |
+      module load rocm/{{ NSP_OMPI_ROCM_version }}
       rm -rf build && mkdir build && cd build
       ../configure --without-gpfs --enable-debug --with-slurm --enable-mpi-fortran \
         --enable-mpirun-prefix-by-default --disable-vt --enable-mpi1-compatibility \
