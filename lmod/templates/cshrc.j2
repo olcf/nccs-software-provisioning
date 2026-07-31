@@ -3,9 +3,9 @@
 
 {% if NSP_LMOD_install_type == "internal" %}
 # clear module environment before setting up internal Lmod
-type module >&/dev/null
+which module >& /dev/null
 if ($status == 0) then
-    clearLmod -q >&/dev/null
+    clearLmod -q >& /dev/null
     unset LMOD_MODULEPATH_INIT
 endif
 {% endif %}
@@ -26,7 +26,7 @@ source {{ [NSP_LMOD_install_root, 'lmod/init/cshrc'] | path_join }}
 module --initial_load --no_redirect restore
 {% elif NSP_LMOD_install_type == "external" %}
 # LMOD configuration for external install
-type module >&/dev/null
+which module >& /dev/null
 if ($status == 0) then
     module --initial_load --no_redirect restore
 endif
