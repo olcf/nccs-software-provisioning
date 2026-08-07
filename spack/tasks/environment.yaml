@@ -33,7 +33,7 @@
     - spack
     - "{{ _SPACK_environment.key }}"
 
-- name: Generate {{ _SPACK_environment_name }} Configuration File(s)
+- name: Generate {{ _SPACK_environment_name }} Shared/Specific Templates
   ansible.builtin.template:
     src: "{{
           [playbook_dir, 'spack/environments', _SPACK_environment_name, '{}.yaml.j2'.format(item)] | path_join
@@ -47,6 +47,17 @@
     mode: "{{ NSP_file_permissions }}"
   loop: "{{ (_SPACK_environment_configuration.specific_templates +
              _SPACK_environment_configuration.shared_templates) | unique }}"
+  tags:
+    - spack
+    - "{{ _SPACK_environment.key }}"
+
+- name: Generate {{ _SPACK_environment_name }} Repeated Templates
+  ansible.builtin.include_tasks:
+    file: repeated_template.yaml
+  loop: "{{ _SPACK_environment_configuration.repeated_templates }}"
+  loop_control:
+    loop_var: _SPACK_repeated_template
+    label: "{{ _SPACK_repeated_template.template }}"
   tags:
     - spack
     - "{{ _SPACK_environment.key }}"
