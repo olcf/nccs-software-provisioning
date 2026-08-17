@@ -20,3 +20,5 @@ NSP_ONEAPI_hpc_toolkit_components:
 NSP_ONEAPI_install_name: "oneapi"
 NSP_ONEAPI_create_module: true
 NSP_ONEAPI_module_name: "oneapi"
+
+# NSP_ONEAPI_gcc_lib64
