@@ -58,6 +58,7 @@
   loop_control:
     loop_var: _SPACK_repeated_template
     label: "{{ _SPACK_repeated_template.template }}"
+  when: _SPACK_environment_configuration.repeated_templates is defined
   tags:
     - spack
     - "{{ _SPACK_environment.key }}"
