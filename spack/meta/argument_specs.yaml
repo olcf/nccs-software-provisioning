@@ -62,6 +62,10 @@ argument_specs:
                     - mirrors
                     - modules
                     - packages
+                  repeated_templates:
+                    - template: rocm
+                      repeat_on: "rocm.versions"
+                      location: shared
 
           For each environment you should create a directory with the same name in the playbook directory under
           ``spack/environments``.
@@ -79,3 +83,8 @@ argument_specs:
           are templates that are specific to each environment. They should be placed under
           ``spack/environments/<environment_name>`` in your playbook directory. ``shared_templates`` are used by all
           of the environments and should be placed under ``spack/environments``.
+
+          Repeated templates are special templates that you want repeated for every value in a list.
+          Set the template name (e.g. ``rocm``), the variable to repeat on, and whether this template can be found
+          in a shared or specific location (defaults to specific). This role will set the variable ``_SPACK_repeated_value``
+          for each value of the list specified in ``repeat_on`` each time it generates the template.

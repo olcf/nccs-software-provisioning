@@ -1,0 +1,19 @@
+- name: Generate {{ _SPACK_environment_name }} Repeated Template {{ _SPACK_repeated_template.template }}
+  ansible.builtin.template:
+    src: "{{
+          [playbook_dir, 'spack/environments', _SPACK_environment_name, '{}.yaml.j2'.format(_SPACK_repeated_template.template)] | path_join 
+          if 'location' not in _SPACK_repeated_template or _SPACK_repeated_template.location != 'shared'
+          else
+          [playbook_dir, 'spack/environments', '{}.yaml.j2'.format(_SPACK_repeated_template.template)] | path_join
+         }}"
+    dest: "{{ [NSP_SPACK_config_directory, _SPACK_environment_name, '{}_{}.yaml'.format(_SPACK_repeated_template.template, _SPACK_repeated_value)] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  loop: "{{ lookup('ansible.builtin.vars', _SPACK_repeated_template.repeat_on.split('.', 1)[0])[_SPACK_repeated_template.repeat_on.split('.', 1)[1]] }}"
+  loop_control:
+    loop_var: _SPACK_repeated_value
+  tags:
+    - spack
+    - "{{ _SPACK_environment.key }}"
+
