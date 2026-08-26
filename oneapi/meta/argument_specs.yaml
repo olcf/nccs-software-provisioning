@@ -57,7 +57,3 @@ argument_specs:
         default: "oneapi"
         description: >-
           Name of the module generated. Common names may be "oneapi", "intel", or "mkl", if only MKL is installed.
-      NSP_ONEAPI_gcc_lib64:
-        type: str
-        required: false
-        description: "GCC lib64 directory to add to LD_LIBRARY_PATH."
