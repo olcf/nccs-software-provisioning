@@ -33,9 +33,5 @@ prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "lib"))
 prepend_path("PKG_CONFIG_PATH", pathJoin(prefix, "lib", "pkgconfig"))
 prepend_path("MKLROOT", pathJoin(base, package, version, "mkl", "{{ '.'.join(NSP_ONEAPI_version.split('.')[:2]) }}"))
 prepend_path("CPATH", pathJoin(base, package, version, "mkl", "{{ '.'.join(NSP_ONEAPI_version.split('.')[:2]) }}", "include"))
-{% if NSP_ONEAPI_gcc_lib64 is defined %}
-
-prepend_path("LD_LIBRARY_PATH", "{{ NSP_ONEAPI_gcc_lib64 }}")
-{% endif %}
 
 setenv(string.upper("{{ NSP_site_name }}_") .. package:upper() .. "_ROOT",  prefix)
