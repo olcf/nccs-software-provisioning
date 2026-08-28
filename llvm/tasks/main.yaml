@@ -12,6 +12,20 @@
   tags:
     - llvm
 
+- name: Generate LLVM v{{ NSP_LLVM_version }} cfg files
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ [NSP_install_root, 'llvm', NSP_LLVM_version, 'bin', item] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  loop:
+    - clang.cfg
+    - clang++.cfg
+    - flang.cfg
+  tags:
+    - llvm
+
 - name: Create LLVM Module Directory
   ansible.builtin.file:
     path: "{{ [NSP_module_root, 'llvm'] | path_join }}"
