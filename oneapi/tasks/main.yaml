@@ -12,6 +12,20 @@
   tags:
     - oneapi
 
+- name: Generate ONEAPI v{{ NSP_ONEAPI_version }} cfg files
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ [NSP_install_root, NSP_ONEAPI_install_name, NSP_ONEAPI_version, 'compiler/{}/bin'.format('.'.join(NSP_ONEAPI_version.split('.')[:2])), item] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  loop:
+    - icx.cfg
+    - icpx.cfg
+    - ifx.cfg
+  tags:
+    - oneapi
+
 - name: Create ONEAPI Module Directory
   ansible.builtin.file:
     path: "{{ [NSP_module_root, NSP_ONEAPI_module_name] | path_join }}"
