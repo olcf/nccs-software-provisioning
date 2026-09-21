@@ -1,14 +1,7 @@
-- name: Check for GCC v{{ NSP_GCC_version }} Install
-  ansible.builtin.stat:
-    path: "{{ [NSP_install_root, 'gcc', NSP_GCC_version, 'bin/gcc'] | path_join }}"
-  register: gcc_status
-  tags:
-    - gcc
-
-- name: Launch GCC v{{ NSP_GCC_version }} Install
+- name: Check for GCC v{{ NSP_GCC_version }} Install type
   ansible.builtin.include_tasks:
-    file: install.yaml
-  when: not gcc_status.stat.exists
+    file: external.yaml
+  when: NSP_GCC_internal is false
   tags:
     - gcc
 

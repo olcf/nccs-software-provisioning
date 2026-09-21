@@ -7,7 +7,7 @@ whatis("LLVM v{{ NSP_LLVM_version }} Projects: {{ NSP_LLVM_projects }} Runtimes:
 
 help("LLVM v{{ NSP_LLVM_version }} Projects: {{ NSP_LLVM_projects }} Runtimes: {{ NSP_LLVM_runtimes }}")
 
-local base = "{{ NSP_install_root }}"
+local base = "{{ NSP_LLVM_install_root }}"
 local package = "llvm"
 local version = "{{ NSP_LLVM_version }}"
 local prefix = pathJoin(base, package, version)

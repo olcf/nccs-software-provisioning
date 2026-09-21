@@ -11,7 +11,7 @@ NSP_LMOD_hierarchy: { }
 NSP_LMOD_nv_mappings: { }
 NSP_LMOD_enable_spack_compiler_projections: true
 
-NSP_LMOD_path_names: { }
+NSP_LMOD_path_names: "{{ dict([(NSP_module_root, '[ Base Modules ]')]) }}"
 
 NSP_LMOD_enable_logging: false
 NSP_LMOD_logging_url: "http://localhost:8080/"

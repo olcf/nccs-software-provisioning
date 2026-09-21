@@ -103,18 +103,18 @@
     - spack
     - "{{ _SPACK_environment.key }}"
 
-- name: Clone {{ _SPACK_environment_name }} Packages Repo
-  ansible.builtin.git:
-    repo: "{{ NSP_SPACK_package_repo }}"
-    dest: "{{ [NSP_SPACK_config_directory, 'packages-{}'.format(_SPACK_environment_name)] | path_join }}"
-    clone: "{{ NSP_SPACK_clone }}"
-    force: true
-    update: true
-    version: "{{ _SPACK_environment_configuration.packages_git_reference }}"
-  when: not ansible_check_mode
-  tags:
-    - spack
-    - "{{ _SPACK_environment.key }}"
+# - name: Clone {{ _SPACK_environment_name }} Packages Repo
+#   ansible.builtin.git:
+#     repo: "{{ NSP_SPACK_package_repo }}"
+#     dest: "{{ [NSP_SPACK_config_directory, 'packages-{}'.format(_SPACK_environment_name)] | path_join }}"
+#     clone: "{{ NSP_SPACK_clone }}"
+#     force: true
+#     update: true
+#     version: "{{ _SPACK_environment_configuration.packages_git_reference }}"
+#   when: not ansible_check_mode
+#   tags:
+#     - spack
+#     - "{{ _SPACK_environment.key }}"
 
 - name: Patch {{ _SPACK_environment_name }} Packages Repo
   ansible.posix.patch:

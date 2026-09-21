@@ -14,6 +14,10 @@ NSP_LLVM_runtimes:
   - libunwind
   - openmp
 
+NSP_LLVM_install_root: "{{ NSP_install_root }}"
+
+NSP_LLVM_internal: false
+
 NSP_LLVM_create_module: true
 
 NSP_LLVM_clear_source: true

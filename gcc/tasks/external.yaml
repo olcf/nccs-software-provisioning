@@ -1,0 +1,49 @@
+- name: Clear Previous GCC v{{ NSP_GCC_version }} Build Files
+  ansible.builtin.file:
+    path: "{{ [NSP_scratch_directory, 'gcc-{}'.format(NSP_GCC_version)] | path_join }}"
+    state: absent
+  when: NSP_GCC_clean_build
+  tags:
+    - gcc
+
+- name: Check for GCC v{{ NSP_GCC_version }} Source Files
+  ansible.builtin.stat:
+    path: "{{ [NSP_scratch_directory, 'gcc-{}'.format(NSP_GCC_version)] | path_join }}"
+  register: gcc_source_status
+  tags:
+    - gcc
+
+- name: Download and Unpack GCC v{{ NSP_GCC_version }} Tarball
+  ansible.builtin.unarchive:
+    remote_src: true
+    src: "https://gcc.gnu.org/pub/gcc/releases/gcc-{{ NSP_GCC_version }}/gcc-{{ NSP_GCC_version }}.tar.gz"
+    dest: "{{ NSP_scratch_directory }}"
+    group: "{{ NSP_group }}"
+    owner: "{{ NSP_user }}"
+    mode: "{{ NSP_executable_permissions }}"
+  when: not gcc_source_status.stat.exists
+  tags:
+    - gcc
+
+- name: Build and Install GCC v{{ NSP_GCC_version }}
+  ansible.builtin.shell:
+    cmd: |
+      ./contrib/download_prerequisites
+      rm -rf build && mkdir build && cd build
+      ../configure CC=/usr/bin/gcc CXX=/usr/bin/g++ \
+        --enable-languages={{ ','.join(NSP_GCC_enabled_languages) }} --disable-multilib \
+        --prefix {{ [NSP_install_root, 'gcc', NSP_GCC_version] | path_join }}
+      make -j{{ NSP_max_threads }}
+      make install
+    chdir: "{{ [NSP_scratch_directory, 'gcc-{}'.format(NSP_GCC_version)] | path_join }}"
+  changed_when: true
+  tags:
+    - gcc
+
+- name: Clean Up Scratch After GCC v{{ NSP_GCC_version }} Build
+  ansible.builtin.include_role:
+    name: nsp
+    tasks_from: clear_scratch
+  when: NSP_keep_scratch_clear
+  tags:
+    - gcc

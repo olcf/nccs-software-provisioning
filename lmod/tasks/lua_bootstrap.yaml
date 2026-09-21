@@ -16,6 +16,7 @@
 - name: Build & Install Lua Bootstrap
   ansible.builtin.shell:
     cmd: |
+      sed -i '/#include <sys\/time.h>/a #include <string.h>' loadsys/unx_sys.c
       ./configure --prefix={{ [NSP_LMOD_install_root, 'bootstrap/lua/5.1.4.9'] | path_join }}
       make && make install
       ln -s {{ [NSP_LMOD_install_root, 'bootstrap/lua/5.1.4.9'] | path_join }} \
