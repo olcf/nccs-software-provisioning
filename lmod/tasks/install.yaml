@@ -1,17 +1,3 @@
-- name: Check for Lua Bootstrap
-  ansible.builtin.stat:
-    path: "{{ [NSP_LMOD_install_root, 'bootstrap/lua/lua/bin/lua'] | path_join }}"
-  register: lua_bootstrap_status
-  tags:
-    - lmod
-
-- name: Configure Lua Bootstrap
-  ansible.builtin.include_tasks:
-    file: lua_bootstrap.yaml
-  when: not lua_bootstrap_status.stat.exists
-  tags:
-    - lmod
-
 - name: Clear Previous LMOD v{{ NSP_LMOD_version }} Build Files
   ansible.builtin.file:
     path: "{{ [NSP_scratch_directory, 'Lmod-{}'.format(NSP_LMOD_version)] | path_join }}"
@@ -30,7 +16,6 @@
 - name: Build & Install LMOD v{{ NSP_LMOD_version }}
   ansible.builtin.shell:
     cmd: |
-      export PATH={{ [NSP_LMOD_install_root, 'bootstrap/lua/lua/bin'] | path_join }}:$PATH
       ./configure \
       --prefix="{{ [NSP_scratch_directory, 'Lmod-{}/install'.format(NSP_LMOD_version)] | path_join }}" \
       --with-siteName='{{ NSP_site_name }}' \
