@@ -23,61 +23,95 @@
     - oneapi
 
 # Base Toolkit
-- name: Download ONEAPI v{{ NSP_ONEAPI_version }} Base Toolkit
-  ansible.builtin.get_url:
-    url: "{{ NSP_ONEAPI_base_toolkit_url }}"
-    dest: "{{ [NSP_scratch_directory, 'oneapi-{}'.format(NSP_ONEAPI_version)] | path_join }}/"
-    owner: "{{ NSP_user }}"
-    group: "{{ NSP_group }}"
-    mode: "744"
-  when: NSP_ONEAPI_base_toolkit_components | length > 0
-  tags:
-    - oneapi
-
-- name: Install ONEAPI v{{ NSP_ONEAPI_version }} Base Toolkit
-  ansible.builtin.command:
-    cmd: "{{
-      [NSP_scratch_directory, 'oneapi-{}'.format(NSP_ONEAPI_version), NSP_ONEAPI_base_toolkit_url.split('/')[-1]]
-      | path_join }}
-      --remove-extracted-files yes -a --cli --silent --action install
-      --download-cache {{ [NSP_scratch_directory, 'oneapi-{}/cache'.format(NSP_ONEAPI_version)] | path_join }}
-      --download-dir {{ [NSP_scratch_directory, 'oneapi-{}/downloads'.format(NSP_ONEAPI_version)] | path_join }}
-      --log-dir {{ [NSP_scratch_directory, 'oneapi-{}/logs'.format(NSP_ONEAPI_version)] | path_join }}
-      --install-dir {{ [NSP_install_root, NSP_ONEAPI_install_name, NSP_ONEAPI_version] | path_join }}
-      --eula accept --components {{ ':'.join(NSP_ONEAPI_base_toolkit_components) }}"
-  changed_when: true
-  when: NSP_ONEAPI_base_toolkit_components | length > 0
-  tags:
-    - oneapi
+- block:
+  - name: Download ONEAPI v{{ NSP_ONEAPI_version }} Base Toolkit
+    ansible.builtin.get_url:
+      url: "{{ NSP_ONEAPI_base_toolkit_url }}"
+      dest: "{{ [NSP_scratch_directory, 'oneapi-{}'.format(NSP_ONEAPI_version)] | path_join }}/"
+      owner: "{{ NSP_user }}"
+      group: "{{ NSP_group }}"
+      mode: "744"
+    when: NSP_ONEAPI_base_toolkit_components | length > 0
+    tags:
+      - oneapi
+  
+  - name: Install ONEAPI v{{ NSP_ONEAPI_version }} Base Toolkit
+    ansible.builtin.command:
+      cmd: "{{
+        [NSP_scratch_directory, 'oneapi-{}'.format(NSP_ONEAPI_version), NSP_ONEAPI_base_toolkit_url.split('/')[-1]]
+        | path_join }}
+        --remove-extracted-files yes -a --cli --silent --action install
+        --download-cache {{ [NSP_scratch_directory, 'oneapi-{}/cache'.format(NSP_ONEAPI_version)] | path_join }}
+        --download-dir {{ [NSP_scratch_directory, 'oneapi-{}/downloads'.format(NSP_ONEAPI_version)] | path_join }}
+        --log-dir {{ [NSP_scratch_directory, 'oneapi-{}/logs'.format(NSP_ONEAPI_version)] | path_join }}
+        --install-dir {{ [NSP_install_root, NSP_ONEAPI_install_name, NSP_ONEAPI_version] | path_join }}
+        --eula accept --components {{ ':'.join(NSP_ONEAPI_base_toolkit_components) }}"
+    changed_when: true
+    when: NSP_ONEAPI_base_toolkit_components | length > 0
+    tags:
+      - oneapi
+  ###
+  
+  # HPC Toolkit
+  - name: Download ONEAPI v{{ NSP_ONEAPI_version }} HPC Toolkit
+    ansible.builtin.get_url:
+      url: "{{ NSP_ONEAPI_hpc_toolkit_url }}"
+      dest: "{{ [NSP_scratch_directory, 'oneapi-{}'.format(NSP_ONEAPI_version)] | path_join }}"
+      owner: "{{ NSP_user }}"
+      group: "{{ NSP_group }}"
+      mode: "744"
+    when: NSP_ONEAPI_hpc_toolkit_components | length > 0
+    tags:
+      - oneapi
+  
+  - name: Install ONEAPI v{{ NSP_ONEAPI_version }} HPC Toolkit
+    ansible.builtin.command:
+      cmd: "{{
+        [NSP_scratch_directory, 'oneapi-{}'.format(NSP_ONEAPI_version), NSP_ONEAPI_hpc_toolkit_url.split('/')[-1]]
+        | path_join }}
+        --remove-extracted-files yes -a --cli --silent --action install
+        --download-cache {{ [NSP_scratch_directory, 'oneapi-{}/cache'.format(NSP_ONEAPI_version)] | path_join }}
+        --download-dir {{ [NSP_scratch_directory, 'oneapi-{}/downloads'.format(NSP_ONEAPI_version)] | path_join }}
+        --log-dir {{ [NSP_scratch_directory, 'oneapi-{}/logs'.format(NSP_ONEAPI_version)] | path_join }}
+        --install-dir {{ [NSP_install_root, NSP_ONEAPI_install_name, NSP_ONEAPI_version] | path_join }}
+        --eula accept --components {{ ':'.join(NSP_ONEAPI_hpc_toolkit_components) }}"
+    changed_when: true
+    when: NSP_ONEAPI_hpc_toolkit_components | length > 0
+    tags:
+      - oneapi
+  when: NSP_ONEAPI_version < '2026.0.0'  
 ###
 
-# HPC Toolkit
-- name: Download ONEAPI v{{ NSP_ONEAPI_version }} HPC Toolkit
-  ansible.builtin.get_url:
-    url: "{{ NSP_ONEAPI_hpc_toolkit_url }}"
-    dest: "{{ [NSP_scratch_directory, 'oneapi-{}'.format(NSP_ONEAPI_version)] | path_join }}"
-    owner: "{{ NSP_user }}"
-    group: "{{ NSP_group }}"
-    mode: "744"
-  when: NSP_ONEAPI_hpc_toolkit_components | length > 0
-  tags:
-    - oneapi
-
-- name: Install ONEAPI v{{ NSP_ONEAPI_version }} HPC Toolkit
-  ansible.builtin.command:
-    cmd: "{{
-      [NSP_scratch_directory, 'oneapi-{}'.format(NSP_ONEAPI_version), NSP_ONEAPI_hpc_toolkit_url.split('/')[-1]]
-      | path_join }}
-      --remove-extracted-files yes -a --cli --silent --action install
-      --download-cache {{ [NSP_scratch_directory, 'oneapi-{}/cache'.format(NSP_ONEAPI_version)] | path_join }}
-      --download-dir {{ [NSP_scratch_directory, 'oneapi-{}/downloads'.format(NSP_ONEAPI_version)] | path_join }}
-      --log-dir {{ [NSP_scratch_directory, 'oneapi-{}/logs'.format(NSP_ONEAPI_version)] | path_join }}
-      --install-dir {{ [NSP_install_root, NSP_ONEAPI_install_name, NSP_ONEAPI_version] | path_join }}
-      --eula accept --components {{ ':'.join(NSP_ONEAPI_hpc_toolkit_components) }}"
-  changed_when: true
-  when: NSP_ONEAPI_hpc_toolkit_components | length > 0
-  tags:
-    - oneapi
+# VERSION 2026 ONWARD - combined base and hpc toolkits
+- block:
+  - name: Download ONEAPI v{{ NSP_ONEAPI_version }} Toolkit
+    ansible.builtin.get_url:
+      url: "{{ NSP_ONEAPI_toolkit_url }}"
+      dest: "{{ [NSP_scratch_directory, 'oneapi-{}'.format(NSP_ONEAPI_version)] | path_join }}"
+      owner: "{{ NSP_user }}"
+      group: "{{ NSP_group }}"
+      mode: "744"
+      validate_certs: no
+    when: NSP_ONEAPI_toolkit_components | length > 0
+    tags:
+      - oneapi
+  
+  - name: Install ONEAPI v{{ NSP_ONEAPI_version }} Toolkit
+    ansible.builtin.command:
+      cmd: "{{
+        [NSP_scratch_directory, 'oneapi-{}'.format(NSP_ONEAPI_version), NSP_ONEAPI_toolkit_url.split('/')[-1]]
+        | path_join }}
+        --remove-extracted-files yes -a --cli --silent --action install
+        --download-cache {{ [NSP_scratch_directory, 'oneapi-{}/cache'.format(NSP_ONEAPI_version)] | path_join }}
+        --download-dir {{ [NSP_scratch_directory, 'oneapi-{}/downloads'.format(NSP_ONEAPI_version)] | path_join }}
+        --log-dir {{ [NSP_scratch_directory, 'oneapi-{}/logs'.format(NSP_ONEAPI_version)] | path_join }}
+        --install-dir {{ [NSP_install_root, NSP_ONEAPI_install_name, NSP_ONEAPI_version] | path_join }}
+        --eula accept --components {{ ':'.join(NSP_ONEAPI_toolkit_components) }}"
+    changed_when: true
+    when: NSP_ONEAPI_toolkit_components | length > 0
+    tags:
+      - oneapi
+  when: NSP_ONEAPI_version >= '2026.0.0'
 ###
 
 - name: Delete 'intel' Directory in Home
