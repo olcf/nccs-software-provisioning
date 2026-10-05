@@ -16,6 +16,7 @@
 - name: Build & Install LMOD v{{ NSP_LMOD_version }}
   ansible.builtin.shell:
     cmd: |
+      set -o pipefail
       ./configure \
       --prefix="{{ [NSP_scratch_directory, 'Lmod-{}/install'.format(NSP_LMOD_version)] | path_join }}" \
       --with-siteName='{{ NSP_site_name }}' \
