@@ -30,6 +30,10 @@
   ansible.builtin.shell:
     cmd: |
       cd {{ [NSP_scratch_directory, 'aws-ofi-nccl-{}'.format(NSP_OFI_NCCL_version)] | path_join }}
+      {% if NSP_OFI_NCCL_CC.startswith('/') and NSP_OFI_NCCL_CXX.startswith('/') %}
+      export CC={{NSP_OFI_NCCL_CC}}
+      export CXX={{NSP_OFI_NCCL_CXX}}
+      {% endif %}
       ./autogen.sh
       ./configure \
         --with-rocm={{ gpu_install_path }} \
