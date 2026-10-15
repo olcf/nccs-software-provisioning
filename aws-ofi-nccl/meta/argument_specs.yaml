@@ -35,10 +35,12 @@ argument_specs:
         type: str
         required: false
         description: "The C compiler to use."
+        default: ""
       NSP_OFI_NCCL_CXX:
         type: str
         required: false
         description: "The CXX compiler to use."
+        default: ""
       NSP_OFI_NCCL_extra_envvars:
         type: dict
         required: false

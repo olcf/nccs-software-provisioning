@@ -1,4 +1,7 @@
 
+NSP_OFI_NCCL_CC: ""
+NSP_OFI_NCCL_CXX: ""
+
 # NSP_OFI_NCCL_libfabric_root: "/opt/cray/libfabric/2.3.1"
 # NSP_OFI_NCCL_gpu_modules:
 #  rocm/6.4.2: "/opt/rocm-6.4.2"
