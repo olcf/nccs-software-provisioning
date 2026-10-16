@@ -52,8 +52,9 @@
   ansible.builtin.shell:  # noqa risky-shell-pipe
     cmd: "export PATH={{ [NSP_install_root, 'miniforge3',
       '{}-{}'.format(NSP_MINIFORGE3_version, NSP_MINIFORGE3_revision), 'bin'] | path_join }}:$PATH\n
-      source deactivate\n
-      conda list | awk 'NR > 3 {print $1}' | grep -E
+      conda list -p {{ [NSP_install_root, 'miniforge3',
+      '{}-{}'.format(NSP_MINIFORGE3_version, NSP_MINIFORGE3_revision)] | path_join }} |
+      awk 'NR > 3 {print $1}' | grep -E
       '^({% for package in NSP_MINIFORGE3_base_packages %}{{ package }}|{% endfor %})$' | wc -l"
   register: base_package_num
   changed_when: (NSP_MINIFORGE3_base_packages | list | length) != (base_package_num.stdout | int)
@@ -64,8 +65,8 @@
   ansible.builtin.shell:
     cmd: "export PATH={{ [NSP_install_root, 'miniforge3', '{}-{}'.format(NSP_MINIFORGE3_version,
       NSP_MINIFORGE3_revision), 'bin'] | path_join }}:$PATH\n
-      source deactivate\n
-      conda install -y{% for package in NSP_MINIFORGE3_base_packages %} {{ package }}{% endfor %}"
+      conda install -y -p {{ [NSP_install_root, 'miniforge3',
+      '{}-{}'.format(NSP_MINIFORGE3_version, NSP_MINIFORGE3_revision)] | path_join }}{% for package in NSP_MINIFORGE3_base_packages %} {{ package }}{% endfor %}"
   when: (NSP_MINIFORGE3_base_packages | list | length) != (base_package_num.stdout | int)
   changed_when: true
   tags:
