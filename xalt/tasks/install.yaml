@@ -80,7 +80,8 @@
         -DKAFKA_USERNAME=\\\"{{ NSP_XALT_kafka_username }}\\\" \
         -DKAFKA_PASSWORD=\\\"{{ NSP_XALT_kafka_password }}\\\" \
         -DKAFKA_CA_LOCATION=\\\""{{ [NSP_install_root, 'xalt/etc/cacerts.pem'] | path_join }}"\\\" \
-        -DKAFKA_CERTIFICATE_LOCATION=\\\""{{ [NSP_install_root, 'xalt/etc/fullchain.pem'] | path_join }}"\\\""' \
+        -DKAFKA_CERTIFICATE_LOCATION=\\\""{{ [NSP_install_root, 'xalt/etc/fullchain.pem'] | path_join }}"\\\" \
+        -DKAFKA_TIMEOUT={{ NSP_XALT_kafka_timeout }}"' \
         install
       cd ..
 
