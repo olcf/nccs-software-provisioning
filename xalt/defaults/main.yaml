@@ -10,3 +10,4 @@ NSP_XALT_container_support: no
 # NSP_XALT_kafka_servers
 # NSP_XALT_kafka_username
 # NSP_XALT_kafka_password
+NSP_XALT_kafka_timeout: 100

@@ -51,3 +51,8 @@ argument_specs:
         type: str
         required: true
         description: XALT kafka password.
+      NSP_XALT_kafka_timeout:
+        type: int
+        required: false
+        default: 100
+        description: Kafka timeout (ms) for sending messages.
