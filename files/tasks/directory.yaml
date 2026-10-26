@@ -36,3 +36,17 @@
   when: item.state == "file"
   tags:
     - files
+
+- name: Generate Links in {{ _FILES_entry.dest }}
+  ansible.builtin.file:
+    src: "{{ item.src }}"
+    dest: "{{ [_FILES_entry.dest, item.path] | path_join }}"
+    state: link
+    follow: false
+    force: true
+  with_community.general.filetree: "{{ [playbook_dir, 'files', _FILES_entry.src] | path_join }}"
+  loop_control:
+    label: "{{ item.path }}"
+  when: item.state == "link"
+  tags:
+    - files
