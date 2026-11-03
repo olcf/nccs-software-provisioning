@@ -12,7 +12,6 @@
     dest: "{{ NSP_scratch_directory }}"
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
-    mode: "{{ NSP_file_permissions }}"
   tags:
     - codee
 
