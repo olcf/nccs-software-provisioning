@@ -56,3 +56,8 @@ argument_specs:
         required: false
         default: 100
         description: Kafka timeout (ms) for sending messages.
+      NSP_XALT_kafka_suppress_output:
+        type: bool
+        required: false
+        default: true
+        description: Suppress all kafka output.
