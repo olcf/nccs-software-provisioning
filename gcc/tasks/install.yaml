@@ -46,7 +46,10 @@
       rm -rf build && mkdir build && cd build
       ../configure CC=/usr/bin/gcc CXX=/usr/bin/g++ \
         --enable-languages={{ ','.join(NSP_GCC_enabled_languages) }} --disable-multilib \
-        {% if NSP_GCC_use_binutils %}--with-gnu-as --with-as="{{ [NSP_install_root, 'gcc', NSP_GCC_version, 'binutils/bin/as'] | path_join }}" --with-gnu-ld --with-ld="{{ [NSP_install_root, 'gcc', NSP_GCC_version, 'binutils/bin/ld'] | path_join }}"{% endif %} \
+        {% if NSP_GCC_use_binutils %}
+        --with-gnu-as --with-as="{{ [NSP_install_root, 'gcc', NSP_GCC_version, 'binutils/bin/as'] | path_join }}" \
+        --with-gnu-ld --with-ld="{{ [NSP_install_root, 'gcc', NSP_GCC_version, 'binutils/bin/ld'] | path_join }}" \
+        {% endif %}
         --prefix {{ [NSP_install_root, 'gcc', NSP_GCC_version] | path_join }}
       make -j{{ NSP_max_threads }}
       make install
