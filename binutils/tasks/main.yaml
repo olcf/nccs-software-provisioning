@@ -1,0 +1,35 @@
+- name: Check for Binutils v{{ NSP_BINUTILS_version }} Install
+  ansible.builtin.stat:
+    path: "{{ [NSP_BINUTILS_install_root, 'bin/ld'] | path_join }}"
+  register: binutils_status
+  tags:
+    - binutils
+
+- name: Launch Binutils v{{ NSP_BINUTILS_version }} Install
+  ansible.builtin.include_tasks:
+    file: install.yaml
+  when: not binutils_status.stat.exists
+  tags:
+    - binutils
+
+- name: Create Binutils Module Directory
+  ansible.builtin.file:
+    path: "{{ [NSP_module_root, 'binutils'] | path_join }}"
+    state: directory
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_executable_permissions }}"
+  when: NSP_BINUTILS_create_module
+  tags:
+    - binutils
+
+- name: Generate Binutils v{{ NSP_BINUTILS_version }} Module File
+  ansible.builtin.template:
+    src: module.lua.j2
+    dest: "{{ [NSP_module_root, 'binutils/{}.lua'.format(NSP_BINUTILS_version)] | path_join }}"
+    owner: "{{ NSP_user }}"
+    group: "{{ NSP_group }}"
+    mode: "{{ NSP_file_permissions }}"
+  when: NSP_BINUTILS_create_module
+  tags:
+    - binutils

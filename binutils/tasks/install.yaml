@@ -1,0 +1,47 @@
+- name: Clear Previous Binutils v{{ NSP_BINUTILS_version }} Build Files
+  ansible.builtin.file:
+    path: "{{ [NSP_scratch_directory, 'binutils-{}'.format(NSP_BINUTILS_version)] | path_join }}"
+    state: absent
+  when: NSP_BINUTILS_clear_source
+  tags:
+    - binutils
+
+- name: Check for Binutils v{{ NSP_BINUTILS_version }} Source Files
+  ansible.builtin.stat:
+    path: "{{ [NSP_scratch_directory, 'binutils-{}'.format(NSP_BINUTILS_version)] | path_join }}"
+  register: binutils_source_status
+  tags:
+    - binutils
+
+- name: Download and Unpack Binutils v{{ NSP_BINUTILS_version }} Tarball
+  ansible.builtin.unarchive:
+    remote_src: true
+    src: "https://sourceware.org/pub/binutils/releases/binutils-{{ NSP_BINUTILS_version }}.tar.xz"
+    dest: "{{ NSP_scratch_directory }}"
+    group: "{{ NSP_group }}"
+    owner: "{{ NSP_user }}"
+  when: not binutils_source_status.stat.exists
+  tags:
+    - binutils
+
+- name: Build and Install Binutils v{{ NSP_BINUTILS_version }}
+  ansible.builtin.shell:
+    cmd: |
+      set -e
+      rm -rf build && mkdir build && cd build
+      CC=/usr/bin/gcc ../configure \
+        --prefix="{{ [NSP_BINUTILS_install_root, NSP_BINUTILS_version] | path_join }}"
+      make -j{{ NSP_max_threads }}
+      make install
+    chdir: "{{ [NSP_scratch_directory, 'binutils-{}'.format(NSP_BINUTILS_version)] | path_join }}"
+  changed_when: true
+  tags:
+    - binutils
+
+- name: Clean Up Scratch After Binutils v{{ NSP_BINUTILS_version }} Build
+  ansible.builtin.include_role:
+    name: nsp
+    tasks_from: clear_scratch
+  when: NSP_keep_scratch_clear
+  tags:
+    - binutils

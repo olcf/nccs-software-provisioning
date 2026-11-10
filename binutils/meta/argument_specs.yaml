@@ -1,0 +1,24 @@
+argument_specs:
+  main:
+    description:
+      - Installs Binutils from source.
+    options:
+      NSP_BINUTILS_version:
+        type: str
+        required: true
+        description: The version to install.
+      NSP_BINUTILS_install_root:
+        type: path
+        required: false
+        default: "{{ [NSP_install_root, 'binutils', NSP_BINUTILS_version] | path_join }}"
+        description: Root directory where the specified version of Binutils will be installed.
+      NSP_BINUTILS_clean_build:
+        type: bool
+        required: false
+        default: true
+        description: Remove source files from previous builds.
+      NSP_BINUTILS_create_module:
+        type: bool
+        required: false
+        default: false
+        description: Toggles module generation.
