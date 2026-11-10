@@ -17,3 +17,6 @@ NSP_LLVM_runtimes:
 NSP_LLVM_create_module: true
 
 NSP_LLVM_clear_source: true
+
+NSP_LLVM_use_binutils: false
+NSP_LLVM_binutils_version: "2.47"
