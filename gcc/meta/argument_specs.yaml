@@ -1,7 +1,7 @@
 argument_specs:
   main:
     description:
-      - Installs GCC and optionally generates a module file.
+      - Installs GCC from source.
     options:
       NSP_GCC_version:
         type: str
@@ -16,13 +16,23 @@ argument_specs:
           - c++
           - fortran
         description: The languages that the build will support.
+      NSP_GCC_clean_build:
+        type: bool
+        required: false
+        default: true
+        description: Remove previous build source files.
       NSP_GCC_create_module:
         type: bool
         required: false
         default: true
         description: Toggles module generation.
-      NSP_GCC_clear_source:
+      NSP_GCC_use_binutils:
         type: bool
         required: false
-        default: true
-        description: Clear previous build source files.
+        default: false
+        description: Install and use Binutils when building GCC.
+      NSP_GCC_binutils_version:
+        type: str
+        required: false
+        default: "2.47"
+        description: The Binutils version to install and use when NSP_GCC_use_binutils is enabled.

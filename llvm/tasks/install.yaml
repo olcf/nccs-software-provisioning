@@ -22,15 +22,41 @@
   tags:
     - llvm
 
+- name: Install Binutils for LLVM v{{ NSP_LLVM_version }}
+  ansible.builtin.include_role:
+    name: binutils
+    apply:
+      tags:
+        - llvm
+  vars:
+    NSP_BINUTILS_version: "{{ NSP_LLVM_binutils_version }}"
+    NSP_BINUTILS_install_root: "{{ [NSP_install_root, 'llvm', NSP_LLVM_version, 'binutils'] | path_join }}"
+    NSP_BINUTILS_create_module: false
+  when: NSP_LLVM_use_binutils
+  tags:
+    - llvm
+
 - name: Build and Install LLVM v{{ NSP_LLVM_version }}
   ansible.builtin.shell:
     cmd: |
+      set -e
+      rm -rf build && mkdir build
+      {% if NSP_LLVM_use_binutils %}
+      BINUTILS_BIN="{{ [NSP_install_root, 'llvm', NSP_LLVM_version, 'binutils/bin'] | path_join }}"
+      {% endif %}
       cmake \
       -S llvm \
       -B build \
       -DCMAKE_C_COMPILER=/usr/bin/gcc \
       -DCMAKE_CXX_COMPILER=/usr/bin/g++ \
       -DCMAKE_INSTALL_PREFIX={{ [NSP_install_root, 'llvm', NSP_LLVM_version] | path_join }} \
+      -DCMAKE_ASM_COMPILER=/usr/bin/gcc \
+      {% if NSP_LLVM_use_binutils %}
+      -DCMAKE_ASM_FLAGS="-B${BINUTILS_BIN}/" \
+      -DCMAKE_LINKER="${BINUTILS_BIN}/ld" \
+      -DCMAKE_C_FLAGS="-B${BINUTILS_BIN}/" \
+      -DCMAKE_CXX_FLAGS="-B${BINUTILS_BIN}/" \
+      {% endif %}
       -DCMAKE_BUILD_TYPE=Release \
       -DLLVM_TARGETS_TO_BUILD='{{ ';'.join(NSP_LLVM_targets) }}' \
       -DLLVM_ENABLE_PROJECTS='{{ ';'.join(NSP_LLVM_projects) }}' \

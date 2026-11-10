@@ -36,3 +36,13 @@ argument_specs:
         required: false
         default: true
         description: Clear source files from previous build.
+      NSP_LLVM_use_binutils:
+        type: bool
+        required: false
+        default: false
+        description: Install and use Binutils when building LLVM.
+      NSP_LLVM_binutils_version:
+        type: str
+        required: false
+        default: "2.47"
+        description: The Binutils version to install and use when NSP_LLVM_use_binutils is enabled.

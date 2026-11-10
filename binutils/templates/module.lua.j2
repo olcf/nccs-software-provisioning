@@ -1,0 +1,10 @@
+{{ NSP_template_header | comment(beginning='--[[', end=']]--', decoration='', prefix_count=0, postfix_count=0) }}
+
+whatis("GNU Binutils v{{ NSP_BINUTILS_version }}")
+
+help("GNU Binutils v{{ NSP_BINUTILS_version }}")
+
+local prefix = "{{ NSP_BINUTILS_install_root }}"
+
+prepend_path("PATH", pathJoin(prefix, "bin"))
+prepend_path("MANPATH", pathJoin(prefix, "share/man"))

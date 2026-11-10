@@ -25,6 +25,20 @@
   tags:
     - gcc
 
+- name: Install Binutils for GCC v{{ NSP_GCC_version }}
+  ansible.builtin.include_role:
+    name: binutils
+    apply:
+      tags:
+        - gcc
+  vars:
+    NSP_BINUTILS_version: "{{ NSP_GCC_binutils_version }}"
+    NSP_BINUTILS_install_root: "{{ [NSP_install_root, 'gcc', NSP_GCC_version, 'binutils'] | path_join }}"
+    NSP_BINUTILS_create_module: false
+  when: NSP_GCC_use_binutils
+  tags:
+    - gcc
+
 - name: Build and Install GCC v{{ NSP_GCC_version }}
   ansible.builtin.shell:
     cmd: |
@@ -32,6 +46,10 @@
       rm -rf build && mkdir build && cd build
       ../configure CC=/usr/bin/gcc CXX=/usr/bin/g++ \
         --enable-languages={{ ','.join(NSP_GCC_enabled_languages) }} --disable-multilib \
+        {% if NSP_GCC_use_binutils %}
+        --with-gnu-as --with-as="{{ [NSP_install_root, 'gcc', NSP_GCC_version, 'binutils/bin/as'] | path_join }}" \
+        --with-gnu-ld --with-ld="{{ [NSP_install_root, 'gcc', NSP_GCC_version, 'binutils/bin/ld'] | path_join }}" \
+        {% endif %}
         --prefix {{ [NSP_install_root, 'gcc', NSP_GCC_version] | path_join }}
       make -j{{ NSP_max_threads }}
       make install
