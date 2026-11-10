@@ -18,4 +18,9 @@ prepend_path("C_INCLUDE_PATH", pathJoin(prefix, "include"))
 prepend_path("CPLUS_INCLUDE_PATH", pathJoin(prefix, "include"))
 prepend_path("MANPATH", pathJoin(prefix, "share/man"))
 
+{% if NSP_GCC_use_binutils %}
+prepend_path("PATH", pathJoin(prefix, "binutils/bin"))
+prepend_path("MANPATH", pathJoin(prefix, "binutils/share/man"))
+{% endif %}
+
 setenv(string.upper("{{ NSP_site_name }}_") .. package:upper() .. "_ROOT",  prefix)
