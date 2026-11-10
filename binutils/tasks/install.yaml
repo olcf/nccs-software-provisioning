@@ -2,7 +2,7 @@
   ansible.builtin.file:
     path: "{{ [NSP_scratch_directory, 'binutils-{}'.format(NSP_BINUTILS_version)] | path_join }}"
     state: absent
-  when: NSP_BINUTILS_clear_source
+  when: NSP_BINUTILS_clean_build
   tags:
     - binutils
 
@@ -30,7 +30,7 @@
       set -e
       rm -rf build && mkdir build && cd build
       CC=/usr/bin/gcc ../configure \
-        --prefix="{{ [NSP_BINUTILS_install_root, NSP_BINUTILS_version] | path_join }}"
+        --prefix="{{ NSP_BINUTILS_install_root }}"
       make -j{{ NSP_max_threads }}
       make install
     chdir: "{{ [NSP_scratch_directory, 'binutils-{}'.format(NSP_BINUTILS_version)] | path_join }}"
