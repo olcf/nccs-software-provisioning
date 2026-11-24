@@ -1,6 +1,10 @@
 {{ NSP_template_header | comment(beginning='##', end='##', decoration='#', prefix_count=0, postfix_count=0) }}
 
---gcc-toolchain={% if NSP_LLVM_use_gcc %}{{ [NSP_LLVM_install_root, 'gcc'] | path_join }}{% else %}/usr{% endif %}
+{% if NSP_LLVM_use_gcc %}
+--gcc-toolchain={{ [NSP_LLVM_install_root, 'gcc'] | path_join }}
+{% else %}
+--gcc-toolchain=/usr
+{% endif %}
 {% if NSP_LLVM_use_gcc %}
 -Wno-unused-command-line-argument
 -L{{ [NSP_LLVM_install_root, 'gcc/lib64'] | path_join }}
