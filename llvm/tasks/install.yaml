@@ -30,9 +30,25 @@
         - llvm
   vars:
     NSP_BINUTILS_version: "{{ NSP_LLVM_binutils_version }}"
-    NSP_BINUTILS_install_root: "{{ [NSP_install_root, 'llvm', NSP_LLVM_version, 'binutils'] | path_join }}"
+    NSP_BINUTILS_install_root: "{{ [NSP_LLVM_install_root, 'binutils'] | path_join }}"
     NSP_BINUTILS_create_module: false
+    NSP_keep_scratch_clear: false
   when: NSP_LLVM_use_binutils
+  tags:
+    - llvm
+
+- name: Install GCC for LLVM v{{ NSP_LLVM_version }}
+  ansible.builtin.include_role:
+    name: gcc
+    apply:
+      tags:
+        - llvm
+  vars:
+    NSP_GCC_version: "{{ NSP_LLVM_gcc_version }}"
+    NSP_GCC_install_root: "{{ [NSP_LLVM_install_root, 'gcc'] | path_join }}"
+    NSP_GCC_create_module: false
+    NSP_keep_scratch_clear: false
+  when: NSP_LLVM_use_gcc
   tags:
     - llvm
 
@@ -42,15 +58,26 @@
       set -e
       rm -rf build && mkdir build
       {% if NSP_LLVM_use_binutils %}
-      BINUTILS_BIN="{{ [NSP_install_root, 'llvm', NSP_LLVM_version, 'binutils/bin'] | path_join }}"
+      BINUTILS_BIN="{{ [NSP_LLVM_install_root, 'binutils/bin'] | path_join }}"
+      {% endif %}
+      {% if NSP_LLVM_use_gcc %}
+      GCC_ROOT="{{ [NSP_LLVM_install_root, 'gcc'] | path_join }}"
+      export LD_LIBRARY_PATH="${GCC_ROOT}/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}"
       {% endif %}
       cmake \
       -S llvm \
       -B build \
+      {% if NSP_LLVM_use_gcc %}
+      -DCMAKE_C_COMPILER="${GCC_ROOT}/bin/gcc" \
+      -DCMAKE_CXX_COMPILER="${GCC_ROOT}/bin/g++" \
+      -DCMAKE_ASM_COMPILER="${GCC_ROOT}/bin/gcc" \
+      -DCMAKE_INSTALL_RPATH="${GCC_ROOT}/lib64" \
+      {% else %}
       -DCMAKE_C_COMPILER=/usr/bin/gcc \
       -DCMAKE_CXX_COMPILER=/usr/bin/g++ \
-      -DCMAKE_INSTALL_PREFIX={{ [NSP_install_root, 'llvm', NSP_LLVM_version] | path_join }} \
       -DCMAKE_ASM_COMPILER=/usr/bin/gcc \
+      {% endif %}
+      -DCMAKE_INSTALL_PREFIX={{ [NSP_LLVM_install_root] | path_join }} \
       {% if NSP_LLVM_use_binutils %}
       -DCMAKE_ASM_FLAGS="-B${BINUTILS_BIN}/" \
       -DCMAKE_LINKER="${BINUTILS_BIN}/ld" \

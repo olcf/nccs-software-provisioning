@@ -7,3 +7,6 @@
 
 # ignore generate roles.rst
 .docs/source/reference/roles.rst
+
+# python files
+.venv

@@ -29,7 +29,7 @@
     cmd: |
       set -e
       rm -rf build && mkdir build && cd build
-      CC=/usr/bin/gcc ../configure \
+      CC=/usr/bin/gcc CXX=/usr/bin/g++ ../configure \
         --prefix="{{ NSP_BINUTILS_install_root }}"
       make -j{{ NSP_max_threads }}
       make install

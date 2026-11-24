@@ -7,6 +7,11 @@ argument_specs:
         type: str
         required: true
         description: The version to install.
+      NSP_GCC_install_root:
+        type: path
+        required: false
+        default: "{{ [NSP_install_root, 'gcc', NSP_GCC_version] | path_join }}"
+        description: Root directory where the specified version of GCC will be installed.
       NSP_GCC_enabled_languages:
         type: list
         elements: str

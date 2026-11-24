@@ -1,6 +1,6 @@
 - name: Check for GCC v{{ NSP_GCC_version }} Install
   ansible.builtin.stat:
-    path: "{{ [NSP_install_root, 'gcc', NSP_GCC_version, 'bin/gcc'] | path_join }}"
+    path: "{{ [NSP_GCC_install_root, 'bin/gcc'] | path_join }}"
   register: gcc_status
   tags:
     - gcc

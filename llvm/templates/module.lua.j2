@@ -7,10 +7,8 @@ whatis("LLVM v{{ NSP_LLVM_version }} Projects: {{ NSP_LLVM_projects }} Runtimes:
 
 help("LLVM v{{ NSP_LLVM_version }} Projects: {{ NSP_LLVM_projects }} Runtimes: {{ NSP_LLVM_runtimes }}")
 
-local base = "{{ NSP_install_root }}"
 local package = "llvm"
-local version = "{{ NSP_LLVM_version }}"
-local prefix = pathJoin(base, package, version)
+local prefix = "{{ NSP_LLVM_install_root }}"
 
 -- Environment Globals
 prepend_path("PATH", pathJoin(prefix, "bin"))
@@ -32,6 +30,12 @@ prepend_path("C_INCLUDE_PATH", pathJoin(prefix, 'lib/clang/{{ llvm_v_list[0] }}/
 
 prepend_path("CPLUS_INCLUDE_PATH", pathJoin(prefix, 'include'))
 prepend_path("CPLUS_INCLUDE_PATH", pathJoin(prefix, 'lib/clang/{{ llvm_v_list[0] }}/include'))
+
+{% if NSP_LLVM_use_gcc %}
+prepend_path("PATH", pathJoin(prefix, "gcc/bin"))
+prepend_path("MANPATH", pathJoin(prefix, "gcc/share/man"))
+prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "gcc/lib64"))
+{% endif %}
 
 {% if NSP_LLVM_use_binutils %}
 prepend_path("PATH", pathJoin(prefix, "binutils/bin"))

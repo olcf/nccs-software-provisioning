@@ -1,5 +1,7 @@
 # NSP_LLVM_version:
 
+NSP_LLVM_install_root: "{{ [NSP_install_root, 'llvm', NSP_LLVM_version] | path_join }}"
+
 NSP_LLVM_targets:
   - X86
 
@@ -20,3 +22,6 @@ NSP_LLVM_clear_source: true
 
 NSP_LLVM_use_binutils: false
 NSP_LLVM_binutils_version: "2.47"
+
+NSP_LLVM_use_gcc: false
+NSP_LLVM_gcc_version: "14.4.0"

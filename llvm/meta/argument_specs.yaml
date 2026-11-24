@@ -7,6 +7,11 @@ argument_specs:
         type: str
         required: true
         description: The version to install.
+      NSP_LLVM_install_root:
+        type: path
+        required: false
+        default: "{{ [NSP_install_root, 'llvm', NSP_LLVM_version] | path_join }}"
+        description: Root directory where the specified version of LLVM will be installed.
       NSP_LLVM_projects:
         type: list
         elements: str
@@ -46,3 +51,13 @@ argument_specs:
         required: false
         default: "2.47"
         description: The Binutils version to install and use when NSP_LLVM_use_binutils is enabled.
+      NSP_LLVM_use_gcc:
+        type: bool
+        required: false
+        default: false
+        description: Install a separate GCC alongside LLVM and use it as the GCC toolchain for building and running LLVM (cfg files and module).
+      NSP_LLVM_gcc_version:
+        type: str
+        required: false
+        default: "14.4.0"
+        description: The GCC version to install and use when NSP_LLVM_use_gcc is enabled.

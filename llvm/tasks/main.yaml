@@ -1,6 +1,6 @@
 - name: Check for LLVM v{{ NSP_LLVM_version }} Install
   ansible.builtin.stat:
-    path: "{{ [NSP_install_root, 'llvm', NSP_LLVM_version] | path_join }}"
+    path: "{{ [NSP_LLVM_install_root] | path_join }}"
   register: llvm_status
   tags:
     - llvm
@@ -15,7 +15,7 @@
 - name: Generate LLVM v{{ NSP_LLVM_version }} cfg files
   ansible.builtin.template:
     src: "{{ item }}.j2"
-    dest: "{{ [NSP_install_root, 'llvm', NSP_LLVM_version, 'bin', item] | path_join }}"
+    dest: "{{ [NSP_LLVM_install_root, 'bin', item] | path_join }}"
     owner: "{{ NSP_user }}"
     group: "{{ NSP_group }}"
     mode: "{{ NSP_file_permissions }}"
